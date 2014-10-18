@@ -1,8 +1,8 @@
 //
-//  TaskKit.h
-//  TaskKit
+//  TSKSelectorTask.m
+//  Task
 //
-//  Created by Prachi Gauriar on 10/18/2014.
+//  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,13 +24,44 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+#import <Task/TSKSelectorTask.h>
 
-#import <TaskKit/TaskKitErrors.h>
 
-#import <TaskKit/TSKTask.h>
-#import <TaskKit/TSKBlockTask.h>
-#import <TaskKit/TSKExternalConditionTask.h>
-#import <TaskKit/TSKSelectorTask.h>
+@implementation TSKSelectorTask
 
-#import <TaskKit/TSKGraph.h>
+- (instancetype)initWithName:(NSString *)name
+{
+    return [self initWithName:name target:nil selector:NULL];
+}
+
+
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector
+{
+    return [self initWithName:nil target:target selector:selector];
+}
+
+
+- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector
+{
+    NSParameterAssert(target);
+    NSParameterAssert(selector);
+
+    self = [super initWithName:name];
+    if (self) {
+        _target = target;
+        _selector = selector;
+    }
+
+    return self;
+}
+
+
+- (void)main
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    [self.target performSelector:self.selector withObject:self];
+#pragma clang diagnostic pop
+}
+
+@end

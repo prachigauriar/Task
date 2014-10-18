@@ -1,8 +1,8 @@
 //
-//  TSKSelectorTask.m
-//  TaskKit
+//  TaskErrors.h
+//  Task
 //
-//  Created by Prachi Gauriar on 10/14/2014.
+//  Created by Prachi Gauriar on 10/18/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,44 +24,13 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKSelectorTask.h>
+#import <Foundation/Foundation.h>
 
+/*! The error domain used by Task framework classes. */
+extern NSString *const TSKTaskErrorDomain;
 
-@implementation TSKSelectorTask
-
-- (instancetype)initWithName:(NSString *)name
-{
-    return [self initWithName:name target:nil selector:NULL];
-}
-
-
-- (instancetype)initWithTarget:(id)target selector:(SEL)selector
-{
-    return [self initWithName:nil target:target selector:selector];
-}
-
-
-- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector
-{
-    NSParameterAssert(target);
-    NSParameterAssert(selector);
-
-    self = [super initWithName:name];
-    if (self) {
-        _target = target;
-        _selector = selector;
-    }
-
-    return self;
-}
-
-
-- (void)main
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    [self.target performSelector:self.selector withObject:self];
-#pragma clang diagnostic pop
-}
-
-@end
+/*! TSKErrorCode enumerates the various error codes used by TSKTask. */
+typedef NS_ENUM(NSInteger, TSKErrorCode) {
+    /*! Error code indicating that a TSKExternalConditionTask is not fulfilled. */
+    TSKErrorCodeExternalConditionNotFulfilled
+};

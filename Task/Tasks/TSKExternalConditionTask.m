@@ -1,8 +1,8 @@
 //
-//  TaskKitErrors.h
-//  TaskKit
+//  TSKExternalConditionTask.m
+//  Task
 //
-//  Created by Prachi Gauriar on 10/18/2014.
+//  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,13 +24,42 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+#import <Task/TSKExternalConditionTask.h>
 
-/*! The error domain used by TaskKit classes. */
-extern NSString *const TSKTaskKitErrorDomain;
+#import <Task/TaskErrors.h>
 
-/*! TSKErrorCode enumerates the various error codes used by TSKTask. */
-typedef NS_ENUM(NSInteger, TSKErrorCode) {
-    /*! Error code indicating that a TSKExternalConditionTask is not fulfilled. */
-    TSKErrorCodeExternalConditionNotFulfilled
-};
+
+@interface TSKExternalConditionTask ()
+
+@property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
+@property (nonatomic, strong) id fulfillmentResult;
+
+@end
+
+
+#pragma mark -
+
+@implementation TSKExternalConditionTask
+
+- (void)main
+{
+    if (self.isFulfilled) {
+        [self finishWithResult:self.fulfillmentResult];
+    } else {
+        [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain code:TSKErrorCodeExternalConditionNotFulfilled userInfo:nil]];
+    }
+}
+
+
+- (void)fulfillWithResult:(id)result
+{
+    if (self.isFinished) {
+        return;
+    }
+
+    self.fulfillmentResult = result;
+    self.fulfilled = YES;
+    [self retry];
+}
+
+@end

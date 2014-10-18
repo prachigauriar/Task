@@ -1,6 +1,6 @@
 //
-//  TaskKitErrors.m
-//  TaskKit
+//  TaskErrors.m
+//  Task
 //
 //  Created by Prachi Gauriar on 10/18/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,6 +24,6 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TaskKitErrors.h>
+#import <Task/TaskErrors.h>
 
-NSString *const TSKTaskKitErrorDomain = @"TSKTaskKitErrorDomain";
+NSString *const TSKTaskErrorDomain = @"TSKTaskErrorDomain";

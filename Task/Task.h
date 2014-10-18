@@ -1,8 +1,8 @@
 //
-//  TSKTask+GraphInterface.h
-//  TaskKit
+//  Task.h
+//  Task
 //
-//  Created by Prachi Gauriar on 10/14/2014.
+//  Created by Prachi Gauriar on 10/18/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,29 +24,13 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKTask.h>
+#import <Foundation/Foundation.h>
 
+#import <Task/TaskErrors.h>
 
-/*!
- The GraphInterface category of TSKTask declares a messages that must be exposed so that TSKGraphs
- can modify the internal state of their TSKTasks.
- */
-@interface TSKTask (GraphInterface)
+#import <Task/TSKTask.h>
+#import <Task/TSKBlockTask.h>
+#import <Task/TSKExternalConditionTask.h>
+#import <Task/TSKSelectorTask.h>
 
-@property (nonatomic, weak, readwrite) TSKGraph *graph;
-
-/*!
- @abstract Returns a recursive description of the task and its dependent tasks starting at the
-     specified depth.
- @param depth The number of levels deep this task is in the recursive description.
- @result A recursive description of the task and its dependent tasks starting at the specified depth.
- */
-- (NSString *)recursiveDescriptionWithDepth:(NSUInteger)depth;
-
-/*!
- @abstract Indicates to the receiver that it has a prerequisite.
- @discussion This has the effect of transitioning the receiver from the ready state to the pending state.
- */
-- (void)didAddPrerequisiteTask;
-
-@end
+#import <Task/TSKGraph.h>

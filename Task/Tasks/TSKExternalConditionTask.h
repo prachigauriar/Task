@@ -1,6 +1,6 @@
 //
-//  TSKBlockTask.m
-//  TaskKit
+//  TSKExternalConditionTask.h
+//  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,39 +24,29 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKBlockTask.h>
+#import <Task/TSKTask.h>
 
 
-@implementation TSKBlockTask
+/*!
+ TSKExternalConditionTask is special type of task that performs no actual work. Instead, it
+ represents an external condition that is either fulfilled or not. When run, the task will either
+ finish successfully if it is fulfilled, or fail immediately with an error.
 
-- (instancetype)initWithName:(NSString *)name
-{
-    return [self initWithName:name block:nil];
-}
+ When a TSKExternalConditionTask is fulfilled, it will automatically retry itself and thus its
+ dependent tasks.
+ */
+@interface TSKExternalConditionTask : TSKTask
 
+/*! Whether the task’s condition is fulfilled. This is initially NO. */
+@property (nonatomic, readonly, assign, getter = isFulfilled) BOOL fulfilled;
 
-- (instancetype)initWithBlock:(void (^)(TSKTask *task))block
-{
-    return [self initWithName:nil block:block];
-}
-
-
-- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block
-{
-    NSParameterAssert(block);
-
-    self = [super initWithName:name];
-    if (self) {
-        _block = [block copy];
-    }
-
-    return self;
-}
-
-
-- (void)main
-{
-    self.block(self);
-}
+/*!
+ @abstract Indicates that the external condition is fulfilled.
+ @param result The result that the task should finish with. May be nil.
+ @discussion Automatically sends itself the -retry message, thus starting itself if possible
+     and allowing its dependent tasks to be retried. Does nothing if the receiver is already
+     finished.
+ */
+- (void)fulfillWithResult:(id)result;
 
 @end

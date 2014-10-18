@@ -1,6 +1,6 @@
 //
 //  TSKTask.h
-//  TaskKit
+//  Task
 //
 //  Created by Prachi Gauriar on 10/11/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.

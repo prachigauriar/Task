@@ -1,6 +1,6 @@
 //
 //  TSKGraph.m
-//  TaskKit
+//  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,9 +24,9 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKGraph.h>
+#import <Task/TSKGraph.h>
 
-#import <TaskKit/TSKTask+GraphInterface.h>
+#import <Task/TSKTask+GraphInterface.h>
 
 
 @interface TSKGraph ()

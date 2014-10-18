@@ -1,6 +1,6 @@
 //
 //  TSKTask.m
-//  TaskKit
+//  Task
 //
 //  Created by Prachi Gauriar on 10/11/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,10 +24,10 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKTask.h>
+#import <Task/TSKTask.h>
 
-#import <TaskKit/TSKGraph.h>
-#import <TaskKit/TSKTask+GraphInterface.h>
+#import <Task/TSKGraph.h>
+#import <Task/TSKTask+GraphInterface.h>
 
 
 #pragma mark Functions

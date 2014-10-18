@@ -1,6 +1,6 @@
 //
-//  TSKExternalConditionTask.m
-//  TaskKit
+//  TSKTask+GraphInterface.h
+//  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,42 +24,29 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKExternalConditionTask.h>
-
-#import <TaskKit/TaskKitErrors.h>
+#import <Task/TSKTask.h>
 
 
-@interface TSKExternalConditionTask ()
+/*!
+ The GraphInterface category of TSKTask declares a messages that must be exposed so that TSKGraphs
+ can modify the internal state of their TSKTasks.
+ */
+@interface TSKTask (GraphInterface)
 
-@property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
-@property (nonatomic, strong) id fulfillmentResult;
+@property (nonatomic, weak, readwrite) TSKGraph *graph;
 
-@end
+/*!
+ @abstract Returns a recursive description of the task and its dependent tasks starting at the
+     specified depth.
+ @param depth The number of levels deep this task is in the recursive description.
+ @result A recursive description of the task and its dependent tasks starting at the specified depth.
+ */
+- (NSString *)recursiveDescriptionWithDepth:(NSUInteger)depth;
 
-
-#pragma mark -
-
-@implementation TSKExternalConditionTask
-
-- (void)main
-{
-    if (self.isFulfilled) {
-        [self finishWithResult:self.fulfillmentResult];
-    } else {
-        [self failWithError:[NSError errorWithDomain:TSKTaskKitErrorDomain code:TSKErrorCodeExternalConditionNotFulfilled userInfo:nil]];
-    }
-}
-
-
-- (void)fulfillWithResult:(id)result
-{
-    if (self.isFinished) {
-        return;
-    }
-
-    self.fulfillmentResult = result;
-    self.fulfilled = YES;
-    [self retry];
-}
+/*!
+ @abstract Indicates to the receiver that it has a prerequisite.
+ @discussion This has the effect of transitioning the receiver from the ready state to the pending state.
+ */
+- (void)didAddPrerequisiteTask;
 
 @end

@@ -1,6 +1,6 @@
 //
 //  TSKSelectorTask.h
-//  TaskKit
+//  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-#import <TaskKit/TSKTask.h>
+#import <Task/TSKTask.h>
 
 
 /*!

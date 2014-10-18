@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <TaskKit/TaskKit.h>
+#import <Task/Task.h>
 
 
 @interface TSKTaskTest : NSObject <TSKTaskDelegate>
