@@ -32,26 +32,21 @@
 
 #pragma mark Functions
 
-/*!
- @abstract Returns a string representation of the specified task state.
- @param state The task state.
- @result A string describing the specified task state. If the task state is unknown, returns nil.
- */
-static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
+NSString *const TSKTaskStateDescription(TSKTaskState state)
 {
     switch (state) {
         case TSKTaskStatePending:
-            return @"pending";
+            return @"Pending";
         case TSKTaskStateReady:
-            return @"ready";
+            return @"Ready";
         case TSKTaskStateExecuting:
-            return @"executing";
+            return @"Executing";
         case TSKTaskStateCancelled:
-            return @"cancelled";
+            return @"Cancelled";
         case TSKTaskStateFinished:
-            return @"finished";
+            return @"Finished";
         case TSKTaskStateFailed:
-            return @"failed";
+            return @"Failed";
         default:
             return nil;
     }
@@ -252,17 +247,16 @@ static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
     //     Ready -> Executing: Task starts (-start)
     //     Ready -> Cancelled: Task is cancelled (-cancel)
     //
+    //     Executing -> Pending: Task is reset (-reset)
     //     Executing -> Cancelled: Task is cancelled (-cancel)
     //     Executing -> Finished: Task finishes (-finishWithResult:)
     //     Executing -> Failed: Task fails (-failWithError:)
     //
-    //     Cancelled -> Pending: Task is retried (-retry)
-    //     Cancelled -> Finished: Task is cancelled while executing but finishes anyway (-finishWithResult:)
-    //     Cancelled -> Failed: Task is cancelled while executing but fails anyway (-failWithError:)
+    //     Cancelled -> Pending: Task is retried (-retry) or reset (-reset)
     //
-    //     Finished -> (none): Finished is a terminal state
+    //     Finished -> Pending: Task is reset (-reset)
     //
-    //     Failed -> Pending: Task is retried (-retry)
+    //     Failed -> Pending: Task is retried (-retry) or reset (-reset)
 
     // Get the state lock. If the current state is not in the set of valid from-states, just unlock
     // and return.
@@ -285,6 +279,11 @@ static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
     [self.stateLock unlock];
     if (fromState != toState) {
         [self didChangeValueForKey:@"state"];
+    }
+
+    // Notify the delegate of the state transition
+    if ([self.delegate respondsToSelector:@selector(task:didTransitionFromState:toState:)]) {
+        [self.delegate task:self didTransitionFromState:fromState toState:toState];
     }
 
     // Only once all KVO notifications have fired should we execute the block
@@ -369,6 +368,25 @@ static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
+- (void)reset
+{
+    static NSSet *fromStates = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateFinished), @(TSKTaskStateFailed), @(TSKTaskStateCancelled), nil];
+    });
+
+    [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
+        self.finishDate = nil;
+        self.result = nil;
+        self.error = nil;
+        [self startIfReady];
+    }];
+
+    [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
+}
+
+
 - (void)retry
 {
     static NSSet *fromStates = nil;
@@ -390,13 +408,7 @@ static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (void)finishWithResult:(id)result
 {
-    static NSSet *fromStates = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateCancelled), nil];
-    });
-
-    [self transitionFromStateInSet:fromStates toState:TSKTaskStateFinished andExecuteBlock:^{
+    [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFinished andExecuteBlock:^{
         self.finishDate = [NSDate date];
         self.result = result;
 
@@ -411,13 +423,7 @@ static inline NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (void)failWithError:(NSError *)error
 {
-    static NSSet *fromStates = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateCancelled), nil];
-    });
-
-    [self transitionFromStateInSet:fromStates toState:TSKTaskStateFailed andExecuteBlock:^{
+    [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFailed andExecuteBlock:^{
         self.finishDate = [NSDate date];
         self.error = error;
 

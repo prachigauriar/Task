@@ -31,8 +31,9 @@
 
 @interface TSKExternalConditionTask ()
 
-@property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
+@property (nonatomic, strong) NSLock *fulfillmentLock;
 @property (nonatomic, strong) id fulfillmentResult;
+@property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
 
 @end
 
@@ -41,25 +42,56 @@
 
 @implementation TSKExternalConditionTask
 
+- (instancetype)initWithName:(NSString *)name
+{
+    self = [super initWithName:name];
+    if (self) {
+        _fulfillmentLock = [[NSLock alloc] init];
+    }
+
+    return self;
+}
+
+
 - (void)main
 {
+    [self.fulfillmentLock lock];
+
     if (self.isFulfilled) {
         [self finishWithResult:self.fulfillmentResult];
     } else {
         [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain code:TSKErrorCodeExternalConditionNotFulfilled userInfo:nil]];
     }
+
+    [self.fulfillmentLock unlock];
 }
 
 
 - (void)fulfillWithResult:(id)result
 {
-    if (self.isFinished) {
+    [self.fulfillmentLock lock];
+
+    if (self.isFulfilled) {
+        [self.fulfillmentLock unlock];
         return;
     }
 
-    self.fulfillmentResult = result;
     self.fulfilled = YES;
+    self.fulfillmentResult = result;
+    [self.fulfillmentLock unlock];
+
     [self retry];
+}
+
+
+- (void)reset
+{
+    [self.fulfillmentLock lock];
+    self.fulfilled = NO;
+    self.fulfillmentResult = nil;
+    [self.fulfillmentLock unlock];
+
+    [super reset];
 }
 
 @end

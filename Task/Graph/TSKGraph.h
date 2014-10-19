@@ -62,6 +62,12 @@
 /*! The task graph’s current set of tasks. */
 @property (nonatomic, copy, readonly) NSSet *allTasks;
 
+/*! The set of tasks currently in the receiver that have no prerequisite tasks. */
+@property (nonatomic, copy, readonly) NSSet *tasksWithNoPrerequisiteTasks;
+
+/*! The set of tasks currently in the receiver that have no dependent tasks. */
+@property (nonatomic, copy, readonly) NSSet *tasksWithNoDependentTasks;
+
 /*!
  @abstract Initializes a newly created TSKGraph instance with the specified name.
  @discussion A new operation queue will be created for the task graph with the default quality of
