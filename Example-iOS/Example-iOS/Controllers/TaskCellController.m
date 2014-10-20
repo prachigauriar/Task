@@ -55,12 +55,24 @@
 
 - (void)configureCell:(TaskTableViewCell *)cell
 {
+    // Set the background according to the task’s state
+    if (self.task.isFinished) {
+        cell.backgroundColor = [UIColor colorWithRed:0.96 green:1.0 blue:0.95 alpha:1.0];
+    } else if (self.task.isFailed) {
+        cell.backgroundColor = [UIColor colorWithRed:1.0 green:0.89 blue:0.90 alpha:1.0];
+    } else {
+        cell.backgroundColor = [UIColor whiteColor];
+    }
+
+    // Set the cell’s name, state, and prerequisite labels
     cell.nameLabel.text = self.task.name;
     cell.stateLabel.text = TSKTaskStateDescription(self.task.state);
 
     NSArray *prerequisites = [[[self.task.prerequisiteTasks valueForKey:@"name"] allObjects] sortedArrayUsingSelector:@selector(compare:)];
     cell.prerequisitesLabel.text = prerequisites.count > 0 ? [prerequisites componentsJoinedByString:@"\n"] : @"None";
 
+    // If the task is a TimeSlicedTask, use its progress property. Otherwise, just
+    // use 1.0 for finished tasks and 0.0 otherwise.
     double progress = 0.0;
     if ([self.task isKindOfClass:[TimeSlicedTask class]]) {
         progress = [(TimeSlicedTask *)self.task progress];
@@ -70,14 +82,17 @@
 
     cell.progressView.progress = progress;
 
+    // Button configuration is complicated…
     [self configureActionButton:cell.actionButton];
 }
 
 
 - (void)configureActionButton:(UIButton *)button
 {
+    // Get rid of any existing targets
     [button removeTarget:nil action:NULL forControlEvents:UIControlEventAllTouchEvents];
 
+    // If this is an external condition task, we either can fulfill or reset the task
     if ([self.task isKindOfClass:[TSKExternalConditionTask class]]) {
         if (![(TSKExternalConditionTask *)self.task isFulfilled]) {
             [button setTitle:@"Fulfill" forState:UIControlStateNormal];
@@ -92,6 +107,7 @@
         return;
     }
 
+    // Otherwise, we can start, cancel, retry, or reset the tasks
     switch (self.task.state) {
         case TSKTaskStatePending:
             [button setTitle:@"N/A" forState:UIControlStateNormal];

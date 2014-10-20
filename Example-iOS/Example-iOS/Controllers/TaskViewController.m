@@ -42,20 +42,22 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 @interface TaskViewController () <UITableViewDataSource, UITableViewDelegate, TSKTaskDelegate>
 
+/*! Our table view of tasks. */
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
+
+/*! An array of controllers. The Nth element manages cell for the Nth row. */
 @property (nonatomic, copy) NSArray *cellControllers;
+
+/*! A cell we use to dynamically calculate heights for each row. */
 @property (nonatomic, strong) TaskTableViewCell *prototypeCell;
 
+/*! Our task graph and tasks. */
 @property (nonatomic, strong) TSKGraph *taskGraph;
-
 @property (nonatomic, strong) TSKTask *createProjectTask;
-
 @property (nonatomic, strong) TSKExternalConditionTask *photo1AvailableCondition;
 @property (nonatomic, strong) TSKTask *uploadPhoto1Task;
-
 @property (nonatomic, strong) TSKExternalConditionTask *photo2AvailableCondition;
 @property (nonatomic, strong) TSKTask *uploadPhoto2Task;
-
 @property (nonatomic, strong) TSKExternalConditionTask *paymentInfoAvailableCondition;
 @property (nonatomic, strong) TSKTask *submitOrderTask;
 
@@ -70,19 +72,24 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 {
     [super viewDidLoad];
 
+    // Create our task graph and tasks
     [self initializeGraph];
     NSArray *tasks = @[ self.createProjectTask,
                         self.photo1AvailableCondition, self.uploadPhoto1Task,
                         self.photo2AvailableCondition, self.uploadPhoto2Task,
                         self.paymentInfoAvailableCondition, self.submitOrderTask ];
 
+    // Create a cell controller for each task
     NSMutableArray *cellControllers = [[NSMutableArray alloc] initWithCapacity:tasks.count];
     for (TSKTask *task in tasks) {
         [cellControllers addObject:[[TaskCellController alloc] initWithTask:task]];
     }
 
     self.cellControllers = cellControllers;
+
+    // Register our table view cell nib and create a prototype cell that we can use for cell height calculations
     [self.tableView registerNib:[TaskTableViewCell nib] forCellReuseIdentifier:kTaskCellReuseIdentifier];
+    self.prototypeCell = [[[TaskTableViewCell nib] instantiateWithOwner:nil options:nil] firstObject];
 }
 
 
@@ -125,16 +132,6 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 #pragma mark - Table View Data Source
 
-- (TaskTableViewCell *)prototypeCell
-{
-    if (!_prototypeCell) {
-        self.prototypeCell = [[[TaskTableViewCell nib] instantiateWithOwner:nil options:nil] firstObject];
-    }
-
-    return _prototypeCell;
-}
-
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return self.cellControllers.count;
@@ -147,14 +144,8 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
     TaskCellController *controller = self.cellControllers[indexPath.row];
     [controller configureCell:cell];
 
-    if (controller.task.isFinished) {
-        cell.backgroundColor = [UIColor colorWithRed:0.96 green:1.0 blue:0.95 alpha:1.0];
-    } else if (controller.task.isFailed) {
-        cell.backgroundColor = [UIColor colorWithRed:1.0 green:0.89 blue:0.90 alpha:1.0];
-    } else {
-        cell.backgroundColor = [UIColor whiteColor];
-    }
-
+    // For the TimeSlicedTasks, add a progress block so that we can animate the cell's progress bar
+    // whenever progress is made.
     if ([controller.task isKindOfClass:[TimeSlicedTask class]]) {
         [(TimeSlicedTask *)controller.task setProgressBlock:^(TimeSlicedTask *task) {
             dispatch_async(dispatch_get_main_queue(), ^{

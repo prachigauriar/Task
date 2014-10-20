@@ -29,12 +29,28 @@
 @class TSKTask;
 @class TaskTableViewCell;
 
+
+/*!
+ TaskCellControllers control a single TaskTableViewCell. They configure the cells and manage their
+ appearance and actions.
+ */
 @interface TaskCellController : NSObject
 
+/*! The controller’s task. May not be nil. */
 @property (nonatomic, strong, readonly) TSKTask *task;
 
+/*! 
+ @abstract Initializes a newly created TaskCellController object with the specified task.
+ @discussion This is the class’s designated initializer.
+ @param task The task the controller manages. May not be nil.
+ @result An initialized TaskCellController object with the specified task.
+ */
 - (instancetype)initWithTask:(TSKTask *)task NS_DESIGNATED_INITIALIZER;
 
+/*!
+ @abstract Configures the specified cell.
+ @param cell The cell that should be configured.
+ */
 - (void)configureCell:(TaskTableViewCell *)cell;
 
 @end
