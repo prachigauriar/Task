@@ -84,7 +84,7 @@
 
 /* Begin PBXFileReference section */
 		4C1EDFB419F48E1C0041A1D9 /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C1EDFBE19F48E1D0041A1D9 /* Task (iOS)Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task (iOS)Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task (iOS) Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5AF19F2E96800C898AF /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5B319F2E96800C898AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4C86D5B419F2E96800C898AF /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
@@ -173,7 +173,7 @@
 				4C86D60319F2ED6300C898AF /* libTask.a */,
 				4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */,
 				4C1EDFB419F48E1C0041A1D9 /* Task.framework */,
-				4C1EDFBE19F48E1D0041A1D9 /* Task (iOS)Tests.xctest */,
+				4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -309,7 +309,7 @@
 			);
 			name = "Task (iOS) Tests";
 			productName = "Task (iOS)Tests";
-			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task (iOS)Tests.xctest */;
+			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4C86D5AE19F2E96800C898AF /* Task */ = {
@@ -854,6 +854,7 @@
 				4C1EDFC819F48E1D0041A1D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task (iOS) Tests" */ = {
 			isa = XCConfigurationList;
@@ -862,6 +863,7 @@
 				4C1EDFCA19F48E1D0041A1D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4C86D5A919F2E96700C898AF /* Build configuration list for PBXProject "Task" */ = {
 			isa = XCConfigurationList;

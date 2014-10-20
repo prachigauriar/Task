@@ -1,5 +1,5 @@
 //
-//  AppDelegate.m
+//  AppDelegate.h
 //  Example-iOS
 //
 //  Created by Prachi Gauriar on 10/18/2014.
@@ -24,17 +24,12 @@
 //  THE SOFTWARE.
 //
 
-#import "AppDelegate.h"
-
-@interface AppDelegate ()
-@end
+@import UIKit;
 
 
-@implementation AppDelegate
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    return YES;
-}
+@property (strong, nonatomic) UIWindow *window;
 
 @end
+
