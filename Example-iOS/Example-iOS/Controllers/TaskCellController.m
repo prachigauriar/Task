@@ -32,6 +32,22 @@
 #import "TimeSlicedTask.h"
 
 
+#pragma mark Private Subclass Interfaces
+
+@interface TimeSlicedTaskCellController : TaskCellController
+@property (nonatomic, strong, readonly) TimeSlicedTask *timeSlicedTask;
+@end
+
+
+#pragma mark -
+
+@interface ExternalConditionTaskCellController : TaskCellController
+@property (nonatomic, strong, readonly) TSKExternalConditionTask *externalConditionTask;
+@end
+
+
+#pragma mark - Task Cell Controller
+
 @implementation TaskCellController
 
 - (instancetype)init
@@ -40,10 +56,19 @@
 }
 
 
-- (instancetype)initWithTask:(TimeSlicedTask *)task
+- (instancetype)initWithTask:(TSKTask *)task
 {
     NSParameterAssert(task);
 
+    // If this was invoked externally and we have a private subclass for the task type,
+    // return an instance of the private subclass
+    if ([task isKindOfClass:[TimeSlicedTask class]] && self.class == [TaskCellController class]) {
+        return [[TimeSlicedTaskCellController alloc] initWithTask:task];
+    } else if ([task isKindOfClass:[TSKExternalConditionTask class]] && self.class == [TaskCellController class]) {
+        return [[ExternalConditionTaskCellController alloc] initWithTask:task];
+    }
+
+    // Otherwise, just do initialization as usual
     self = [super init];
     if (self) {
         _task = task;
@@ -53,7 +78,7 @@
 }
 
 
-- (void)configureCell:(TaskTableViewCell *)cell
+- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView
 {
     // Set the background according to the task’s state
     if (self.task.isFinished) {
@@ -71,16 +96,7 @@
     NSArray *prerequisites = [[[self.task.prerequisiteTasks valueForKey:@"name"] allObjects] sortedArrayUsingSelector:@selector(compare:)];
     cell.prerequisitesLabel.text = prerequisites.count > 0 ? [prerequisites componentsJoinedByString:@"\n"] : @"None";
 
-    // If the task is a TimeSlicedTask, use its progress property. Otherwise, just
-    // use 1.0 for finished tasks and 0.0 otherwise.
-    double progress = 0.0;
-    if ([self.task isKindOfClass:[TimeSlicedTask class]]) {
-        progress = [(TimeSlicedTask *)self.task progress];
-    } else {
-        progress = self.task.isFinished ? 1.0 : 0.0;
-    }
-
-    cell.progressView.progress = progress;
+    cell.progressView.progress = self.task.isFinished ? 1.0 : 0.0;
 
     // Button configuration is complicated…
     [self configureActionButton:cell.actionButton];
@@ -91,21 +107,6 @@
 {
     // Get rid of any existing targets
     [button removeTarget:nil action:NULL forControlEvents:UIControlEventAllTouchEvents];
-
-    // If this is an external condition task, we either can fulfill or reset the task
-    if ([self.task isKindOfClass:[TSKExternalConditionTask class]]) {
-        if (![(TSKExternalConditionTask *)self.task isFulfilled]) {
-            [button setTitle:@"Fulfill" forState:UIControlStateNormal];
-            button.enabled = YES;
-            [button addTarget:self action:@selector(fulfillConditionTask) forControlEvents:UIControlEventTouchUpInside];
-        } else {
-            [button setTitle:@"Reset" forState:UIControlStateNormal];
-            button.enabled = YES;
-            [button addTarget:self action:@selector(resetTask) forControlEvents:UIControlEventTouchUpInside];
-        }
-
-        return;
-    }
 
     // Otherwise, we can start, cancel, retry, or reset the tasks
     switch (self.task.state) {
@@ -161,6 +162,64 @@
 - (void)resetTask
 {
     [self.task reset];
+}
+
+@end
+
+
+#pragma mark - TimeSlicedTask Cell Controller
+
+@implementation TimeSlicedTaskCellController
+
+- (TimeSlicedTask *)timeSlicedTask
+{
+    return (TimeSlicedTask *)self.task;
+}
+
+
+- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView
+{
+    [super configureCell:cell forRowAtIndexPath:indexPath inTableView:tableView];
+    cell.progressView.progress = [self.timeSlicedTask progress];
+
+    if (tableView && indexPath) {
+        self.timeSlicedTask.progressBlock = ^(TimeSlicedTask *task) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                TaskTableViewCell *tableCell = (TaskTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
+                [tableCell.progressView setProgress:task.progress animated:YES];
+            });
+        };
+    }
+}
+
+@end
+
+
+
+#pragma mark - TSKExternalConditionTask Cell Controller
+
+@implementation ExternalConditionTaskCellController
+
+- (TSKExternalConditionTask *)externalConditionTask
+{
+    return (TSKExternalConditionTask *)self.task;
+}
+
+
+- (void)configureActionButton:(UIButton *)button
+{
+    // Get rid of any existing targets
+    [button removeTarget:nil action:NULL forControlEvents:UIControlEventAllTouchEvents];
+
+    if (![self.externalConditionTask isFulfilled]) {
+        [button setTitle:@"Fulfill" forState:UIControlStateNormal];
+        button.enabled = YES;
+        [button addTarget:self action:@selector(fulfillConditionTask) forControlEvents:UIControlEventTouchUpInside];
+    } else {
+        [button setTitle:@"Reset" forState:UIControlStateNormal];
+        button.enabled = YES;
+        [button addTarget:self action:@selector(resetTask) forControlEvents:UIControlEventTouchUpInside];
+    }
 }
 
 

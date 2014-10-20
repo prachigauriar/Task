@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-@import Foundation;
+@import UIKit;
 
 @class TSKTask;
 @class TaskTableViewCell;
@@ -50,7 +50,9 @@
 /*!
  @abstract Configures the specified cell.
  @param cell The cell that should be configured.
+ @param indexPath The index path for the row the cell will be displaying. May be nil.
+ @param tableView The table view that the cell will be displayed in. May be nil.
  */
-- (void)configureCell:(TaskTableViewCell *)cell;
+- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
 
 @end

@@ -113,7 +113,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
     // These are analagous to the previous two tasks, but for a second photo
     self.photo2AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 2 Available"];
-    self.uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2 Task" timeRequired:7.0];
+    self.uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2 Task" timeRequired:6.0];
     [self.taskGraph addTask:self.photo2AvailableCondition prerequisites:nil];
     [self.taskGraph addTask:self.uploadPhoto2Task prerequisites:self.createProjectTask, self.photo2AvailableCondition, nil];
 
@@ -142,26 +142,14 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 {
     TaskTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kTaskCellReuseIdentifier forIndexPath:indexPath];
     TaskCellController *controller = self.cellControllers[indexPath.row];
-    [controller configureCell:cell];
-
-    // For the TimeSlicedTasks, add a progress block so that we can animate the cell's progress bar
-    // whenever progress is made.
-    if ([controller.task isKindOfClass:[TimeSlicedTask class]]) {
-        [(TimeSlicedTask *)controller.task setProgressBlock:^(TimeSlicedTask *task) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                TaskTableViewCell *cell = (TaskTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
-                [cell.progressView setProgress:task.progress animated:YES];
-            });
-        }];
-    }
-
+    [controller configureCell:cell forRowAtIndexPath:indexPath inTableView:tableView];
     return cell;
 }
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self.cellControllers[indexPath.row] configureCell:self.prototypeCell];
+    [self.cellControllers[indexPath.row] configureCell:self.prototypeCell forRowAtIndexPath:nil inTableView:nil];
     CGSize compressedSize = [self.prototypeCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
     return compressedSize.height;
 }
