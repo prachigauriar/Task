@@ -68,6 +68,12 @@
             return;
         }
 
+        // On each iteration of the loop, there’s a 1 in 500 chance we’ll error out
+        if (arc4random_uniform(500) == kBadLuckErrorCode) {
+            [self failWithError:[NSError errorWithDomain:@"TimeSliceErrorDomain" code:kBadLuckErrorCode userInfo:nil]];
+            return;
+        }
+
         // Otherwise, just sleep for the time slice and add the time slice to our time taken
         [NSThread sleepForTimeInterval:kTimeSliceInterval];
         self.timeTaken += kTimeSliceInterval;
@@ -78,12 +84,7 @@
         }
     }
 
-    // There’s a 90% chance this will succeed
-    if (arc4random_uniform(10) != 0) {
-        [self finishWithResult:nil];
-    } else {
-        [self failWithError:[NSError errorWithDomain:@"TimeSliceErrorDomain" code:kBadLuckErrorCode userInfo:nil]];
-    }
+    [self finishWithResult:nil];
 }
 
 
