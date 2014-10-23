@@ -32,22 +32,6 @@
 #import "TimeSlicedTask.h"
 
 
-#pragma mark Private Subclass Interfaces
-
-@interface TimeSlicedTaskCellController : TaskCellController
-@property (nonatomic, strong, readonly) TimeSlicedTask *timeSlicedTask;
-@end
-
-
-#pragma mark -
-
-@interface ExternalConditionTaskCellController : TaskCellController
-@property (nonatomic, strong, readonly) TSKExternalConditionTask *externalConditionTask;
-@end
-
-
-#pragma mark - Task Cell Controller
-
 @implementation TaskCellController
 
 - (instancetype)init
@@ -60,14 +44,6 @@
 {
     NSParameterAssert(task);
 
-    // If this was invoked externally and we have a private subclass for the task type,
-    // return an instance of the private subclass
-    if ([task isKindOfClass:[TimeSlicedTask class]] && self.class == [TaskCellController class]) {
-        return [[TimeSlicedTaskCellController alloc] initWithTask:task];
-    } else if ([task isKindOfClass:[TSKExternalConditionTask class]] && self.class == [TaskCellController class]) {
-        return [[ExternalConditionTaskCellController alloc] initWithTask:task];
-    }
-
     // Otherwise, just do initialization as usual
     self = [super init];
     if (self) {
@@ -78,7 +54,7 @@
 }
 
 
-- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView
+- (void)configureCell:(TaskTableViewCell *)cell
 {
     // Set the background according to the task’s state
     if (self.task.isFinished) {
@@ -177,23 +153,25 @@
 }
 
 
-- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView
+- (void)configureCell:(TaskTableViewCell *)cell
 {
-    [super configureCell:cell forRowAtIndexPath:indexPath inTableView:tableView];
+    [super configureCell:cell];
     cell.progressView.progress = [self.timeSlicedTask progress];
+}
 
-    if (tableView && indexPath) {
-        self.timeSlicedTask.progressBlock = ^(TimeSlicedTask *task) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                TaskTableViewCell *tableCell = (TaskTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
-                [tableCell.progressView setProgress:task.progress animated:YES];
-            });
-        };
-    }
+
+- (void)setCell:(TaskTableViewCell *)cell
+{
+    [super setCell:cell];
+
+    self.timeSlicedTask.progressBlock = !cell ? nil : ^(TimeSlicedTask *task) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [cell.progressView setProgress:task.progress animated:YES];
+        });
+    };
 }
 
 @end
-
 
 
 #pragma mark - TSKExternalConditionTask Cell Controller
@@ -226,6 +204,42 @@
 - (void)fulfillConditionTask
 {
     [(TSKExternalConditionTask *)self.task fulfillWithResult:nil];
+}
+
+@end
+
+
+#pragma mark - TaskCellControllerCreation category
+
+@implementation TSKTask (TaskCellControllerCreation)
+
+- (TaskCellController *)createTaskCellController
+{
+    return [[TaskCellController alloc] initWithTask:self];
+}
+
+@end
+
+
+#pragma mark -
+
+@implementation TimeSlicedTask (TaskCellControllerCreation)
+
+- (TaskCellController *)createTaskCellController
+{
+    return [[TimeSlicedTaskCellController alloc] initWithTask:self];
+}
+
+@end
+
+
+#pragma mark -
+
+@implementation TSKExternalConditionTask (TaskCellControllerCreation)
+
+- (TaskCellController *)createTaskCellController
+{
+    return [[ExternalConditionTaskCellController alloc] initWithTask:self];
 }
 
 @end

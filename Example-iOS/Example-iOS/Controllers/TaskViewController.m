@@ -82,7 +82,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
     // Create a cell controller for each task
     NSMutableArray *cellControllers = [[NSMutableArray alloc] initWithCapacity:tasks.count];
     for (TSKTask *task in tasks) {
-        [cellControllers addObject:[[TaskCellController alloc] initWithTask:task]];
+        [cellControllers addObject:[task createTaskCellController]];
     }
 
     self.cellControllers = cellControllers;
@@ -130,7 +130,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-#pragma mark - Table View Data Source
+#pragma mark - Table View Data Source and Delegate
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -142,16 +142,24 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 {
     TaskTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kTaskCellReuseIdentifier forIndexPath:indexPath];
     TaskCellController *controller = self.cellControllers[indexPath.row];
-    [controller configureCell:cell forRowAtIndexPath:indexPath inTableView:tableView];
+    controller.cell = cell;
+    [controller configureCell:cell];
     return cell;
 }
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self.cellControllers[indexPath.row] configureCell:self.prototypeCell forRowAtIndexPath:nil inTableView:nil];
+    [self.cellControllers[indexPath.row] configureCell:self.prototypeCell];
     CGSize compressedSize = [self.prototypeCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
     return compressedSize.height;
+}
+
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    TaskCellController *cellController = self.cellControllers[indexPath.row];
+    cellController.cell = nil;
 }
 
 
@@ -169,9 +177,14 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)task:(TSKTask *)task didTransitionFromState:(TSKTaskState)fromState toState:(TSKTaskState)toState
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.tableView reloadRowsAtIndexPaths:@[ [self indexPathForTask:task] ] withRowAnimation:UITableViewRowAnimationNone];
-    });
+    NSIndexPath *indexPath = [self indexPathForTask:task];
+    TaskCellController *controller = self.cellControllers[indexPath.row];
+
+    if (controller.cell) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [controller configureCell:controller.cell];
+        });
+    }
 }
 
 @end

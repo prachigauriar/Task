@@ -26,8 +26,10 @@
 
 @import UIKit;
 
-@class TSKTask;
+#import <Task/Task.h>
+
 @class TaskTableViewCell;
+@class TimeSlicedTask;
 
 
 /*!
@@ -38,6 +40,9 @@
 
 /*! The controller’s task. May not be nil. */
 @property (nonatomic, strong, readonly) TSKTask *task;
+
+/*! The cell that the controller’s task is being displayed in. */
+@property (nonatomic, strong) TaskTableViewCell *cell;
 
 /*! 
  @abstract Initializes a newly created TaskCellController object with the specified task.
@@ -50,9 +55,51 @@
 /*!
  @abstract Configures the specified cell.
  @param cell The cell that should be configured.
- @param indexPath The index path for the row the cell will be displaying. May be nil.
- @param tableView The table view that the cell will be displayed in. May be nil.
  */
-- (void)configureCell:(TaskTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
+- (void)configureCell:(TaskTableViewCell *)cell;
+
+@end
+
+
+#pragma mark -
+
+/*! 
+ TimeSlicedTaskCellController control a single TaskTableViewCell for a TimeSlicedTask.
+ */
+@interface TimeSlicedTaskCellController : TaskCellController
+
+/*! The receiver’s task as a TimeSlicedTask. */
+@property (nonatomic, strong, readonly) TimeSlicedTask *timeSlicedTask;
+
+@end
+
+
+#pragma mark -
+
+/*!
+ ExternalConditionTaskCellController control a single TaskTableViewCell for a TSKExternalConditionTask.
+ */
+@interface ExternalConditionTaskCellController : TaskCellController
+
+/*! The receiver’s task as a TSKExternalConditionTask. */
+@property (nonatomic, strong, readonly) TSKExternalConditionTask *externalConditionTask;
+
+@end
+
+
+#pragma mark -
+
+/*!
+ The TaskCellControllerCreation interface provides a method to create a task cell controller
+ of the appropriate type for a given TSKTask. This effectively negates the need to check a task’s type
+ to create an appropriate task cell controller.
+ */
+@interface TSKTask (TaskCellControllerCreation)
+
+/*!
+ @abstract Creates a new task cell controller for the receiver.
+ @result A new task cell controller for the receiver.
+ */
+- (TaskCellController *)createTaskCellController;
 
 @end
