@@ -55,10 +55,10 @@
 @property (nonatomic, strong, readonly) NSMapTable *dependentTasks;
 
 /*! The set of tasks currently in the receiver that have no prerequisite tasks. */
-@property (nonatomic, copy) NSSet *tasksWithNoPrerequisiteTasks;
+@property (nonatomic, copy, readwrite) NSSet *tasksWithNoPrerequisiteTasks;
 
 /*! The set of tasks currently in the receiver that have no dependent tasks. */
-@property (nonatomic, copy) NSSet *tasksWithNoDependentTasks;
+@property (nonatomic, copy, readwrite) NSSet *tasksWithNoDependentTasks;
 
 @end
 

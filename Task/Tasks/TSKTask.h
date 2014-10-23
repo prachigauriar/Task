@@ -27,7 +27,7 @@
 #import <Foundation/Foundation.h>
 
 
-#pragma mark Constants
+#pragma mark Constants and Functions
 
 /*! TSKTaskState enumerates the various states that a TSKTask can be in. */
 typedef NS_ENUM(NSUInteger, TSKTaskState) {
@@ -52,6 +52,13 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
     /*! State indicating that the task failed. */
     TSKTaskStateFailed
 };
+
+/*!
+ @abstract Returns a string representation of the specified task state.
+ @param state The task state.
+ @result A string describing the specified task state. If the task state is unknown, returns nil.
+ */
+extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 
 #pragma mark -
@@ -190,8 +197,8 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
      the receiver be sent either -finishWithResult: or -failWithError:. Failing to do so will 
      prevent dependent tasks from executing.
      
-     Subclass implementations of this method should periodically check whether the task has been 
-     marked as cancelled and, if so, stop executing at the earliest possible moment.
+     Subclass implementations of this method should periodically check whether the task is in the 
+     executing state (-isExecuting) and, if not, stop executing at the earliest possible moment.
  */
 - (void)main;
 
@@ -218,6 +225,16 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
      Subclasses should not override this method.
  */
 - (void)cancel;
+
+/*!
+ @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
+     starts the task if its prerequisite tasks have all finished successfully.
+ @discussion Regardless of the receiver’s state, sends the -reset message to all of the
+     receiver’s dependent tasks.
+
+     Subclasses should invoke the superclass implementation of this method.
+ */
+- (void)reset;
 
 /*!
  @abstract Sets the task’s state to pending if it is pending, ready, cancelled or failed, and
@@ -259,11 +276,19 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
 
 /*!
  The TSKTaskDelegate protocol defines an interface via which an task’s delegate can perform 
- specialized actions when the task finishes successfully or fails.
+ specialized actions when the task finishes successfully, fails, or its state changes.
  */
 @protocol TSKTaskDelegate <NSObject>
 
 @optional
+
+/*!
+ @abstract Sent to the delegate when the specified task changes states.
+ @param task The task whose state changed.
+ @param fromState The state the task transitioned from.
+ @param toState The state the task transitioned to.
+ */
+- (void)task:(TSKTask *)task didTransitionFromState:(TSKTaskState)fromState toState:(TSKTaskState)toState;
 
 /*!
  @abstract Sent to the delegate when the specified task finishes successfully.
