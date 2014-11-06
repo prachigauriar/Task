@@ -44,4 +44,10 @@
     srandom(seed);
 }
 
+
+- (NSString *)defaultNameForTask:(TSKTask *)task
+{
+    return [NSString stringWithFormat:@"TSKTask %p", task];
+}
+
 @end

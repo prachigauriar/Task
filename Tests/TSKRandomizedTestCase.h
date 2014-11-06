@@ -37,4 +37,7 @@
  */
 @interface TSKRandomizedTestCase : XCTestCase
 
+- (NSString *)defaultNameForTask:(TSKTask *)task;
+
+
 @end
