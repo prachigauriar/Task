@@ -88,9 +88,6 @@
     XCTAssertEqual(dependent.state, TSKTaskStatePending, @"dependent state not set to pending");
 }
 
-
-
-
 @end
 
 

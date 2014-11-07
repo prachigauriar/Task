@@ -39,5 +39,4 @@
 
 - (NSString *)defaultNameForTask:(TSKTask *)task;
 
-
 @end
