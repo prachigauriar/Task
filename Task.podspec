@@ -7,9 +7,11 @@ Pod::Spec.new do |s|
                    dependencies, and can succeed or fail.
                    SUMMARY
   s.description  = <<-DESC
-                   TWTValidation is a Cocoa framework for declaratively validating data. It provides a
-                   mechanism for validating individual objects and collections, and for combining multiple
-                   validators using logical operators to create more complex validations."
+                   Task is a simple framework for representing tasks — units of work that have prerequisites,
+                   dependencies, and can succeed or fail. The framework provides a straightforward way to 
+                   create multiple tasks with blocks, selectors, etc.; create relationships between them; and
+                   then execute them all together so that tasks only start once all their prerequisite tasks
+                   finish successfully.
                    DESC
 
   s.author       = { "Two Toasters" => "general@twotoasters.com" }
