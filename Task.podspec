@@ -3,8 +3,7 @@ Pod::Spec.new do |s|
   s.version      = "0.1"
 
   s.summary      = <<-SUMMARY
-                   A simple Cocoa framework for representing tasks — units of work that have prerequisites,
-                   dependencies, and can succeed or fail.
+                   A simple Cocoa framework for representing interdependent units of work.
                    SUMMARY
   s.description  = <<-DESC
                    Task is a simple framework for representing tasks — units of work that have prerequisites,
