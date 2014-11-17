@@ -101,7 +101,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
     // This task is completely independent of other tasks. Imagine that this creates a server resource that
     // we are going to update with additional data
-    self.createProjectTask = [[TimeSlicedTask alloc] initWithName:@"Create Project Task" timeRequired:2.0];
+    self.createProjectTask = [[TimeSlicedTask alloc] initWithName:@"Create Project" timeRequired:2.0];
     [self.taskGraph addTask:self.createProjectTask prerequisites:nil];
 
     // This is an external condition task that indicates that a photo is available. Imagine that this is
@@ -110,12 +110,12 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
     [self.taskGraph addTask:self.photo1AvailableCondition prerequisites:nil];
 
     // This uploads the first photo. It can’t run until the project is created and the photo is available
-    self.uploadPhoto1Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 1 Task" timeRequired:5.0];
+    self.uploadPhoto1Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 1" timeRequired:5.0];
     [self.taskGraph addTask:self.uploadPhoto1Task prerequisites:self.createProjectTask, self.photo1AvailableCondition, nil];
 
     // These are analagous to the previous two tasks, but for a second photo
     self.photo2AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 2 Available"];
-    self.uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2 Task" timeRequired:6.0];
+    self.uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2" timeRequired:6.0];
     [self.taskGraph addTask:self.photo2AvailableCondition prerequisites:nil];
     [self.taskGraph addTask:self.uploadPhoto2Task prerequisites:self.createProjectTask, self.photo2AvailableCondition, nil];
 
@@ -125,7 +125,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
     [self.taskGraph addTask:self.paymentInfoAvailableCondition prerequisites:nil];
 
     // This submits an order. It can’t run until the photos are uploaded and the payment data is provided.
-    self.submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order Task" timeRequired:2.0];
+    self.submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order" timeRequired:2.0];
     [self.taskGraph addTask:self.submitOrderTask prerequisites:self.uploadPhoto1Task, self.uploadPhoto2Task, self.paymentInfoAvailableCondition, nil];
 
     for (TSKTask *task in [self.taskGraph allTasks]) {
