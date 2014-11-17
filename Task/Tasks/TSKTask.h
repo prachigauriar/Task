@@ -275,20 +275,12 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 #pragma mark - Task Delegate Protocol
 
 /*!
- The TSKTaskDelegate protocol defines an interface via which an task’s delegate can perform 
- specialized actions when the task finishes successfully, fails, or its state changes.
+ The TSKTaskDelegate protocol defines an interface via which a task’s delegate can perform 
+ specialized actions when the task finishes successfully or fails.
  */
 @protocol TSKTaskDelegate <NSObject>
 
 @optional
-
-/*!
- @abstract Sent to the delegate when the specified task changes states.
- @param task The task whose state changed.
- @param fromState The state the task transitioned from.
- @param toState The state the task transitioned to.
- */
-- (void)task:(TSKTask *)task didTransitionFromState:(TSKTaskState)fromState toState:(TSKTaskState)toState;
 
 /*!
  @abstract Sent to the delegate when the specified task finishes successfully.
@@ -300,7 +292,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 /*!
  @abstract Sent to the delegate when the specified task fails.
  @param task The task that failed.
- @param error An error containing the reason for why the task failed. May be nil. 
+ @param error An error containing the reason the task failed. May be nil. 
  */
 - (void)task:(TSKTask *)task didFailWithError:(NSError *)error;
 

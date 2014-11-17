@@ -39,6 +39,13 @@
 @property (nonatomic, strong, readonly) NSMutableSet *tasks;
 
 /*!
+ @abstract The set of tasks in the graph that have finished successfully.
+ @discussion Access to this object is not thread-safe. All accesses to the set should be synchronized
+     on the set itself to maintain data integrity.
+ */
+@property (nonatomic, strong, readonly) NSMutableSet *finishedTasks;
+
+/*!
  @abstract A map table that maps a task to its prerequisite tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSSets.
  */
@@ -103,6 +110,7 @@
         _name = [name copy];
         _operationQueue = operationQueue;
         _tasks = [[NSMutableSet alloc] init];
+        _finishedTasks = [[NSMutableSet alloc] init];
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
         _dependentTasks = [NSMapTable strongToStrongObjectsMapTable];
     }
@@ -227,6 +235,35 @@
     return NO;
 }
 
+
+#pragma mark - Subtask State
+
+- (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
+{
+    @synchronized (self.finishedTasks) {
+        [self.finishedTasks addObject:task];
+
+        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks]) {
+            [self.delegate graphDidFinish:self];
+        }
+    }
+}
+
+
+- (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(task:inGraph:didFailWithError:)]) {
+        [self.delegate task:task inGraph:self didFailWithError:error];
+    }
+}
+
+
+- (void)subtaskDidReset:(TSKTask *)task
+{
+    @synchronized (self.finishedTasks) {
+        [self.finishedTasks removeObject:task];
+    }
+}
 
 #pragma mark -
 

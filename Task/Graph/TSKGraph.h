@@ -28,6 +28,7 @@
 
 
 @class TSKTask;
+@protocol TSKGraphDelegate;
 
 /*!
  Instances of TSKGraph, or simply task graphs, provide execution contexts for tasks and keep
@@ -40,7 +41,11 @@
  Task graphs also have the ability to be started, canceled, or retried, which simply sends the
  appropriate message to those tasks in the graph that have no prerequisites. At that point, the
  messages will propagate throughout the graph.
- */
+
+ Every TSKGraph has an optional delegate that can be informed when all the graph’s tasks finish
+ successfully or any of the tasks fail. See the documentation for TSKGraphDelegate for more 
+ information.
+*/
 @interface TSKGraph : NSObject
 
 /*!
@@ -49,6 +54,9 @@
      address of the task graph.
  */
 @property (nonatomic, copy) NSString *name;
+
+/*! The task graph’s delegate. */
+@property (nonatomic, weak) id<TSKGraphDelegate> delegate;
 
 /*!
  @abstract The task graph’s operation queue.
@@ -186,3 +194,34 @@
 - (BOOL)hasFailedTasks;
 
 @end
+
+
+#pragma mark - Graph Delegate Protocol
+
+/*!
+ The TSKGraphDelegate protocol defines an interface via which a graph’s delegate can perform
+ specialized actions when all the tasks in a graph finish successfully or if a single task fails.
+ */
+@protocol TSKGraphDelegate <NSObject>
+
+@optional
+
+/*!
+ @abstract Sent to the delegate when all a graph’s tasks finish successfully.
+ @discussion This is invoked after individual task delegates receive -task:didFinishWithResult:.
+ @param graph The graph whose tasks finished.
+ @param result An object that represents the result of performing the task’s work. May be nil.
+ */
+- (void)graphDidFinish:(TSKGraph *)graph;
+
+/*!
+ @abstract Sent to the delegate when one of a graph’s tasks fail.
+ @discussion This is invoked after the task’s delegate receives -task:didFailWithError:.
+ @param task The task that failed.
+ @param graph The graph that contains the task.
+ @param error An error containing the reason the task failed. May be nil.
+ */
+- (void)task:(TSKTask *)task inGraph:(TSKGraph *)graph didFailWithError:(NSError *)error;
+
+@end
+

@@ -165,9 +165,9 @@
     [super setCell:cell];
 
     self.timeSlicedTask.progressBlock = !cell ? nil : ^(TimeSlicedTask *task) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [cell.progressView setProgress:task.progress animated:YES];
-        });
+        }];
     };
 }
 

@@ -27,6 +27,7 @@
 #import <Task/TSKTask.h>
 
 #import <Task/TSKGraph.h>
+#import <Task/TSKGraph+TaskInterface.h>
 #import <Task/TSKTask+GraphInterface.h>
 
 
@@ -281,11 +282,6 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         [self didChangeValueForKey:@"state"];
     }
 
-    // Notify the delegate of the state transition
-    if ([self.delegate respondsToSelector:@selector(task:didTransitionFromState:toState:)]) {
-        [self.delegate task:self didTransitionFromState:fromState toState:toState];
-    }
-
     // Only once all KVO notifications have fired should we execute the block
     if (block) {
         block();
@@ -380,6 +376,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
+        [self.graph subtaskDidReset:self];
         [self startIfReady];
     }];
 
@@ -416,6 +413,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFinishWithResult:result];
         }
 
+        [self.graph subtask:self didFinishWithResult:result];
+
         [self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
     }];
 }
@@ -430,6 +429,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
             [self.delegate task:self didFailWithError:error];
         }
+
+        [self.graph subtask:self didFailWithError:error];
     }];
 }
 

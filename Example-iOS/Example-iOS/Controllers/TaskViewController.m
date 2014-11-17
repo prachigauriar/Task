@@ -35,12 +35,13 @@
 
 #pragma mark Constants
 
+static void *taskStateContext = &taskStateContext;
 static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCell";
 
 
 #pragma mark -
 
-@interface TaskViewController () <UITableViewDataSource, UITableViewDelegate, TSKTaskDelegate>
+@interface TaskViewController () <UITableViewDataSource, UITableViewDelegate, TSKGraphDelegate>
 
 /*! Our table view of tasks. */
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
@@ -96,6 +97,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 - (void)initializeGraph
 {
     self.taskGraph = [[TSKGraph alloc] initWithName:@"Task Graph"];
+    self.taskGraph.delegate = self;
 
     // This task is completely independent of other tasks. Imagine that this creates a server resource that
     // we are going to update with additional data
@@ -126,7 +128,17 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
     self.submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order Task" timeRequired:2.0];
     [self.taskGraph addTask:self.submitOrderTask prerequisites:self.uploadPhoto1Task, self.uploadPhoto2Task, self.paymentInfoAvailableCondition, nil];
 
-    [[self.taskGraph allTasks] makeObjectsPerformSelector:@selector(setDelegate:) withObject:self];
+    for (TSKTask *task in [self.taskGraph allTasks]) {
+        [task addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionInitial context:taskStateContext];
+    }
+}
+
+
+- (void)dealloc
+{
+    for (TSKTask *task in [self.taskGraph allTasks]) {
+        [task removeObserver:self forKeyPath:@"state" context:taskStateContext];
+    }
 }
 
 
@@ -173,18 +185,54 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-#pragma mark - Task Delegate
+#pragma mark - Task State Changes
 
-- (void)task:(TSKTask *)task didTransitionFromState:(TSKTaskState)fromState toState:(TSKTaskState)toState
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
+    if (context != taskStateContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+
+    TSKTask *task = object;
+
     NSIndexPath *indexPath = [self indexPathForTask:task];
     TaskCellController *controller = self.cellControllers[indexPath.row];
 
     if (controller.cell) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [controller configureCell:controller.cell];
-        });
+        }];
     }
+}
+
+
+#pragma mark - Task Graph Delegate
+
+- (void)graphDidFinish:(TSKGraph *)graph
+{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tasks Finished"
+                                                                                 message:@"All tasks finished succesffully."
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }];
+}
+
+
+- (void)task:(TSKTask *)task inGraph:(TSKGraph *)graph didFailWithError:(NSError *)error
+{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Task Failed"
+                                                                                 message:[NSString stringWithFormat:@"%@ failed.", task.name]
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Retry" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [task retry];
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }];
 }
 
 @end
