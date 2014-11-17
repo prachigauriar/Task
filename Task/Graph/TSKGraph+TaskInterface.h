@@ -43,7 +43,7 @@
 /*!
  @abstract Indicates to the receiver that the specified task failed.
  @param task The task that failed. May not be nil.
- @param result The error that caused the task to fail.
+ @param error The error that caused the task to fail.
  */
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
 

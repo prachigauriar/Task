@@ -134,7 +134,7 @@
 
      This is not a thread-safe operation. This method should only execute on one thread at a time.
  @param task The task to add. May not be nil. May not be a member of any other task graph.
- @param prerequisiteTask1, ... The task’s prerequisite tasks as a nil-terminated list. Each task in
+ @param prerequisiteTask1 ... The task’s prerequisite tasks as a nil-terminated list. Each task in
      the set must have already been added to the receiver.
  */
 - (void)addTask:(TSKTask *)task prerequisites:(TSKTask *)prerequisiteTask1, ... NS_REQUIRES_NIL_TERMINATION;
@@ -210,7 +210,6 @@
  @abstract Sent to the delegate when all a graph’s tasks finish successfully.
  @discussion This is invoked after individual task delegates receive -task:didFinishWithResult:.
  @param graph The graph whose tasks finished.
- @param result An object that represents the result of performing the task’s work. May be nil.
  */
 - (void)graphDidFinish:(TSKGraph *)graph;
 
@@ -224,4 +223,3 @@
 - (void)task:(TSKTask *)task inGraph:(TSKGraph *)graph didFailWithError:(NSError *)error;
 
 @end
-
