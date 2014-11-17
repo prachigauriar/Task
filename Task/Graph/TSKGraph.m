@@ -277,8 +277,8 @@
 
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
 {
-    if ([self.delegate respondsToSelector:@selector(task:inGraph:didFailWithError:)]) {
-        [self.delegate task:task inGraph:self didFailWithError:error];
+    if ([self.delegate respondsToSelector:@selector(graph:task:didFailWithError:)]) {
+        [self.delegate graph:self task:task didFailWithError:error];
     }
 }
 

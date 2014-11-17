@@ -216,10 +216,10 @@
 /*!
  @abstract Sent to the delegate when one of a graph’s tasks fail.
  @discussion This is invoked after the task’s delegate receives -task:didFailWithError:.
- @param task The task that failed.
  @param graph The graph that contains the task.
+ @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.
  */
-- (void)task:(TSKTask *)task inGraph:(TSKGraph *)graph didFailWithError:(NSError *)error;
+- (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error;
 
 @end

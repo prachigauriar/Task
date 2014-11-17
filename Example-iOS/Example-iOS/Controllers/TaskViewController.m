@@ -221,7 +221,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-- (void)task:(TSKTask *)task inGraph:(TSKGraph *)graph didFailWithError:(NSError *)error
+- (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
 {
     if (task == self.photo1AvailableCondition || task == self.photo2AvailableCondition || task == self.paymentInfoAvailableCondition) {
         return;
