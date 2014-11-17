@@ -214,13 +214,9 @@
 
 - (BOOL)hasUnfinishedTasks
 {
-    for (TSKTask *task in self.tasksWithNoDependentTasks) {
-        if (!task.isFinished) {
-            return YES;
-        }
+    @synchronized (self.finishedTasks) {
+        return [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
     }
-
-    return NO;
 }
 
 
