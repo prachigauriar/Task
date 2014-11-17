@@ -31,7 +31,7 @@
 
 @interface TSKExternalConditionTask ()
 
-@property (nonatomic, strong) NSLock *fulfillmentLock;
+@property (nonatomic, strong, readonly) dispatch_queue_t fulfillmentQueue;
 @property (nonatomic, strong) id fulfillmentResult;
 @property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
 
@@ -46,7 +46,8 @@
 {
     self = [super initWithName:name];
     if (self) {
-        _fulfillmentLock = [[NSLock alloc] init];
+        NSString *fulfillmentQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKExternalConditionTask.%@.fulfillment", self.name];
+        _fulfillmentQueue = dispatch_queue_create([fulfillmentQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
     return self;
@@ -55,42 +56,42 @@
 
 - (void)main
 {
-    [self.fulfillmentLock lock];
-
-    if (self.isFulfilled) {
-        [self finishWithResult:self.fulfillmentResult];
-    } else {
-        [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain code:TSKErrorCodeExternalConditionNotFulfilled userInfo:nil]];
-    }
-
-    [self.fulfillmentLock unlock];
+    dispatch_sync(self.fulfillmentQueue, ^{
+        if (self.isFulfilled) {
+            [self finishWithResult:self.fulfillmentResult];
+        } else {
+            [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain code:TSKErrorCodeExternalConditionNotFulfilled userInfo:nil]];
+        }
+    });
 }
 
 
 - (void)fulfillWithResult:(id)result
 {
-    [self.fulfillmentLock lock];
+    __block BOOL didFulfill = NO;
+    dispatch_sync(self.fulfillmentQueue, ^{
+        if (self.isFulfilled) {
+            return;
+        }
 
-    if (self.isFulfilled) {
-        [self.fulfillmentLock unlock];
-        return;
+        self.fulfilled = YES;
+        self.fulfillmentResult = result;
+        didFulfill = YES;
+    });
+
+    if (didFulfill) {
+        [self retry];
     }
-
-    self.fulfilled = YES;
-    self.fulfillmentResult = result;
-    [self.fulfillmentLock unlock];
-
-    [self retry];
 }
 
 
 - (void)reset
 {
-    [self.fulfillmentLock lock];
-    self.fulfilled = NO;
-    self.fulfillmentResult = nil;
-    [self.fulfillmentLock unlock];
-
+    dispatch_sync(self.fulfillmentQueue, ^{
+        self.fulfilled = NO;
+        self.fulfillmentResult = nil;
+    });
+    
     [super reset];
 }
 
