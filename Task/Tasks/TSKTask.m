@@ -27,6 +27,7 @@
 #import <Task/TSKTask.h>
 
 #import <Task/TSKGraph.h>
+#import <Task/TSKGraph+TaskInterface.h>
 #import <Task/TSKTask+GraphInterface.h>
 
 
@@ -64,10 +65,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 @property (nonatomic, strong, readwrite) id result;
 
 /*!
- @abstract A lock to control changes to task state.
- @discussion This lock is only used within -transitionFromStateInSet:toState:andExecuteBlock:.
+ @abstract A dispatch queue to control changes to task state.
+ @discussion This queue is only used within -transitionFromStateInSet:toState:andExecuteBlock: to 
+     perform data synchronization.
  */
-@property (nonatomic, strong, readonly) NSLock *stateLock;
+@property (nonatomic, strong, readonly) dispatch_queue_t stateQueue;
 
 /*!
  @abstract If the receiver’s state is in the specified set of from-states, transitions to the specified
@@ -122,7 +124,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
         _name = [name copy];
         _state = TSKTaskStateReady;
-        _stateLock = [[NSLock alloc] init];
+        NSString *stateQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKTask.%@.state", name];
+        _stateQueue = dispatch_queue_create([stateQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
     return self;
@@ -182,13 +185,13 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 + (BOOL)automaticallyNotifiesObserversOfState
 {
-    // This avoids a deadlock condition in -transitionFromStateInSet:toState:andExecuteBlock: in
-    // which the stateLock is locked, but KVO observers are notified of the change before the lock
-    // can be unlocked. This is a problem when, e.g., upon task failure, a KVO observer is notified
-    // on the same thread as the aforementioned method. If the KVO observer immediately sends the
-    // task -retry, that message will result in -transitionFromStateInSet:toState:andExecuteBlock:
-    // being invoked again before the stateLock from the original invocation can be unlocked, thus
-    // resulting in deadlock.
+    // This avoids a deadlock condition in -transitionFromStateInSet:toState:andExecuteBlock: in which
+    // the stateQueue is in use, but KVO observers are notified of the change before the state transition
+    // block exits the queue. This is a problem when, e.g., upon task failure, a KVO observer is notified
+    // on the same thread as the aforementioned method. If the KVO observer immediately sends the task
+    // -retry, that message will result in -transitionFromStateInSet:toState:andExecuteBlock: being
+    // invoked again before the block from the original invocation exits the stateQueue, thus resulting
+    // in deadlock.
     return NO;
 }
 
@@ -258,37 +261,30 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     //
     //     Failed -> Pending: Task is retried (-retry) or reset (-reset)
 
-    // Get the state lock. If the current state is not in the set of valid from-states, just unlock
-    // and return.
-    [self.stateLock lock];
-    if (![validFromStates containsObject:@(self.state)]) {
-        [self.stateLock unlock];
-        return;
-    }
+    __block BOOL didTransition = NO;
+    dispatch_sync(self.stateQueue, ^{
+        // If the current state is not in the set of valid from-states, we have nothing to do
+        if (![validFromStates containsObject:@(self.state)]) {
+            return;
+        }
 
-    // Otherwise, if the from-state and the to-state differ, change the state. Do not use the
-    // built-in accessor, as that will trigger KVO notifications, which we do not want. See the
-    // explanatory comments in +automaticallyNotifiesObserversOfState.
-    TSKTaskState fromState = self.state;
-    if (fromState != toState) {
-        [self willChangeValueForKey:@"state"];
-        _state = toState;
-    }
+        // Otherwise, if the from-state and the to-state differ, change the state. We should avoid triggering
+        // KVO notifications. See the explanatory comments in +automaticallyNotifiesObserversOfState.
+        TSKTaskState fromState = self.state;
+        if (fromState != toState) {
+            [self willChangeValueForKey:@"state"];
+            _state = toState;
+            didTransition = YES;
+        }
+    });
 
-    // Only after we have unlocked the state lock should we mark the state as changed
-    [self.stateLock unlock];
-    if (fromState != toState) {
+    if (didTransition) {
         [self didChangeValueForKey:@"state"];
-    }
 
-    // Notify the delegate of the state transition
-    if ([self.delegate respondsToSelector:@selector(task:didTransitionFromState:toState:)]) {
-        [self.delegate task:self didTransitionFromState:fromState toState:toState];
-    }
-
-    // Only once all KVO notifications have fired should we execute the block
-    if (block) {
-        block();
+        // Only once all KVO notifications have fired should we execute the block
+        if (block) {
+            block();
+        }
     }
 }
 
@@ -380,6 +376,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
+        [self.graph subtaskDidReset:self];
         [self startIfReady];
     }];
 
@@ -416,6 +413,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFinishWithResult:result];
         }
 
+        [self.graph subtask:self didFinishWithResult:result];
+
         [self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
     }];
 }
@@ -430,6 +429,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
             [self.delegate task:self didFailWithError:error];
         }
+
+        [self.graph subtask:self didFailWithError:error];
     }];
 }
 

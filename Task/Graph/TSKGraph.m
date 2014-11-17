@@ -38,6 +38,15 @@
  */
 @property (nonatomic, strong, readonly) NSMutableSet *tasks;
 
+@property (nonatomic, strong, readonly) dispatch_queue_t finishedTasksQueue;
+
+/*!
+ @abstract The set of tasks in the graph that have finished successfully.
+ @discussion Access to this object is not thread-safe. All accesses to the set should be synchronized
+     on the set itself to maintain data integrity.
+ */
+@property (nonatomic, strong, readonly) NSMutableSet *finishedTasks;
+
 /*!
  @abstract A map table that maps a task to its prerequisite tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSSets.
@@ -97,12 +106,17 @@
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
-            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKGraph.operationQueue.%@", name];
+            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKGraph.%@", name];
         }
 
         _name = [name copy];
         _operationQueue = operationQueue;
         _tasks = [[NSMutableSet alloc] init];
+        _finishedTasks = [[NSMutableSet alloc] init];
+
+        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKGraph.%@.finishedTasks", _name];
+        _finishedTasksQueue = dispatch_queue_create([finishedTasksQueueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
+
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
         _dependentTasks = [NSMapTable strongToStrongObjectsMapTable];
     }
@@ -206,13 +220,12 @@
 
 - (BOOL)hasUnfinishedTasks
 {
-    for (TSKTask *task in self.tasksWithNoDependentTasks) {
-        if (!task.isFinished) {
-            return YES;
-        }
-    }
+    __block BOOL isSubset = NO;
+    dispatch_sync(self.finishedTasksQueue, ^{
+        isSubset = [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
+    });
 
-    return NO;
+    return isSubset;
 }
 
 
@@ -245,6 +258,36 @@
 - (void)retry
 {
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
+}
+
+
+#pragma mark - Subtask State
+
+- (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
+{
+    dispatch_barrier_async(self.finishedTasksQueue, ^{
+        [self.finishedTasks addObject:task];
+    });
+
+    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && [self hasUnfinishedTasks]) {
+        [self.delegate graphDidFinish:self];
+    }
+}
+
+
+- (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(graph:task:didFailWithError:)]) {
+        [self.delegate graph:self task:task didFailWithError:error];
+    }
+}
+
+
+- (void)subtaskDidReset:(TSKTask *)task
+{
+    dispatch_barrier_async(self.finishedTasksQueue, ^{
+        [self.finishedTasks removeObject:task];
+    });
 }
 
 @end
