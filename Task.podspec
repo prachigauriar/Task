@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Task"
-  s.version      = "0.2"
+  s.version      = "0.3"
 
   s.summary      = <<-SUMMARY
                    A simple Cocoa framework for representing interdependent units of work.

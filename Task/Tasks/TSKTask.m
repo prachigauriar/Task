@@ -181,6 +181,12 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
+- (NSOperationQueue *)operationQueue
+{
+    return _operationQueue ? _operationQueue : self.graph.operationQueue;
+}
+
+
 #pragma mark - States
 
 + (BOOL)automaticallyNotifiesObserversOfState
@@ -321,7 +327,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     // task has already been marked cancelled. This shouldn’t be an issue, since -main should be
     // checking if the task is cancelled and exiting as soon as possible, but that’s not always
     // possible. Doing the check inside the operation’s block before invoking -main avoids that.
-    [self.graph.operationQueue addOperationWithBlock:^{
+    [self.operationQueue addOperationWithBlock:^{
         [self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
             [self main];
         }];
