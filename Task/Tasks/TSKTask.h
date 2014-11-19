@@ -101,6 +101,12 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 /*! The task’s delegate. */
 @property (nonatomic, weak) id<TSKTaskDelegate> delegate;
 
+/*!
+ @abstract The task’s operation queue.
+ @discussion If not explicitly set, the task’s queue will be the same as its graph’s.
+ */
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
+
 /*! 
  @abstract The task’s graph. 
  @discussion This property is set when the task is added to a graph. Once a task has been added to a
