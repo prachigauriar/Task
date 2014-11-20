@@ -220,12 +220,12 @@
 
 - (BOOL)hasUnfinishedTasks
 {
-    __block BOOL isSubset = NO;
+    __block BOOL hasUnfinishedTasks = NO;
     dispatch_sync(self.finishedTasksQueue, ^{
-        isSubset = [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
+        hasUnfinishedTasks = ![self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
     });
 
-    return isSubset;
+    return hasUnfinishedTasks;
 }
 
 
@@ -269,7 +269,7 @@
         [self.finishedTasks addObject:task];
     });
 
-    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && [self hasUnfinishedTasks]) {
+    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && ![self hasUnfinishedTasks]) {
         [self.delegate graphDidFinish:self];
     }
 }
