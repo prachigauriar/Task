@@ -265,11 +265,13 @@
 
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
 {
-    dispatch_barrier_async(self.finishedTasksQueue, ^{
+    __block BOOL allTasksFinished = NO;
+    dispatch_barrier_sync(self.finishedTasksQueue, ^{
         [self.finishedTasks addObject:task];
+        allTasksFinished = [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
     });
 
-    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && ![self hasUnfinishedTasks]) {
+    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && allTasksFinished) {
         [self.delegate graphDidFinish:self];
     }
 }
