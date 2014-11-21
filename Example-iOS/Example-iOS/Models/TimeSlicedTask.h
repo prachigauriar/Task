@@ -39,6 +39,9 @@
 /*! The total amount of time the task must run before being complete. 0.0 by default. */
 @property (nonatomic, assign, readonly) NSTimeInterval timeRequired;
 
+/*! The probability that the task will fail. This should be a value between 0.0 and 1.0. 0.0 by default. */
+@property (nonatomic, assign) double probabilityOfFailure;
+
 /*! 
  @abstract The task’s progress (between 0.0 and 1.0, inclusive).
  @discussion If the task is in the executing state, returns timeTaken / timeRequired. If it is in the 

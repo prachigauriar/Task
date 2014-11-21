@@ -38,6 +38,15 @@
 
 @implementation TimeSlicedTask
 
++ (void)initialize
+{
+    // Seed the random number generator that we use for failure determination
+    if (self == [TimeSlicedTask class]) {
+        srand48(arc4random());
+    }
+}
+
+
 - (instancetype)initWithName:(NSString *)name
 {
     return [self initWithName:name timeRequired:0.0];
@@ -58,7 +67,8 @@
 - (void)main
 {
     const NSTimeInterval kTimeSliceInterval = 0.0625;
-    const NSInteger kBadLuckErrorCode = 13;
+    BOOL shouldFail = drand48() < self.probabilityOfFailure;
+    NSTimeInterval failureTime = drand48() * self.timeRequired;
 
     // Until our time taken exceeds our time required, keep iterating
     self.timeTaken = 0.0;
@@ -68,9 +78,8 @@
             return;
         }
 
-        // On each iteration of the loop, there’s a 1 in 500 chance we’ll error out
-        if (arc4random_uniform(500) == kBadLuckErrorCode) {
-            [self failWithError:[NSError errorWithDomain:@"TimeSliceErrorDomain" code:kBadLuckErrorCode userInfo:nil]];
+        if (shouldFail && self.timeTaken > failureTime) {
+            [self failWithError:[NSError errorWithDomain:@"TimeSliceErrorDomain" code:1234 userInfo:nil]];
             return;
         }
 
@@ -95,6 +104,12 @@
     }
 
     return self.isFinished ? 1.0 : 0.0;
+}
+
+
+- (void)setProbabilityOfFailure:(double)probabilityOfFailure
+{
+    _probabilityOfFailure = MAX(0.0, MIN(probabilityOfFailure, 1.0));
 }
 
 @end

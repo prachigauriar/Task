@@ -52,15 +52,9 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 /*! A cell we use to dynamically calculate heights for each row. */
 @property (nonatomic, strong) TaskTableViewCell *prototypeCell;
 
-/*! Our task graph and tasks. */
+/*! Our task graph and tasks (in the order we want them displayed). */
 @property (nonatomic, strong) TSKGraph *taskGraph;
-@property (nonatomic, strong) TSKTask *createProjectTask;
-@property (nonatomic, strong) TSKExternalConditionTask *photo1AvailableCondition;
-@property (nonatomic, strong) TSKTask *uploadPhoto1Task;
-@property (nonatomic, strong) TSKExternalConditionTask *photo2AvailableCondition;
-@property (nonatomic, strong) TSKTask *uploadPhoto2Task;
-@property (nonatomic, strong) TSKExternalConditionTask *paymentInfoAvailableCondition;
-@property (nonatomic, strong) TSKTask *submitOrderTask;
+@property (nonatomic, copy) NSArray *tasks;
 
 @end
 
@@ -75,15 +69,14 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
     // Create our task graph and tasks
     [self initializeGraph];
-    NSArray *tasks = @[ self.createProjectTask,
-                        self.photo1AvailableCondition, self.uploadPhoto1Task,
-                        self.photo2AvailableCondition, self.uploadPhoto2Task,
-                        self.paymentInfoAvailableCondition, self.submitOrderTask ];
+
+    self.title = self.taskGraph.name;
 
     // Create a cell controller for each task
-    NSMutableArray *cellControllers = [[NSMutableArray alloc] initWithCapacity:tasks.count];
-    for (TSKTask *task in tasks) {
+    NSMutableArray *cellControllers = [[NSMutableArray alloc] initWithCapacity:self.tasks.count];
+    for (TSKTask *task in self.tasks) {
         [cellControllers addObject:[task createTaskCellController]];
+        [task addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionInitial context:taskStateContext];
     }
 
     self.cellControllers = cellControllers;
@@ -96,41 +89,48 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)initializeGraph
 {
-    self.taskGraph = [[TSKGraph alloc] initWithName:@"Task Graph"];
+
+    self.taskGraph = [[TSKGraph alloc] initWithName:@"Order Product Workflow"];
     self.taskGraph.delegate = self;
 
     // This task is completely independent of other tasks. Imagine that this creates a server resource that
     // we are going to update with additional data
-    self.createProjectTask = [[TimeSlicedTask alloc] initWithName:@"Create Project" timeRequired:2.0];
-    [self.taskGraph addTask:self.createProjectTask prerequisites:nil];
+    TimeSlicedTask *createProjectTask = [[TimeSlicedTask alloc] initWithName:@"Create Project" timeRequired:2.0];
+    createProjectTask.probabilityOfFailure = 0.1;
+    [self.taskGraph addTask:createProjectTask prerequisites:nil];
 
     // This is an external condition task that indicates that a photo is available. Imagine that this is
     // fulfilled when the user takes a photo or chooses a photo from their library for this project.
-    self.photo1AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 1 Available"];
-    [self.taskGraph addTask:self.photo1AvailableCondition prerequisites:nil];
+    TSKTask *photo1AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 1 Available"];
+    [self.taskGraph addTask:photo1AvailableCondition prerequisites:nil];
 
     // This uploads the first photo. It can’t run until the project is created and the photo is available
-    self.uploadPhoto1Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 1" timeRequired:5.0];
-    [self.taskGraph addTask:self.uploadPhoto1Task prerequisites:self.createProjectTask, self.photo1AvailableCondition, nil];
+    TimeSlicedTask *uploadPhoto1Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 1" timeRequired:5.0];
+    uploadPhoto1Task.probabilityOfFailure = 0.15;
+    [self.taskGraph addTask:uploadPhoto1Task prerequisites:createProjectTask, photo1AvailableCondition, nil];
 
     // These are analagous to the previous two tasks, but for a second photo
-    self.photo2AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 2 Available"];
-    self.uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2" timeRequired:6.0];
-    [self.taskGraph addTask:self.photo2AvailableCondition prerequisites:nil];
-    [self.taskGraph addTask:self.uploadPhoto2Task prerequisites:self.createProjectTask, self.photo2AvailableCondition, nil];
+    TSKTask *photo2AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 2 Available"];
+    TimeSlicedTask *uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2" timeRequired:6.0];
+    uploadPhoto1Task.probabilityOfFailure = 0.15;
 
-    // This is an external condition task that indicates that some payment info has been entered. Imagine that
-    // once the two photos are uploaded, the user is asked to purchase whatever it is they’re building.
-    self.paymentInfoAvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Payment Info Available"];
-    [self.taskGraph addTask:self.paymentInfoAvailableCondition prerequisites:nil];
+    [self.taskGraph addTask:photo2AvailableCondition prerequisites:nil];
+    [self.taskGraph addTask:uploadPhoto2Task prerequisites:createProjectTask, photo2AvailableCondition, nil];
 
-    // This submits an order. It can’t run until the photos are uploaded and the payment data is provided.
-    self.submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order" timeRequired:2.0];
-    [self.taskGraph addTask:self.submitOrderTask prerequisites:self.uploadPhoto1Task, self.uploadPhoto2Task, self.paymentInfoAvailableCondition, nil];
+    // This is an external condition task that indicates that some metadata has been entered. Imagine that
+    // once the two photos are uploaded, the user is asked to name the project.
+    TSKTask *metadataAvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Metadata Available"];
+    [self.taskGraph addTask:metadataAvailableCondition prerequisites:nil];
 
-    for (TSKTask *task in [self.taskGraph allTasks]) {
-        [task addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionInitial context:taskStateContext];
-    }
+    // This submits an order. It can’t run until the photos are uploaded and the metadata is provided.
+    TimeSlicedTask *submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order" timeRequired:2.0];
+    submitOrderTask.probabilityOfFailure = 0.1;
+    [self.taskGraph addTask:submitOrderTask prerequisites:uploadPhoto1Task, uploadPhoto2Task, metadataAvailableCondition, nil];
+
+    self.tasks = @[ createProjectTask,
+                    photo1AvailableCondition, uploadPhoto1Task,
+                    photo2AvailableCondition, uploadPhoto2Task,
+                    metadataAvailableCondition, submitOrderTask ];
 }
 
 
@@ -215,7 +215,9 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tasks Finished"
                                                                                  message:@"All tasks finished succesffully."
                                                                           preferredStyle:UIAlertControllerStyleAlert];
+
         [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+
         [self presentViewController:alertController animated:YES completion:nil];
     }];
 }
@@ -223,7 +225,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
 {
-    if (task == self.photo1AvailableCondition || task == self.photo2AvailableCondition || task == self.paymentInfoAvailableCondition) {
+    if ([task isKindOfClass:[TSKExternalConditionTask class]]) {
         return;
     }
 
@@ -231,10 +233,13 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Task Failed"
                                                                                  message:[NSString stringWithFormat:@"%@ failed.", task.name]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
+
         [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+
         [alertController addAction:[UIAlertAction actionWithTitle:@"Retry" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             [task retry];
         }]];
+
         [self presentViewController:alertController animated:YES completion:nil];
     }];
 }
