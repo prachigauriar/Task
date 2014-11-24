@@ -15,7 +15,7 @@ The tasks in the app are instances of one of two classes: `TSKExternalConditionT
 tasks to use `TSKSelectorTask` or `TSKBlockTask`.
 
 `TaskViewController` is the only view controller in the app. It creates the app’s tasks and task
-graph in its `-initializeGraph` method. It also acts as the task graph’s delegate. Instances of
+graph in its `‑initializeGraph` method. It also acts as the task graph’s delegate. Instances of
 `TaskCellController` manage the individual task cells in the table. The task cells are instances of
 `TaskTableViewCell`, which is built using a xib and a tiny amount of code to declare the cell’s
 properties.
