@@ -29,7 +29,9 @@ previously completed tasks.
 
 The easiest way to start using Task is to install it with CocoaPods.
 
-    pod 'Task', '~> 0.3'
+```ruby
+pod 'Task', '~> 0.3'
+```
 
 You can also build it and include the built products in your project. For OS X and iOS 8, just add
 `Task.framework` to your project. For older versions of iOS, add Task’s public headers to your
@@ -62,7 +64,9 @@ To model a workflow with Task, you first need to create a graph. Each graph can 
 a name — useful when debugging — and an operation queue on which the graph’s tasks run. If you don’t
 provide a queue, one will be created for you, which is what we do below: 
 
-    TSKGraph *graph = [[TSKGraph alloc] initWithName:@"Workflow"];
+```Objective-C
+TSKGraph *graph = [[TSKGraph alloc] initWithName:@"Workflow"];
+```
 
 Once you’ve created a graph, you need to create tasks that represent your work. `TSKTask` is an 
 abstract class which means you can’t use it directly. For reusable tasks, you’ll probably want to 
@@ -74,15 +78,17 @@ invokes some imaginary API request and executes `‑finishWithResult:` and `‑f
 API request’s success and failure blocks, respectively. We then add it to the task graph with no
 prerequisites.
 
-    TSKTask *blockTask = [[TSKBlockTask alloc] initWithName:@"Block Task" block:^(TSKTask *task) { 
-        [self executeAPIRequestWithSuccess:^(id response) {
-            [task finishWithResult:response];
-        } failure:^(NSError *error) {
-            [task failWithError:error];
-        }];
+```Objective-C
+TSKTask *blockTask = [[TSKBlockTask alloc] initWithName:@"Block Task" block:^(TSKTask *task) { 
+    [self executeAPIRequestWithSuccess:^(id response) {
+        [task finishWithResult:response];
+    } failure:^(NSError *error) {
+        [task failWithError:error];
     }];
+}];
     
-    [graph addTask:blockTask prerequisites:nil];
+[graph addTask:blockTask prerequisites:nil];
+```
 
 We can also create a task that performs a selector using `TSKSelectorTask`. The selector takes a
 single `TSKTask *` parameter. Like the block, the method should invoke `‑finishWithResult:` on
@@ -90,27 +96,29 @@ success and invoke `‑failWithError:` on failure. In the example below, we’ll
 and set its prerequisite to `blockTask` from above. In our task method, we’ll read the prerequisite
 task’s result and use that as input for our work.
 
-    TSKTask *selectorTask = [[TSKSelectorTask alloc] initWithName:@"Selector Task"
-                                                           target:self
-                                                         selector:@selector(mapResultFromTask:)];
-    
-    [graph addTask:selectorTask prerequisites:blockTask, nil];
-    
-    …
-    
-    - (void)mapResultFromTask:(TSKTask *)task
-    {
-        NSDictionary *JSONResponse = [[task.prerequisites anyObject] result];
-        NSManagedObject *mappedObject = [self mapJSONResponse:JSONResponse
-                                                  intoContext:self.managedObjectContext];
+```Objective-C
+TSKTask *selectorTask = [[TSKSelectorTask alloc] initWithName:@"Selector Task"
+                                                       target:self
+                                                     selector:@selector(mapResultFromTask:)];
 
-        NSError *error = nil;
-        if ([self.managedObjectContext save:&error]) {
-            [self finishWithResult:mappedObject.objectID];
-        } else {
-            [self failWithError:error];
-        }
+[graph addTask:selectorTask prerequisites:blockTask, nil];
+
+…
+
+- (void)mapResultFromTask:(TSKTask *)task
+{
+    NSDictionary *JSONResponse = [[task.prerequisites anyObject] result];
+    NSManagedObject *mappedObject = [self mapJSONResponse:JSONResponse
+                                              intoContext:self.managedObjectContext];
+
+    NSError *error = nil;
+    if ([self.managedObjectContext save:&error]) {
+        [self finishWithResult:mappedObject.objectID];
+    } else {
+        [self failWithError:error];
     }
+}
+```
     
 Again, the work that the task is actually doing is imaginary, but you get the idea.
 
@@ -120,16 +128,18 @@ is fulfilled. This is ideal for tasks that require some user input before being 
 example, suppose a REST API call requires user data as a parameter. You could represent the API 
 call as a `TSKTask`, and create an external condition task as a prerequisite:
 
-    TSKExternalConditionTask *dataTask = [[TSKExternalConditionTask alloc] initWithName:@"dataTask"];
-    [graph addTask:dataTask prerequisites:nil];
-    
-    TSKTask *APIRequestTask = … ;
-    [graph addTask:APIRequestTask prerequisites:dataTask, nil];
-    
-    …
-    
-    // When the user has entered in their data
-    [dataTask fulfillWithResult:userSuppliedData];    
+```Objective-C
+TSKExternalConditionTask *dataTask = [[TSKExternalConditionTask alloc] initWithName:@"dataTask"];
+[graph addTask:dataTask prerequisites:nil];
+
+TSKTask *APIRequestTask = … ;
+[graph addTask:APIRequestTask prerequisites:dataTask, nil];
+
+…
+
+// When the user has entered in their data
+[dataTask fulfillWithResult:userSuppliedData];    
+```
 
 In this example, when the external condition task is fulfilled, the API task automatically starts.
 
