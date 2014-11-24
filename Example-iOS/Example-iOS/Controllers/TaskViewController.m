@@ -89,7 +89,6 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)initializeGraph
 {
-
     self.taskGraph = [[TSKGraph alloc] initWithName:@"Order Product Workflow"];
     self.taskGraph.delegate = self;
 
