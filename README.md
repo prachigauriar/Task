@@ -64,7 +64,7 @@ To model a workflow with Task, you first need to create a graph. Each graph can 
 a name — useful when debugging — and an operation queue on which the graph’s tasks run. If you don’t
 provide a queue, one will be created for you, which is what we do below: 
 
-```Objective-C
+```objc
 TSKGraph *graph = [[TSKGraph alloc] initWithName:@"Workflow"];
 ```
 
@@ -78,7 +78,7 @@ invokes some imaginary API request and executes `‑finishWithResult:` and `‑f
 API request’s success and failure blocks, respectively. We then add it to the task graph with no
 prerequisites.
 
-```Objective-C
+```objc
 TSKTask *blockTask = [[TSKBlockTask alloc] initWithName:@"Block Task" block:^(TSKTask *task) { 
     [self executeAPIRequestWithSuccess:^(id response) {
         [task finishWithResult:response];
@@ -96,7 +96,7 @@ success and invoke `‑failWithError:` on failure. In the example below, we’ll
 and set its prerequisite to `blockTask` from above. In our task method, we’ll read the prerequisite
 task’s result and use that as input for our work.
 
-```Objective-C
+```objc
 TSKTask *selectorTask = [[TSKSelectorTask alloc] initWithName:@"Selector Task"
                                                        target:self
                                                      selector:@selector(mapResultFromTask:)];
@@ -128,7 +128,7 @@ is fulfilled. This is ideal for tasks that require some user input before being 
 example, suppose a REST API call requires user data as a parameter. You could represent the API 
 call as a `TSKTask`, and create an external condition task as a prerequisite:
 
-```Objective-C
+```objc
 TSKExternalConditionTask *dataTask = [[TSKExternalConditionTask alloc] initWithName:@"dataTask"];
 [graph addTask:dataTask prerequisites:nil];
 
