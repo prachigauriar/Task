@@ -88,6 +88,180 @@
     XCTAssertEqual(dependent.state, TSKTaskStatePending, @"dependent state not set to pending");
 }
 
+
+- (void)testStart
+{
+    XCTestExpectation *startExpectation = [self expectationWithDescription:@"task started"];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+        [startExpectation fulfill];
+    }];
+
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
+
+    [task start];
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+
+- (void)testFinish
+{
+    NSString *resultString = UMKRandomUnicodeString();
+    TSKTask *task = [[TSKTask alloc] init];
+
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [task start];
+    [task finishWithResult:resultString];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+        XCTAssertEqual(task.result, resultString, @"result not set correctly");
+    });
+}
+
+
+- (void)testFail
+{
+    NSError *error = [NSError errorWithDomain:UMKRandomUnicodeString()
+                                         code:12345
+                                     userInfo:nil];
+    TSKTask *task = [[TSKTask alloc] init];
+
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [task start];
+    [task failWithError:error];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateFailed, @"state  is not failed");
+        XCTAssertEqual(task.error, error, @"error not returned correcctly");
+    });
+}
+
+
+- (void)testRetry
+{
+    TSKTask *task = [[TSKTask alloc] init];
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+
+    [task retry];
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"retry executed from invalid state");
+
+    [task start];
+    [task failWithError:nil];
+    [task retry];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+
+        [task finishWithResult:nil];
+        XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+    });
+}
+
+
+- (void)testCancel
+{
+    __block NSUInteger counter = 0;
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        counter++;
+    }];
+
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [task start];
+
+    sleep(1);
+    [task cancel];
+    XCTAssertEqual(task.state, TSKTaskStateCancelled, @"state is not cancelled");
+    XCTAssertEqual(counter, 1, @"-cancel impacts execution of main");
+
+    [task start];
+    sleep(1);
+    XCTAssertEqual(task.state, TSKTaskStateCancelled, @"start executes on cancelled task");
+    XCTAssertEqual(counter, 1, @"start executes on cancelled task");
+
+    [task retry];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+
+        [task finishWithResult:nil];
+        XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+        XCTAssertEqual(counter, 2, @"main did not execute twice");
+    });
+
+    NSString *resultString = UMKRandomUnicodeString();
+    TSKBlockTask *finishTask = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        sleep(1);
+        [task finishWithResult:resultString];
+    }];
+
+    NSError *error = [NSError errorWithDomain:UMKRandomUnicodeString()
+                                         code:12345
+                                     userInfo:nil];
+    TSKBlockTask *failTask = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        sleep(1);
+        [task failWithError:error];
+    }];
+
+    TSKGraph *graph2 = [[TSKGraph alloc] init];
+    [graph2 addTask:finishTask prerequisites:nil];
+    [graph2 addTask:failTask prerequisites:nil];
+    [finishTask start];
+    [finishTask cancel];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateCancelled, @"finish is honored on cancelled task");
+        XCTAssertNil(task.result, @"finish is honored on cancelled task");
+    });
+
+    [failTask start];
+    [failTask cancel];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateCancelled, @"fail is honored on cancelled task");
+        XCTAssertNil(task.error, @"fail is honored on cancelled task");
+    });
+
+}
+
+
+- (void)testReset
+{
+    __block NSUInteger counter = 0;
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        counter++;
+        if (counter == 1) {
+            [task failWithError:nil];
+        }
+    }];
+
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+
+    [task start];
+
+    sleep(1);
+    XCTAssertEqual(counter, 1, @"main did not run once");
+    XCTAssertEqual(task.state, TSKTaskStateFailed, @"state is not failed");
+
+    [task reset];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+
+        [task finishWithResult:nil];
+        XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+        XCTAssertEqual(counter, 2, @"main did not run twice");
+    });
+    
+}
+
 @end
 
 
