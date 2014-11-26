@@ -167,66 +167,69 @@
 
 - (void)testCancel
 {
-    __block NSUInteger counter = 0;
+    NSLock *didCancelLock = [[NSLock alloc] init];
+
+    XCTestExpectation *didStartExpectation = [self expectationWithDescription:@"main executed"];
+
     TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        counter++;
+        // Confirms that task is mid-execution when -cancel is called
+        [didStartExpectation fulfill];
+
+        // Pause for lock to ensure this executes after -cancel
+        [didCancelLock lock];
+        [task finishWithResult:UMKRandomAlphanumericString()];
+        [didCancelLock unlock];
     }];
 
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
+
+    // Lock to ensure state transitions to cancelled before -finishWithResult: is called
+    [didCancelLock lock];
     [task start];
 
-    sleep(1);
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    // Call cancel only after main has been entered
     [task cancel];
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"state is not cancelled");
-    XCTAssertEqual(counter, 1, @"-cancel impacts execution of main");
+    [didCancelLock unlock];
 
-    [task start];
-    sleep(1);
-    XCTAssertEqual(task.state, TSKTaskStateCancelled, @"start executes on cancelled task");
-    XCTAssertEqual(counter, 1, @"start executes on cancelled task");
+    // Block is waiting for lock and executes
+    // Test pauses to ensure block is finished and -finishWithResult: is called on task
+    [didCancelLock lock];
+    XCTAssertEqual(task.state, TSKTaskStateCancelled, @"finish is honored on cancelled task");
+    XCTAssertNil(task.result, @"finish is honored on cancelled task");
+    [didCancelLock unlock];
 
-    [task retry];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
-
-        [task finishWithResult:nil];
-        XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
-        XCTAssertEqual(counter, 2, @"main did not execute twice");
-    });
-
-    NSString *resultString = UMKRandomUnicodeString();
-    TSKBlockTask *finishTask = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        sleep(1);
-        [task finishWithResult:resultString];
-    }];
-
-    NSError *error = [NSError errorWithDomain:UMKRandomUnicodeString()
-                                         code:12345
-                                     userInfo:nil];
+    XCTestExpectation *didStartExpectation2 = [self expectationWithDescription:@"main executed"];
     TSKBlockTask *failTask = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        sleep(1);
-        [task failWithError:error];
+        [didStartExpectation2 fulfill];
+
+        // Pause to ensure state is cancelled before failWithError: is called
+        [didCancelLock lock];
+        [task failWithError:UMKRandomError()];
+        [didCancelLock unlock];
     }];
 
-    TSKGraph *graph2 = [[TSKGraph alloc] init];
-    [graph2 addTask:finishTask prerequisites:nil];
-    [graph2 addTask:failTask prerequisites:nil];
-    [finishTask start];
-    [finishTask cancel];
+    [graph addTask:failTask prerequisites:nil];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual(task.state, TSKTaskStateCancelled, @"finish is honored on cancelled task");
-        XCTAssertNil(task.result, @"finish is honored on cancelled task");
-    });
-
+    [didCancelLock lock];
     [failTask start];
+
+    // Ensure task is executing before cancel is called
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
     [failTask cancel];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertEqual(task.state, TSKTaskStateCancelled, @"fail is honored on cancelled task");
-        XCTAssertNil(task.error, @"fail is honored on cancelled task");
-    });
+    [didCancelLock unlock];
+
+    // Block is waiting for lock and executes
+    // Test pauses to ensure block is finished and -failWithError: is called on task
+    [didCancelLock lock];
+    XCTAssertEqual(task.state, TSKTaskStateCancelled, @"fail is honored on cancelled task");
+    XCTAssertNil(task.error, @"fail is honored on cancelled task");
+    [didCancelLock unlock];
 
 }
 
