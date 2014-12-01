@@ -31,44 +31,6 @@
 static const NSTimeInterval kFinishDateTolerance = .1;
 
 
-#pragma mark - TSKTestResetTask
-
-@interface TSKTestResetTask : TSKTask
-
-@property (nonatomic, strong) XCTestExpectation *firstExpectation;
-@property (nonatomic, strong) XCTestExpectation *secondExpectation;
-@property (nonatomic, strong) NSLock *lock;
-
-@end
-
-
-@implementation TSKTestResetTask
-
-- (void)main
-{
-    static NSUInteger mainCounter = 1;
-
-    if (mainCounter == 1) {
-        if (self.firstExpectation) {
-            [self.firstExpectation fulfill];
-        }
-    } else if (mainCounter == 2) {
-        if (self.secondExpectation) {
-            [self.secondExpectation fulfill];
-        }
-    }
-
-    mainCounter++;
-
-    // Pause to allow for testing during execution but before finishWithResult:
-    [self.lock lock];
-    [self finishWithResult:UMKRandomUnicodeString()];
-    [self.lock unlock];
-}
-
-@end
-
-
 #pragma mark - TSKTaskTestCase
 
 @interface TSKTaskTestCase : TSKRandomizedTestCase
@@ -301,37 +263,35 @@ static const NSTimeInterval kFinishDateTolerance = .1;
 
 - (void)testReset
 {
-    TSKTestResetTask *task = [[TSKTestResetTask alloc] init];
-    task.lock = [[NSLock alloc] init];
-    task.firstExpectation = [self expectationWithDescription:@"main executed first time"];
+    __block XCTestExpectation *expectation = [self expectationWithDescription:@"main executed first time"];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        [expectation fulfill];
+    }];
 
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
+    [task finishWithResult:UMKRandomUnicodeString()];
 
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
     XCTAssertNotNil(task.result, @"result not set");
 
-    task.secondExpectation = [self expectationWithDescription:@"main executed second time"];
-
-    // Ensure task is rest, starts executing, and pauses before finishWithResult: is called
-    [task.lock lock];
+    expectation = [self expectationWithDescription:@"main executed second time"];
     [task reset];
+    // Wait for task to reset and start executing before testing that results were reset
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertNil(task.finishDate, @"finish date was not reset");
     XCTAssertNil(task.result, @"result was not reset to nil");
-    [task.lock unlock];
 
-    // Pause until after finishWithResult: is called
-    [task.lock lock];
+    [task finishWithResult:UMKRandomUnicodeString()];
+
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
     XCTAssertNotNil(task.result, @"result not set");
-    [task.lock unlock];
 }
 
 @end
