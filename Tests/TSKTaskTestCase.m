@@ -74,6 +74,14 @@ static const NSTimeInterval kFinishDateTolerance = .1;
 @interface TSKTaskTestCase : TSKRandomizedTestCase
 
 - (void)testInit;
+- (void)testGraph;
+- (void)testStart;
+- (void)testFinish;
+- (void)testFail;
+- (void)testRetry;
+- (void)testCancelAndFinish;
+- (void)testCancelAndFail;
+- (void)testReset;
 
 @end
 
