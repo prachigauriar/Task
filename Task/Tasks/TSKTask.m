@@ -268,17 +268,19 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     //     Failed -> Pending: Task is retried (-retry) or reset (-reset)
 
     __block BOOL didTransition = NO;
+    __weak typeof(self) weak_self = self;
     dispatch_sync(self.stateQueue, ^{
+        typeof(self) strong_self = weak_self;
         // If the current state is not in the set of valid from-states, we have nothing to do
-        if (![validFromStates containsObject:@(self.state)]) {
+        if (![validFromStates containsObject:@(strong_self.state)]) {
             return;
         }
 
         // Otherwise, if the from-state and the to-state differ, change the state. We should avoid triggering
         // KVO notifications. See the explanatory comments in +automaticallyNotifiesObserversOfState.
-        TSKTaskState fromState = self.state;
+        TSKTaskState fromState = strong_self.state;
         if (fromState != toState) {
-            [self willChangeValueForKey:@"state"];
+            [strong_self willChangeValueForKey:@"state"];
             _state = toState;
             didTransition = YES;
         }
@@ -327,9 +329,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     // task has already been marked cancelled. This shouldn’t be an issue, since -main should be
     // checking if the task is cancelled and exiting as soon as possible, but that’s not always
     // possible. Doing the check inside the operation’s block before invoking -main avoids that.
+    __weak typeof(self) weak_self = self;
     [self.operationQueue addOperationWithBlock:^{
-        [self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
-            [self main];
+        typeof(self) strong_self = weak_self;
+        [strong_self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
+            [strong_self main];
         }];
     }];
 }
@@ -350,8 +354,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 - (void)startIfReady
 {
     if ([self allPrerequisiteTasksFinished]) {
+        __weak typeof(self) weak_self = self;
         [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:^{
-            [self start];
+            typeof(self) strong_self = weak_self;
+            [strong_self start];
         }];
     }
 }
@@ -378,12 +384,14 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateFinished), @(TSKTaskStateFailed), @(TSKTaskStateCancelled), nil];
     });
 
+    __weak typeof(self) weak_self = self;
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
-        self.finishDate = nil;
-        self.result = nil;
-        self.error = nil;
-        [self.graph subtaskDidReset:self];
-        [self startIfReady];
+        typeof(self) strong_self = weak_self;
+        strong_self.finishDate = nil;
+        strong_self.result = nil;
+        strong_self.error = nil;
+        [strong_self.graph subtaskDidReset:self];
+        [strong_self startIfReady];
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
@@ -398,11 +406,13 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStatePending), @(TSKTaskStateReady), @(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
     });
 
+    __weak typeof(self) weak_self = self;
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
-        self.finishDate = nil;
-        self.result = nil;
-        self.error = nil;
-        [self startIfReady];
+        typeof(self) strong_self = weak_self;
+        strong_self.finishDate = nil;
+        strong_self.result = nil;
+        strong_self.error = nil;
+        [strong_self startIfReady];
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(retry)];
@@ -411,32 +421,36 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (void)finishWithResult:(id)result
 {
+    __weak typeof(self) weak_self = self;
     [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFinished andExecuteBlock:^{
-        self.finishDate = [NSDate date];
-        self.result = result;
+        typeof(self) strong_self = weak_self;
+        strong_self.finishDate = [NSDate date];
+        strong_self.result = result;
 
-        if ([self.delegate respondsToSelector:@selector(task:didFinishWithResult:)]) {
-            [self.delegate task:self didFinishWithResult:result];
+        if ([strong_self.delegate respondsToSelector:@selector(task:didFinishWithResult:)]) {
+            [strong_self.delegate task:strong_self didFinishWithResult:result];
         }
 
-        [self.graph subtask:self didFinishWithResult:result];
+        [strong_self.graph subtask:strong_self didFinishWithResult:result];
 
-        [self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
+        [strong_self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
     }];
 }
 
 
 - (void)failWithError:(NSError *)error
 {
+    __weak typeof(self) weak_self = self;
     [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFailed andExecuteBlock:^{
-        self.finishDate = [NSDate date];
-        self.error = error;
+        typeof(self) strong_self = weak_self;
+        strong_self.finishDate = [NSDate date];
+        strong_self.error = error;
 
-        if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
-            [self.delegate task:self didFailWithError:error];
+        if ([strong_self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
+            [strong_self.delegate task:strong_self didFailWithError:error];
         }
 
-        [self.graph subtask:self didFailWithError:error];
+        [strong_self.graph subtask:strong_self didFailWithError:error];
     }];
 }
 
