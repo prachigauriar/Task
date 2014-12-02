@@ -69,13 +69,15 @@
 - (void)fulfillWithResult:(id)result
 {
     __block BOOL didFulfill = NO;
+    __weak typeof(self) weak_self = self;
     dispatch_sync(self.fulfillmentQueue, ^{
-        if (self.isFulfilled) {
+        typeof(self) strong_self = weak_self;
+        if (strong_self.isFulfilled) {
             return;
         }
 
-        self.fulfilled = YES;
-        self.fulfillmentResult = result;
+        strong_self.fulfilled = YES;
+        strong_self.fulfillmentResult = result;
         didFulfill = YES;
     });
 
@@ -87,9 +89,11 @@
 
 - (void)reset
 {
+    __weak typeof(self) weak_self = self;
     dispatch_sync(self.fulfillmentQueue, ^{
-        self.fulfilled = NO;
-        self.fulfillmentResult = nil;
+        typeof(self) strong_self = weak_self;
+        strong_self.fulfilled = NO;
+        strong_self.fulfillmentResult = nil;
     });
     
     [super reset];

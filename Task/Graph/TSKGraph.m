@@ -221,8 +221,10 @@
 - (BOOL)hasUnfinishedTasks
 {
     __block BOOL hasUnfinishedTasks = NO;
+    __weak typeof(self) weak_self = self;
     dispatch_sync(self.finishedTasksQueue, ^{
-        hasUnfinishedTasks = ![self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
+        typeof(self) strong_self = weak_self;
+        hasUnfinishedTasks = ![strong_self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
     });
 
     return hasUnfinishedTasks;
@@ -266,9 +268,11 @@
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
 {
     __block BOOL allTasksFinished = NO;
+    __weak typeof(self) weak_self = self;
     dispatch_barrier_sync(self.finishedTasksQueue, ^{
-        [self.finishedTasks addObject:task];
-        allTasksFinished = [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
+        typeof(self) strong_self = weak_self;
+        [strong_self.finishedTasks addObject:task];
+        allTasksFinished = [strong_self.tasksWithNoDependentTasks isSubsetOfSet:strong_self.finishedTasks];
     });
 
     if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && allTasksFinished) {
@@ -287,8 +291,10 @@
 
 - (void)subtaskDidReset:(TSKTask *)task
 {
+    __weak typeof(self) weak_self = self;
     dispatch_barrier_async(self.finishedTasksQueue, ^{
-        [self.finishedTasks removeObject:task];
+        typeof(self) strong_self = weak_self;
+        [strong_self.finishedTasks removeObject:task];
     });
 }
 

@@ -210,14 +210,16 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)graphDidFinish:(TSKGraph *)graph
 {
+    __weak typeof(self) weak_self = self;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        typeof(self) strong_self = weak_self;
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tasks Finished"
                                                                                  message:@"All tasks finished succesffully."
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
 
-        [self presentViewController:alertController animated:YES completion:nil];
+        [strong_self presentViewController:alertController animated:YES completion:nil];
     }];
 }
 
@@ -228,7 +230,9 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
         return;
     }
 
+    __weak typeof(self) weak_self = self;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        typeof(self) strong_self = weak_self;
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Task Failed"
                                                                                  message:[NSString stringWithFormat:@"%@ failed.", task.name]
                                                                           preferredStyle:UIAlertControllerStyleAlert];
@@ -239,7 +243,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
             [task retry];
         }]];
 
-        [self presentViewController:alertController animated:YES completion:nil];
+        [strong_self presentViewController:alertController animated:YES completion:nil];
     }];
 }
 
