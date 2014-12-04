@@ -268,7 +268,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
  @discussion Subclasses should ensure that this message is sent to the task when the task’s work
      fails. 
 
-     If the receiver’s delegate implements -task:didFinishWithResult:, it is sent that message
+     If the receiver’s delegate implements -task:didFailWithError:, it is sent that message
      after the task’s state is updated.
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
