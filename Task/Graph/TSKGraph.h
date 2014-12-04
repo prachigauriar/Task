@@ -25,7 +25,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <Task/TaskMacros.h>
 
 @class TSKTask;
 @protocol TSKGraphDelegate;
