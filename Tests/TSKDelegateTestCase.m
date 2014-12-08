@@ -268,37 +268,36 @@
 
 - (void)testGraphDelegateFail
 {
-    TSKTask *task = nil;
-    NSError *error = nil;
+    NSError *error = UMKRandomError();
 
     // Test delegate only implementing fail
     TSKGraphDelegateFail *failDelegate = [[TSKGraphDelegateFail alloc] init];
-    TSKGraph *graph = [self failGraphWithDelegate:failDelegate task:&task error:&error];
+    TSKTask *task = [self failedTaskWithGraphDelegate:failDelegate error:error];
 
     XCTAssertTrue(failDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(failDelegate.graph, graph, @"correct graph not sent");
+    XCTAssertEqual(failDelegate.graph, task.graph, @"correct graph not sent");
     XCTAssertEqual(failDelegate.task, task, @"correct task not sent");
     XCTAssertEqual(failDelegate.error, error, @"correct error not sent");
 
     // Test with nil error
     failDelegate = [[TSKGraphDelegateFail alloc] init];
-    graph = [self failGraphWithDelegate:failDelegate task:&task error:nil];
+    task = [self failedTaskWithGraphDelegate:failDelegate error:nil];
     XCTAssertTrue(failDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(failDelegate.graph, graph, @"correct graph not sent");
+    XCTAssertEqual(failDelegate.graph, task.graph, @"correct graph not sent");
     XCTAssertEqual(failDelegate.task, task, @"correct task not sent");
     XCTAssertNil(failDelegate.error, @"error is non-nil");
 
     // Test delegate only implementing finish
     TSKGraphDelegateFinish *finishDelegate = [[TSKGraphDelegateFinish alloc] init];
-    XCTAssertNoThrow([self failGraphWithDelegate:finishDelegate task:&task error:&error], @"messages the delegate a method it doesn't implement");
+    XCTAssertNoThrow([self failedTaskWithGraphDelegate:finishDelegate error:error], @"messages the delegate a method it doesn't implement");
 
     // Test delegate implementing both optional methods
     TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    graph = [self failGraphWithDelegate:finishAndFailDelegate task:&task error:&error];
+    task = [self failedTaskWithGraphDelegate:finishAndFailDelegate error:nil];
 
     XCTAssertTrue(finishAndFailDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
     XCTAssertEqual(error, finishAndFailDelegate.error, @"correct error not passed");
-    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertEqual(finishAndFailDelegate.graph, task.graph, @"correct graph not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFinish, @"wrong delegate method sent");
  }
@@ -343,16 +342,10 @@
 }
 
 
-- (TSKGraph *)failGraphWithDelegate:(id)delegate task:(TSKTask **)outTask error:(NSError **)outError
+- (TSKTask *)failedTaskWithGraphDelegate:(id)delegate error:(NSError *)error
 {
     TSKGraph *graph = [[TSKGraph alloc] init];
     graph.delegate = delegate;
-
-    NSError *error = nil;
-    if (outError) {
-        *outError = UMKRandomError();
-        error = *outError;
-    }
 
     XCTestExpectation *didFinishExpectation = [self expectationWithDescription:@"task did finish"];
     TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
@@ -360,15 +353,11 @@
         [didFinishExpectation fulfill];
     }];
 
-    if (outTask) {
-        *outTask = task;
-    }
-
     [graph addTask:task prerequisites:nil];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
-    return graph;
+    return task;
 }
 
 
