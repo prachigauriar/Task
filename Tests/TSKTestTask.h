@@ -28,18 +28,18 @@
 
 #pragma mark Constants
 
-extern NSString * const kTaskDidStartNotification;
-extern NSString * const kTaskDidFinishNotification;
-extern NSString * const kTaskDidFailNotification;
-extern NSString * const kTaskDidRetryNotification;
-extern NSString * const kTaskDidResetNotification;
-extern NSString * const kTaskDidCancelNotification;
+extern NSString *const TSKTestTaskDidStartNotification;
+extern NSString *const TSKTestTaskDidFinishNotification;
+extern NSString *const TSKTestTaskDidFailNotification;
+extern NSString *const TSKTestTaskDidRetryNotification;
+extern NSString *const TSKTestTaskDidResetNotification;
+extern NSString *const TSKTestTaskDidCancelNotification;
 
 
-#pragma mark TSKTestTask
+#pragma mark -
 /*!
  TSKTestTask provides notifications for major events to enable testing with expectations.
- It can take a block that executes in -main after the kTaskDidStartNotification is posted. (The class is similar to TSKBlock, but it allows the block to be nil.)
+ It can take a block that executes in -main after the TSKTestTaskDidStartNotification is posted. (The class is similar to TSKBlock, but it allows the block to be nil.)
 */
 @interface TSKTestTask : TSKTask
 

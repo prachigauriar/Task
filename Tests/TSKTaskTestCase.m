@@ -112,7 +112,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:task prerequisites:nil];
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
@@ -144,7 +144,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
@@ -163,7 +163,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidFailNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
@@ -180,13 +180,13 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:task prerequisites:nil];
 
     // Put task in a typical state for retry
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     [task failWithError:nil];
 
-    [self expectationForNotification:kTaskDidRetryNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task retry];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
@@ -204,9 +204,9 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:dependent1 prerequisites:task, nil];
     [graph addTask:dependent2 prerequisites:task, nil];
 
-    [self expectationForNotification:kTaskDidRetryNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidRetryNotification object:dependent1 handler:nil];
-    [self expectationForNotification:kTaskDidRetryNotification object:dependent2 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent2 handler:nil];
 
     [task retry];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -227,7 +227,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:task prerequisites:nil];
 
     // Lock to ensure state transitions to cancelled before -finishWithResult: is called
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [didCancelLock lock];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil]; // Confirms that task is mid-execution when -cancel is called
@@ -255,9 +255,9 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:dependent1 prerequisites:task, nil];
     [graph addTask:dependent2 prerequisites:task, nil];
 
-    [self expectationForNotification:kTaskDidCancelNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidCancelNotification object:dependent1 handler:nil];
-    [self expectationForNotification:kTaskDidCancelNotification object:dependent2 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:dependent2 handler:nil];
 
     [task cancel];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -277,7 +277,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [didCancelLock lock];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];   // Ensure task is executing before cancel is called
@@ -302,7 +302,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     [task finishWithResult:UMKRandomUnicodeString()];
@@ -316,8 +316,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     NSParameterAssert(newResult != task.result);
 
     // Test that reset occurs and properties are reset
-    [self expectationForNotification:kTaskDidResetNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task reset];
     [self waitForExpectationsWithTimeout:1 handler:nil];  // Wait for task to reset and start executing before testing that results were reset
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
@@ -339,9 +339,9 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:dependent1 prerequisites:task, nil];
     [graph addTask:dependent2 prerequisites:task, nil];
 
-    [self expectationForNotification:kTaskDidResetNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidResetNotification object:dependent1 handler:nil];
-    [self expectationForNotification:kTaskDidResetNotification object:dependent2 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent2 handler:nil];
 
     [task reset];
     [self waitForExpectationsWithTimeout:1 handler:nil];

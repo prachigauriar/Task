@@ -111,13 +111,13 @@
     TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertTrue(graph.hasUnfinishedTasks, @"hasUnfinishedTasks is false");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
     [willFinishLock unlock];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertFalse(graph.hasUnfinishedTasks, @"hasUnfinishedTasks is true");
@@ -126,7 +126,7 @@
     task = [self failingTaskWithLock:nil];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidFailNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertTrue(graph.hasUnfinishedTasks, @"hasUnfinishedTasks is false");
@@ -141,13 +141,13 @@
     TSKTestTask *task = [self failingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertFalse(graph.hasFailedTasks, @"hasFailedTasks is true");
 
-    [self expectationForNotification:kTaskDidFailNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [willFinishLock unlock];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertTrue(graph.hasFailedTasks, @"hasFailedTasks is false");
@@ -156,7 +156,7 @@
     task = [self finishingTaskWithLock:nil];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertFalse(graph.hasFailedTasks, @"hasFailedTasks is true");
@@ -171,7 +171,7 @@
 
     XCTAssertEqual(task.state, TSKTaskStateReady, "state is not ready");
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateExecuting, "state is not executing");
@@ -190,15 +190,15 @@
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil]; // wait until task starts
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:dependentTask handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:dependentTask handler:nil];
     [willFinishLock unlock];
     // First task is waiting for lock and finishes
     [willFinishLock lock];
@@ -207,7 +207,7 @@
     XCTAssertEqual(dependentTask.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertTrue(graph.hasUnfinishedTasks, @"graph.hasUnfinishedTasks is not true");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:dependentTask handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:dependentTask handler:nil];
     [willFinishLock unlock];
     // Dependent task is waiting for lock and finishes
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -232,8 +232,8 @@
     XCTAssertEqual(task2.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidStartNotification object:task1 handler:nil];
-    [self expectationForNotification:kTaskDidFinishNotification object:task2 handler:nil]; // task2 has no lock, so it will finish
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task2 handler:nil]; // task2 has no lock, so it will finish
     [willFinishLock lock];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil]; // wait until task1 starts and task2 finishes
@@ -241,8 +241,8 @@
     XCTAssertEqual(task2.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task1 handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:dependentTask handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:dependentTask handler:nil];
     [willFinishLock unlock];
     // task1 is waiting for lock and finishes, then dependentTask begins executing
     [willFinishLock lock];
@@ -252,7 +252,7 @@
     XCTAssertEqual(dependentTask.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertTrue(graph.hasUnfinishedTasks, @"graph.hasUnfinishedTasks is not true");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:dependentTask handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:dependentTask handler:nil];
     [willFinishLock unlock];
     [self waitForExpectationsWithTimeout:1 handler:nil];  // dependentTask is waiting for lock and finishes
     XCTAssertEqual(dependentTask.state, TSKTaskStateFinished, "state is not finished");
@@ -277,7 +277,7 @@
     XCTAssertEqual(dependentTask1.state, TSKTaskStatePending, @"dependent state is not pending");
     XCTAssertEqual(dependentTask2.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil]; // wait until task1 starts and task2 finishes
@@ -285,9 +285,9 @@
     XCTAssertEqual(dependentTask1.state, TSKTaskStatePending, @"dependent state is not pending");
     XCTAssertEqual(dependentTask2.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:dependentTask1 handler:nil];
-    [self expectationForNotification:kTaskDidStartNotification object:dependentTask2 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:dependentTask1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:dependentTask2 handler:nil];
     [willFinishLock unlock];
     // task is waiting for lock and finishes, then dependents begin executing
     [willFinishLock lock];
@@ -297,8 +297,8 @@
     XCTAssertEqual(dependentTask2.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertTrue(graph.hasUnfinishedTasks, @"graph.hasUnfinishedTasks is not true");
 
-    [self expectationForNotification:kTaskDidFinishNotification object:dependentTask1 handler:nil];
-    [self expectationForNotification:kTaskDidFinishNotification object:dependentTask2 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:dependentTask1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:dependentTask2 handler:nil];
     [willFinishLock unlock];
     // dependentTasks are waiting for lock and finish
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -316,7 +316,7 @@
     [graph addTask:task prerequisites:nil];
 
     // Put task in typical state for retry
-    [self expectationForNotification:kTaskDidFailNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateFailed, @"state is not failed");
@@ -324,7 +324,7 @@
     XCTAssertTrue(graph.hasFailedTasks, @"graph.hasFailedTasks is not true");
 
     // Test that graph sends retry to its task
-    [self expectationForNotification:kTaskDidRetryNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
     [willFailLock lock];
     [graph retry];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -343,14 +343,14 @@
     [graph addTask:task prerequisites:nil];
 
     // Put task mid-execution
-    [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
 
     // Test that graph sends cancel to its task
-    [self expectationForNotification:kTaskDidCancelNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
     [graph cancel];
     [willFinishLock unlock];
     // Task is waiting for lock and finishes executing. However, it should have received -cancel and thus not honor finish

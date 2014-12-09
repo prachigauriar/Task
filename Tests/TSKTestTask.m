@@ -26,12 +26,12 @@
 
 #import "TSKTestTask.h"
 
-NSString * const kTaskDidStartNotification = @"Task did start";
-NSString * const kTaskDidFinishNotification = @"Task did finish";
-NSString * const kTaskDidFailNotification = @"Task did fail";
-NSString * const kTaskDidRetryNotification = @"Task did retry";
-NSString * const kTaskDidResetNotification = @"Task did reset";
-NSString * const kTaskDidCancelNotification = @"Task did cancel";
+NSString *const TSKTestTaskDidStartNotification = @"Task did start";
+NSString *const TSKTestTaskDidFinishNotification = @"Task did finish";
+NSString *const TSKTestTaskDidFailNotification = @"Task did fail";
+NSString *const TSKTestTaskDidRetryNotification = @"Task did retry";
+NSString *const TSKTestTaskDidResetNotification = @"Task did reset";
+NSString *const TSKTestTaskDidCancelNotification = @"Task did cancel";
 
 
 @implementation TSKTestTask
@@ -45,10 +45,6 @@ NSString * const kTaskDidCancelNotification = @"Task did cancel";
 
 - (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block
 {
-    if (!block) {
-        return [super initWithName:nil];
-    }
-
     self = [super initWithName:nil];
     if (self) {
         _block = [block copy];
@@ -61,7 +57,7 @@ NSString * const kTaskDidCancelNotification = @"Task did cancel";
 
 - (void)main
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidStartNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidStartNotification object:self];
 
     if (self.block) {
         self.block(self);
@@ -71,21 +67,21 @@ NSString * const kTaskDidCancelNotification = @"Task did cancel";
 - (void)cancel
 {
     [super cancel];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidCancelNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidCancelNotification object:self];
 }
 
 
 - (void)reset
 {
     [super reset];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidResetNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidResetNotification object:self];
 }
 
 
 - (void)retry
 {
     [super retry];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidRetryNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidRetryNotification object:self];
 
 }
 
@@ -93,14 +89,14 @@ NSString * const kTaskDidCancelNotification = @"Task did cancel";
 - (void)finishWithResult:(id)result
 {
     [super finishWithResult:result];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidFinishNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidFinishNotification object:self];
 }
 
 
 - (void)failWithError:(NSError *)error
 {
     [super failWithError:error];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTaskDidFailNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TSKTestTaskDidFailNotification object:self];
 }
 
 @end
