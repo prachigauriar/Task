@@ -159,6 +159,7 @@
 - (void)testTaskDelegateFail;
 - (void)testGraphDelegateFinish;
 - (void)testGraphDelegateFail;
+- (void)testGraphDelegateNoTasks;
 
 @end
 
@@ -209,7 +210,7 @@
     [task failWithError:error];
 
     XCTAssertTrue(failDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, failDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, failDelegate.error, @"correct error not passed");
     XCTAssertEqual(failDelegate.task, task, @"correct task not passed");
 
     // Test with nil error
@@ -235,7 +236,7 @@
 
     // Test delegate implementing both optional methods
     XCTAssertTrue(finishAndFailDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, finishAndFailDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, finishAndFailDelegate.error, @"correct error not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFinish, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.result, @"wrong delegate method sent");
@@ -293,15 +294,28 @@
 
     // Test delegate implementing both optional methods
     TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    task = [self failedTaskWithGraphDelegate:finishAndFailDelegate error:nil];
+    task = [self failedTaskWithGraphDelegate:finishAndFailDelegate error:error];
 
     XCTAssertTrue(finishAndFailDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, finishAndFailDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, finishAndFailDelegate.error, @"correct error not passed");
     XCTAssertEqual(finishAndFailDelegate.graph, task.graph, @"correct graph not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFinish, @"wrong delegate method sent");
  }
 
+
+- (void)testGraphDelegateNoTasks
+{
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
+    graph.delegate = finishAndFailDelegate;
+
+    XCTAssertTrue(finishAndFailDelegate.didReceiveFinish, @"delegate method not sent to delegate implementing it");
+    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertFalse(finishAndFailDelegate.didReceiveFail, @"wrong delegate method sent");
+    XCTAssertNil(finishAndFailDelegate.error, @"wrong delegate method sent");
+    XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
+}
 
 #pragma mark Helper methods
 

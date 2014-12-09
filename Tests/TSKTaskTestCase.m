@@ -39,6 +39,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testInit;
 - (void)testGraph;
 - (void)testStart;
+- (void)testOperationQueue;
 - (void)testFinish;
 - (void)testFail;
 - (void)testRetry;
@@ -106,18 +107,30 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
 - (void)testStart
 {
-    XCTestExpectation *startExpectation = [self expectationWithDescription:@"task started"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
-        [startExpectation fulfill];
-    }];
-
+    TSKTestTask *task = [[TSKTestTask alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
 
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+}
 
+
+- (void)testOperationQueue
+{
+    NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
+    TSKGraph *graph = [[TSKGraph alloc] initWithOperationQueue:operationQueue];
+    XCTestExpectation *testDidRunExpectation = [self expectationWithDescription:@"test for operation queue did run"];
+
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        XCTAssertEqualObjects(operationQueue, [NSOperationQueue currentQueue], @"task not executing on correct queue");
+        [testDidRunExpectation fulfill];
+    }];
+    [graph addTask:task prerequisites:nil];
+    [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
@@ -125,16 +138,15 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testFinish
 {
     NSString *resultString = UMKRandomUnicodeString();
-    XCTestExpectation *expectation = [self expectationWithDescription:@"main is executing"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        [expectation fulfill];
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
+        [task finishWithResult:resultString];
     }];
-    
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    [task finishWithResult:resultString];
 
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqual(task.result, resultString, @"result not set correctly");
@@ -145,56 +157,66 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testFail
 {
     NSError *error = UMKRandomError();
-    XCTestExpectation *expectation = [self expectationWithDescription:@"main is executing"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        [expectation fulfill];
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
+        [task failWithError:error];
     }];
-
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
+    [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    [task failWithError:error];
 
     XCTAssertEqual(task.state, TSKTaskStateFailed, @"state  is not failed");
-    XCTAssertEqual(task.error, error, @"error not returned correcctly");
+    XCTAssertEqualObjects(task.error, error, @"error not returned correcctly");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
 }
 
 
 - (void)testRetry
 {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"main is executing"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        [expectation fulfill];
-    }];
+    TSKTestTask *task = [[TSKTestTask alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
-    [task retry];
-    XCTAssertEqual(task.state, TSKTaskStateReady, @"retry executed from invalid state");
-
+    // Put task in a typical state for retry
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
-    [task failWithError:nil];
-    [task retry];
-
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+    [task failWithError:nil];
 
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
+    [task retry];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    // Test that retry triggers state change to executing and that finishing is then possible
+    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
     [task finishWithResult:nil];
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+
+    // Test that when task receives retry, it sends to dependents
+    task = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
+    graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [graph addTask:dependent1 prerequisites:task, nil];
+    [graph addTask:dependent2 prerequisites:task, nil];
+
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent2 handler:nil];
+
+    [task retry];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 
 - (void)testCancelAndFinish
 {
     NSLock *didCancelLock = [[NSLock alloc] init];
-    XCTestExpectation *didStartExpectation = [self expectationWithDescription:@"main executed"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        // Confirms that task is mid-execution when -cancel is called
-        [didStartExpectation fulfill];
-
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         // Pause for lock to ensure this executes after -cancel
         [didCancelLock lock];
         [task finishWithResult:UMKRandomAlphanumericString()];
@@ -205,34 +227,47 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [graph addTask:task prerequisites:nil];
 
     // Lock to ensure state transitions to cancelled before -finishWithResult: is called
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [didCancelLock lock];
     [task start];
-
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil]; // Confirms that task is mid-execution when -cancel is called
 
     // Call cancel only after main has been entered
     [task cancel];
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"state is not cancelled");
     [didCancelLock unlock];
 
-    // Block is waiting for lock and executes
-    // Test pauses to ensure block is finished and -finishWithResult: is called on task
+    // Block is waiting for lock and executes before this continues
+    // Test that -finishWithResult: is called on task but is not honored in cancelled state
     [didCancelLock lock];
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"finish is honored on cancelled task");
     XCTAssertNil(task.result, @"finish is honored on cancelled task");
     XCTAssertNil(task.finishDate, @"finish is honored on cancelled task");
 
     [didCancelLock unlock];
+
+    // Test that when task receives cancel, it sends to dependents
+    task = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
+    graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [graph addTask:dependent1 prerequisites:task, nil];
+    [graph addTask:dependent2 prerequisites:task, nil];
+
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:dependent2 handler:nil];
+
+    [task cancel];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 
 - (void)testCancelAndFail
 {
     NSLock *didCancelLock = [[NSLock alloc] init];
-    XCTestExpectation *didStartExpectation = [self expectationWithDescription:@"main executed"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        [didStartExpectation fulfill];
-
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         // Pause to ensure state is cancelled before failWithError: is called
         [didCancelLock lock];
         [task failWithError:UMKRandomError()];
@@ -242,17 +277,16 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [didCancelLock lock];
     [task start];
-
-    // Ensure task is executing before cancel is called
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];   // Ensure task is executing before cancel is called
 
     [task cancel];
     [didCancelLock unlock];
 
-    // Block is waiting for lock and executes
-    // Test pauses to ensure block is finished and -failWithError: is called on task
+    // Block is waiting for lock and executes before this continues
+    // Test that -failWithError: is called on task but is not honored in cancelled state
     [didCancelLock lock];
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"fail is honored on cancelled task");
     XCTAssertNil(task.error, @"fail is honored on cancelled task");
@@ -264,35 +298,53 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
 - (void)testReset
 {
-    __block XCTestExpectation *expectation = [self expectationWithDescription:@"main executed first time"];
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        [expectation fulfill];
-    }];
-
+    TSKTestTask *task = [[TSKTestTask alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
     [graph addTask:task prerequisites:nil];
 
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     [task finishWithResult:UMKRandomUnicodeString()];
 
+    // Confirm task is finished and relevant properties have been set before resetting
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
     XCTAssertNotNil(task.result, @"result not set");
 
-    expectation = [self expectationWithDescription:@"main executed second time"];
+    NSString *newResult = UMKRandomAlphanumericString();
+    NSParameterAssert(newResult != task.result);
+
+    // Test that reset occurs and properties are reset
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [task reset];
-    // Wait for task to reset and start executing before testing that results were reset
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];  // Wait for task to reset and start executing before testing that results were reset
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertNil(task.finishDate, @"finish date was not reset");
     XCTAssertNil(task.result, @"result was not reset to nil");
 
-    [task finishWithResult:UMKRandomUnicodeString()];
-
+    // Test task finishes correctly with new date and result
+    [task finishWithResult:newResult];
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
-    XCTAssertNotNil(task.result, @"result not set");
+    XCTAssertEqual(task.result, newResult, @"result not set correctly");
+
+    // Test that when task receives reset, it sends to dependents
+    task = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
+    TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
+    graph = [[TSKGraph alloc] init];
+    [graph addTask:task prerequisites:nil];
+    [graph addTask:dependent1 prerequisites:task, nil];
+    [graph addTask:dependent2 prerequisites:task, nil];
+
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent1 handler:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent2 handler:nil];
+
+    [task reset];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 @end
