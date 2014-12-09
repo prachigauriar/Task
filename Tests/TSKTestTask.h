@@ -1,8 +1,8 @@
 //
-//  TSKRandomizedTestCase.h
+//  TSKTestTask.h
 //  Task
 //
-//  Created by Prachi Gauriar on 10/30/2014.
+//  Created by Jill Cohen on 12/9/14.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,19 +24,28 @@
 //  THE SOFTWARE.
 //
 
-@import XCTest;
-
-#import <URLMock/UMKTestUtilities.h>
 #import <Task/Task.h>
-#import "TSKTestTask.h"
 
+#pragma mark Constants
+
+extern NSString * const kTaskDidStartNotification;
+extern NSString * const kTaskDidFinishNotification;
+extern NSString * const kTaskDidFailNotification;
+extern NSString * const kTaskDidRetryNotification;
+extern NSString * const kTaskDidResetNotification;
+extern NSString * const kTaskDidCancelNotification;
+
+
+#pragma mark TSKTestTask
 /*!
- TSKRandomizedTestCases override +setUp to call srandomdev() and -setUp to generate and log a random seed
- value before calling srandom(). Subclasses that override +setUp or -setUp should invoke the superclass 
- implementation.
- */
-@interface TSKRandomizedTestCase : XCTestCase
+ TSKTestTask provides notifications for major events to enable testing with expectations.
+ It can take a block that executes in -main after the kTaskDidStartNotification is posted. (The class is similar to TSKBlock, but it allows the block to be nil.)
+*/
+@interface TSKTestTask : TSKTask
 
-- (NSString *)defaultNameForTask:(TSKTask *)task;
+@property (nonatomic, copy, readonly) void (^block)(TSKTask *task);
+
+- (instancetype)initWithBlock:(void (^)(TSKTask *task))block;
+- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block;
 
 @end

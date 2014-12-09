@@ -50,13 +50,16 @@
 		4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
 		4CD396F01A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
 		4CD396F11A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
+		710AAA811A377AC900512286 /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
+		7153184D1A3796130088290C /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
+		7153184E1A3796140088290C /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
+		7153184F1A3796180088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
+		715318501A3796190088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71E1002E1A096D6B00AD73F4 /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
-		71E1002F1A09706100AD73F4 /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
-		71E100301A09706200AD73F4 /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
 		71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
 		71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
 		71FE68021A0AA264009684FE /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */; };
@@ -131,6 +134,8 @@
 		4CB6CAE01A197B1000E68A6C /* TSKGraph+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKGraph+TaskInterface.h"; sourceTree = "<group>"; };
 		4CD396ED1A02F8AE008F6037 /* TSKRandomizedTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKRandomizedTestCase.h; sourceTree = "<group>"; };
 		4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKRandomizedTestCase.m; sourceTree = "<group>"; };
+		710AAA7F1A377AC900512286 /* TSKTestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTestTask.h; sourceTree = "<group>"; };
+		710AAA801A377AC900512286 /* TSKTestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTestTask.m; sourceTree = "<group>"; };
 		7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTaskTestCase.m; sourceTree = "<group>"; };
 		717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKDelegateTestCase.m; sourceTree = "<group>"; };
 		7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBlockTaskTestCase.m; sourceTree = "<group>"; };
@@ -255,6 +260,8 @@
 				71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */,
 				4C86D5BF19F2E96800C898AF /* Supporting Files */,
 				717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */,
+				710AAA7F1A377AC900512286 /* TSKTestTask.h */,
+				710AAA801A377AC900512286 /* TSKTestTask.m */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -671,10 +678,11 @@
 			files = (
 				4CD396F01A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
 				71FE68021A0AA264009684FE /* TSKBlockTaskTestCase.m in Sources */,
-				71E1002F1A09706100AD73F4 /* TSKGraphTestCase.m in Sources */,
+				7153184F1A3796180088290C /* TSKTestTask.m in Sources */,
 				71FE68091A0AD255009684FE /* TSKSelectorTaskTestCase.m in Sources */,
 				71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */,
 				71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
+				7153184D1A3796130088290C /* TSKGraphTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,6 +705,7 @@
 			files = (
 				71FE680D1A0AD2A7009684FE /* TSKBlockTaskTestCase.m in Sources */,
 				717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */,
+				710AAA811A377AC900512286 /* TSKTestTask.m in Sources */,
 				4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
 				7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */,
 				71FE680A1A0AD297009684FE /* TSKSelectorTaskTestCase.m in Sources */,
@@ -723,10 +732,11 @@
 			files = (
 				71FE680C1A0AD2A6009684FE /* TSKBlockTaskTestCase.m in Sources */,
 				4CD396F11A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
+				715318501A3796190088290C /* TSKTestTask.m in Sources */,
 				71FE680B1A0AD298009684FE /* TSKSelectorTaskTestCase.m in Sources */,
-				71E100301A09706200AD73F4 /* TSKGraphTestCase.m in Sources */,
 				71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */,
 				71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
+				7153184E1A3796140088290C /* TSKGraphTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
