@@ -39,6 +39,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testInit;
 - (void)testGraph;
 - (void)testStart;
+- (void)testOperationQueue;
 - (void)testFinish;
 - (void)testFail;
 - (void)testRetry;
@@ -118,6 +119,22 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 }
 
 
+- (void)testOperationQueue
+{
+    NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
+    TSKGraph *graph = [[TSKGraph alloc] initWithOperationQueue:operationQueue];
+    XCTestExpectation *testDidRunExpectation = [self expectationWithDescription:@"test for operation queue did run"];
+
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        XCTAssertEqualObjects(operationQueue, [NSOperationQueue currentQueue], @"task not executing on correct queue");
+        [testDidRunExpectation fulfill];
+    }];
+    [graph addTask:task prerequisites:nil];
+    [graph start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+
 - (void)testFinish
 {
     NSString *resultString = UMKRandomUnicodeString();
@@ -151,7 +168,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
     XCTAssertEqual(task.state, TSKTaskStateFailed, @"state  is not failed");
-    XCTAssertEqual(task.error, error, @"error not returned correcctly");
+    XCTAssertEqualObjects(task.error, error, @"error not returned correcctly");
     XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
 }
 

@@ -32,12 +32,11 @@
 - (void)testInit;
 - (void)testAddTasks;
 - (void)testAddTaskErrorCases;
-- (void)testOperationQueue;
 - (void)testHasUnfinishedTasks;
 - (void)testHasFailedTasks;
 - (void)testStartNoPrerequisites;
 - (void)testStartOnePrerequisite;
-- (void)testStartMultiplePrequisites;
+- (void)testStartMultiplePrerequisites;
 - (void)testStartMultipleDependents;
 - (void)testRetry;
 - (void)testCancel;
@@ -58,11 +57,13 @@
 
     NSString *graphName = UMKRandomUnicodeString();
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    NSString *queueName = queue.name;
     graph = [[TSKGraph alloc] initWithName:graphName operationQueue:queue];
     XCTAssertNotNil(graph, @"returns nil");
     XCTAssertEqualObjects(graph.allTasks, [NSSet set]);
     XCTAssertEqualObjects(graph.name, graphName, @"name not set properly");
-    XCTAssertEqual(graph.operationQueue, queue, @"operation queue not set properly");
+    XCTAssertEqualObjects(graph.operationQueue, queue, @"operation queue not set properly");
+    XCTAssertEqualObjects(graph.operationQueue.name, queueName, @"operation queue name changed");
 }
 
 
@@ -102,28 +103,12 @@
 }
 
 
-- (void)testOperationQueue
-{
-    NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
-    TSKGraph *graph = [[TSKGraph alloc] initWithOperationQueue:operationQueue];
-    XCTestExpectation *testDidRunExpectation = [self expectationWithDescription:@"test for operation queue did run"];
-
-    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
-        XCTAssertEqual(operationQueue, [NSOperationQueue currentQueue], @"task not executing on correct queue");
-        [testDidRunExpectation fulfill];
-    }];
-    [graph addTask:task prerequisites:nil];
-    [graph start];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
-}
-
-
 - (void)testHasUnfinishedTasks
 {
-// NOTE This property is also tested in other methods to test in other scenarios (e.g., retry, cancel)
+    // NOTE This property is also tested in other methods to test in other scenarios (e.g., retry, cancel)
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFinishLock];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
 
     [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
@@ -138,7 +123,7 @@
     XCTAssertFalse(graph.hasUnfinishedTasks, @"hasUnfinishedTasks is true");
 
     graph = [[TSKGraph alloc] init];
-    task = [self taskWithLock:nil failsWithError:nil];
+    task = [self failingTaskWithLock:nil];
     [graph addTask:task prerequisites:nil];
 
     [self expectationForNotification:kTaskDidFailNotification object:task handler:nil];
@@ -150,10 +135,10 @@
 
 - (void)testHasFailedTasks
 {
-// NOTE This property is also tested in other methods to test in other scenarios (e.g., retry, cancel)
+    // NOTE This property is also tested in other methods to test in other scenarios (e.g., retry, cancel)
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFinishLock failsWithError:nil];
+    TSKTestTask *task = [self failingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
 
     [self expectationForNotification:kTaskDidStartNotification object:task handler:nil];
@@ -168,7 +153,7 @@
     XCTAssertTrue(graph.hasFailedTasks, @"hasFailedTasks is false");
 
     graph = [[TSKGraph alloc] init];
-    task = [self taskWithLock:nil];
+    task = [self finishingTaskWithLock:nil];
     [graph addTask:task prerequisites:nil];
 
     [self expectationForNotification:kTaskDidFinishNotification object:task handler:nil];
@@ -181,7 +166,7 @@
 - (void)testStartNoPrerequisites
 {
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self task];
+    TSKTestTask *task = [[TSKTestTask alloc] init];
     [graph addTask:task prerequisites:nil];
 
     XCTAssertEqual(task.state, TSKTaskStateReady, "state is not ready");
@@ -197,8 +182,8 @@
 {
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFinishLock];
-    TSKTestTask *dependentTask = [self taskWithLock:willFinishLock];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
+    TSKTestTask *dependentTask = [self finishingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
     [graph addTask:dependentTask prerequisites:task, nil];
 
@@ -232,13 +217,13 @@
 }
 
 
-- (void)testStartMultiplePrequisites
+- (void)testStartMultiplePrerequisites
 {
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task1 = [self taskWithLock:willFinishLock];
-    TSKTestTask *task2 = [self taskWithLock:nil];
-    TSKTestTask *dependentTask = [self taskWithLock:willFinishLock];
+    TSKTestTask *task1 = [self finishingTaskWithLock:willFinishLock];
+    TSKTestTask *task2 = [self finishingTaskWithLock:nil];
+    TSKTestTask *dependentTask = [self finishingTaskWithLock:willFinishLock];
     [graph addTask:task1 prerequisites:nil];
     [graph addTask:task2 prerequisites:nil];
     [graph addTask:dependentTask prerequisites:task1, task2, nil];
@@ -280,9 +265,9 @@
 {
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFinishLock];
-    TSKTestTask *dependentTask1 = [self taskWithLock:willFinishLock];
-    TSKTestTask *dependentTask2 = [self taskWithLock:willFinishLock];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
+    TSKTestTask *dependentTask1 = [self finishingTaskWithLock:willFinishLock];
+    TSKTestTask *dependentTask2 = [self finishingTaskWithLock:willFinishLock];
 
     [graph addTask:task prerequisites:nil];
     [graph addTask:dependentTask1 prerequisites:task, nil];
@@ -327,7 +312,7 @@
 {
     NSLock *willFailLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFailLock failsWithError:nil];
+    TSKTestTask *task = [self failingTaskWithLock:willFailLock];
     [graph addTask:task prerequisites:nil];
 
     // Put task in typical state for retry
@@ -354,7 +339,7 @@
 {
     NSLock *willFinishLock = [[NSLock alloc] init];
     TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKTestTask *task = [self taskWithLock:willFinishLock];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
     [graph addTask:task prerequisites:nil];
 
     // Put task mid-execution
@@ -378,22 +363,11 @@
 
 #pragma mark Helper methods
 
-- (TSKTestTask *)task
-{
-    return [[TSKTestTask alloc] init];
-}
-
-- (TSKTestTask *)taskWithLock:(NSLock *)lock
-{
-    return [self taskWithLock:lock finishWithResult:nil];
-}
-
-
-- (TSKTestTask *)taskWithLock:(NSLock *)lock finishWithResult:(id)result
+- (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock
 {
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [lock lock];
-        [task finishWithResult:result];
+        [task finishWithResult:nil];
         [lock unlock];
     }];
 
@@ -401,11 +375,11 @@
 }
 
 
-- (TSKTestTask *)taskWithLock:(NSLock *)lock failsWithError:(NSError *)error
+- (TSKTestTask *)failingTaskWithLock:(NSLock *)lock
 {
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [lock lock];
-        [task failWithError:error];
+        [task failWithError:nil];
         [lock unlock];
     }];
     

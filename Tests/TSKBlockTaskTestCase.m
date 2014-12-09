@@ -45,7 +45,7 @@
 
     TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:block];
     XCTAssertNotNil(task, @"returns nil");
-    XCTAssertEqual(task.block, block, @"block not set propertly");
+    XCTAssertEqualObjects(task.block, block, @"block not set propertly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNil(task.graph, @"graph is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
@@ -54,7 +54,7 @@
     NSString *name = UMKRandomUnicodeString();
     task = [[TSKBlockTask alloc] initWithName:name block:block];
     XCTAssertNotNil(task, @"returns nil");
-    XCTAssertEqual(task.block, block, @"block not set properly");
+    XCTAssertEqualObjects(task.block, block, @"block not set properly");
     XCTAssertEqualObjects(task.name, name, @"name not set properly");
     XCTAssertNil(task.graph, @"graph is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");

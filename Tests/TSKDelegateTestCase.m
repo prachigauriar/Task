@@ -210,7 +210,7 @@
     [task failWithError:error];
 
     XCTAssertTrue(failDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, failDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, failDelegate.error, @"correct error not passed");
     XCTAssertEqual(failDelegate.task, task, @"correct task not passed");
 
     // Test with nil error
@@ -236,7 +236,7 @@
 
     // Test delegate implementing both optional methods
     XCTAssertTrue(finishAndFailDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, finishAndFailDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, finishAndFailDelegate.error, @"correct error not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFinish, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.result, @"wrong delegate method sent");
@@ -297,7 +297,7 @@
     task = [self failedTaskWithGraphDelegate:finishAndFailDelegate error:error];
 
     XCTAssertTrue(finishAndFailDelegate.didReceiveFail, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(error, finishAndFailDelegate.error, @"correct error not passed");
+    XCTAssertEqualObjects(error, finishAndFailDelegate.error, @"correct error not passed");
     XCTAssertEqual(finishAndFailDelegate.graph, task.graph, @"correct graph not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFinish, @"wrong delegate method sent");
