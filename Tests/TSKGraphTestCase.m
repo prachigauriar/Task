@@ -47,15 +47,12 @@
     XCTAssertEqualObjects(graph.operationQueue.name, ([NSString stringWithFormat:@"com.twotoasters.TSKGraph.TSKGraph %p", graph]), @"name not set to default");
 
     NSString *graphName = UMKRandomUnicodeString();
-    NSString *queueName = UMKRandomUnicodeString();
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.name = queueName;
     graph = [[TSKGraph alloc] initWithName:graphName operationQueue:queue];
     XCTAssertNotNil(graph, @"returns nil");
     XCTAssertEqualObjects(graph.allTasks, [NSSet set]);
     XCTAssertEqualObjects(graph.name, graphName, @"name not set properly");
     XCTAssertEqual(graph.operationQueue, queue, @"operation queue not set properly");
-    XCTAssertEqualObjects(graph.operationQueue.name, queueName, @"queue name modified");
 }
 
 
@@ -67,7 +64,6 @@
     XCTAssertEqualObjects([graph prerequisiteTasksForTask:task], [NSSet set], @"prereqs not set");
     XCTAssertEqualObjects([graph dependentTasksForTask:task], [NSSet set], @"prereqs not set");
 
-
     TSKTask *dependent = [[TSKTask alloc] init];
     [graph addTask:dependent prerequisites:task, nil];
 
@@ -76,6 +72,39 @@
     XCTAssertEqualObjects([graph allTasks], ([NSSet setWithObjects:task, dependent, nil]), @"all tasks not set property");
     XCTAssertEqualObjects([graph tasksWithNoPrerequisiteTasks], ([NSSet setWithObject:task]), @"tasksWithNoPrerequisiteTasks not set correctly");
     XCTAssertEqualObjects([graph tasksWithNoDependentTasks], ([NSSet setWithObject:dependent]), @"tasksWithNoDependentTasks not set correctly");
+}
+
+
+- (void)testAddTaskErrorCases
+{
+    TSKGraph *graph = [[TSKGraph alloc] init];
+    TSKTask *task = [[TSKTask alloc] init];
+    [graph addTask:task prerequisites:nil];
+    XCTAssertThrows([graph addTask:task prerequisites:nil], @"adding a task to the same graph twice does not throw an exception");
+
+    TSKGraph *otherGraph = [[TSKGraph alloc] init];
+    XCTAssertThrows([otherGraph addTask:task prerequisites:nil], @"adding a task to a second graph does not throw an exception");
+
+    TSKTask *prerequisiteTask = [[TSKTask alloc] init];
+    TSKTask *dependentTask = [[TSKTask alloc] init];
+
+    XCTAssertThrows(([graph addTask:dependentTask prerequisites:prerequisiteTask, nil]), @"graph allows a task to be added before its prerequisite is added");
+}
+
+
+- (void)testOperationQueue
+{
+    NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
+    TSKGraph *graph = [[TSKGraph alloc] initWithOperationQueue:operationQueue];
+    XCTestExpectation *testDidRunExpectation = [self expectationWithDescription:@"test for operation queue did run"];
+
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        XCTAssertEqual(operationQueue, [NSOperationQueue currentQueue], @"task not executing on correct queue");
+        [testDidRunExpectation fulfill];
+    }];
+    [graph addTask:task prerequisites:nil];
+    [graph start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 @end
