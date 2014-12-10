@@ -317,6 +317,20 @@
     TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
     graph.delegate = finishAndFailDelegate;
 
+    [graph start];
+
+    XCTAssertTrue(finishAndFailDelegate.didReceiveFinish, @"delegate method not sent to delegate implementing it");
+    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertFalse(finishAndFailDelegate.didReceiveFail, @"wrong delegate method sent");
+    XCTAssertNil(finishAndFailDelegate.error, @"wrong delegate method sent");
+    XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
+
+    graph = [[TSKGraph alloc] init];
+    finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
+    graph.delegate = finishAndFailDelegate;
+
+    [graph retry];
+
     XCTAssertTrue(finishAndFailDelegate.didReceiveFinish, @"delegate method not sent to delegate implementing it");
     XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
     XCTAssertFalse(finishAndFailDelegate.didReceiveFail, @"wrong delegate method sent");

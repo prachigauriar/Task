@@ -245,6 +245,13 @@
 
 - (void)start
 {
+    if (self.tasks.count == 0) {
+        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
+            [self.delegate graphDidFinish:self];
+        }
+        return;
+    }
+
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
 }
 
@@ -257,6 +264,13 @@
 
 - (void)retry
 {
+    if (self.tasks.count == 0) {
+        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
+            [self.delegate graphDidFinish:self];
+        }
+        return;
+    }
+
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
 }
 
