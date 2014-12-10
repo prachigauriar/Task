@@ -36,7 +36,7 @@
  first being added to a graph. Once a task is added to a graph, it cannot be placed in another
  graph.
 
- Every task graph has an operation queue on which its tasks -main methods are enqueued.
+ Every task graph has an operation queue on which its tasks ‑main methods are enqueued.
 
  Task graphs also have the ability to be started, canceled, or retried, which simply sends the
  appropriate message to those tasks in the graph that have no prerequisites. At that point, the
@@ -91,7 +91,7 @@
  @abstract Initializes a newly created TSKGraph instance with the specified operation queue.
  @discussion The task graph will have a name of “TSKGraph «id»”, where «id» is the memory
      address of the task graph.
- @param operationQueue The operation queue the graph’s tasks will use to execute their -main
+ @param operationQueue The operation queue the graph’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task graph with the default
      quality of service and maximum concurrent operations count. The queue’s name will be of the
      form “com.twotoasters.TSKGraph.«name»”, where «name» is the name of the task graph.
@@ -105,7 +105,7 @@
  @discussion This is the class’s designated initializer.
  @param name The name of the task graph. If nil, the instance’s name will be set to 
      “TSKGraph «id»”, where «id» is the memory address of the task.
- @param operationQueue The operation queue the graph’s tasks will use to execute their -main
+ @param operationQueue The operation queue the graph’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task graph with the default
      quality of service and maximum concurrent operations count. The queue’s name will be of the
      form “com.twotoasters.TSKGraph.«name»”, where «name» is the name of the task graph.
@@ -156,16 +156,16 @@
 - (NSSet *)dependentTasksForTask:(TSKTask *)task;
 
 /*!
- @abstract Sends -start to every prerequisite-less task in the receiver.
+ @abstract Sends ‑start to every prerequisite-less task in the receiver.
  @discussion This serves to begin execution of the tasks in the receiver. After the initial set of 
-     tasks finish successfully, they will automatically invoke -start on their dependent tasks and
+     tasks finish successfully, they will automatically invoke ‑start on their dependent tasks and
      so on until all tasks have finished successfully. If no tasks have been added to the graph, 
-     this will immediately send -graphDidFinish: to the delegate.
+     this will immediately send ‑graphDidFinish: to the delegate.
  */
 - (void)start;
 
 /*!
- @abstract Sends -cancel to every prerequisite-less task in the receiver. 
+ @abstract Sends ‑cancel to every prerequisite-less task in the receiver. 
  @discussion This serves to mark all the tasks in the receiver as cancelled. The initial set of 
      tasks will propagate the cancellation to their dependent tasks and so on until all tasks that
      can be cancelled will be.
@@ -173,11 +173,11 @@
 - (void)cancel;
 
 /*!
- @abstract Sends -retry to every prerequisite-less task in the receiver. 
+ @abstract Sends ‑retry to every prerequisite-less task in the receiver. 
  @discussion This serves to retry all the tasks in the receiver that have failed. The initial set of 
      tasks will propagate the retry to their dependent tasks and so on until all tasks that
      can be retried will be. If no tasks have been added to the graph, this will immediately send
-     -graphDidFinish: to the delegate.
+     ‑graphDidFinish: to the delegate.
  */
 - (void)retry;
 
@@ -210,14 +210,14 @@
 
 /*!
  @abstract Sent to the delegate when all a graph’s tasks finish successfully.
- @discussion This is invoked after individual task delegates receive -task:didFinishWithResult:.
+ @discussion This is invoked after individual task delegates receive ‑task:didFinishWithResult:.
  @param graph The graph whose tasks finished.
  */
 - (void)graphDidFinish:(TSKGraph *)graph;
 
 /*!
  @abstract Sent to the delegate when one of a graph’s tasks fail.
- @discussion This is invoked after the task’s delegate receives -task:didFailWithError:.
+ @discussion This is invoked after the task’s delegate receives ‑task:didFailWithError:.
  @param graph The graph that contains the task.
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.

@@ -73,16 +73,16 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
  For tasks to be useful, they must be added to a task graph — a TSKGraph object. Task graphs
  provide an execution context for tasks and keep track of prerequisite and dependent relationships
- between them. While tasks can be started directly (using -start), they are more typically started
- by sending their graph the -start message, which begins executing all tasks in the graph that have
+ between them. While tasks can be started directly (using ‑start), they are more typically started
+ by sending their graph the ‑start message, which begins executing all tasks in the graph that have
  no prerequisite tasks. When all of a task’s prerequisite tasks have finished successfully, the task
  will automatically be enqueued for execution. A task cannot be executed until all of its
- prerequisite tasks have completed successfully. If a task fails, it can be retried using the -retry
+ prerequisite tasks have completed successfully. If a task fails, it can be retried using the ‑retry
  message. See the TSKGraph documentation for more information on running tasks.
  
- To make a task perform useful work, you must subclass TSKTask and override -main. Your implementation
- should execute any operations necessary to complete your task, and invoke either -finishWithResult: or
- -failWithError: when complete. TSKTask has three built-in subclasses — TSKBlockTask, TSKSelectorTask, 
+ To make a task perform useful work, you must subclass TSKTask and override ‑main. Your implementation
+ should execute any operations necessary to complete your task, and invoke either ‑finishWithResult: or
+  ‑failWithError: when complete. TSKTask has three built-in subclasses — TSKBlockTask, TSKSelectorTask, 
  and TSKExternalConditionTask — which can generally be used as an alternative to subclassing TSKTask 
  yourself. See their respective class documentation for more information.
  
@@ -152,7 +152,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 /*!
  @abstract Whether the task has been cancelled.
- @discussion Subclasses should periodically check this property during the execution of the -main
+ @discussion Subclasses should periodically check this property during the execution of the ‑main
      method and quit executing if it is set to YES.
  */
 @property (nonatomic, assign, readonly, getter=isCancelled) BOOL cancelled;
@@ -165,20 +165,20 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 /*!
  @abstract The date at which the task either finished successfully or failed. 
- @discussion This is nil until the task receives either -finishWithResult: or -failWithError:.
+ @discussion This is nil until the task receives either ‑finishWithResult: or ‑failWithError:.
  */
 @property (nonatomic, strong, readonly) NSDate *finishDate;
 
 /*!
  @abstract The result of the task finishing successfully. 
- @discussion This is nil until the task receives -finishWithResult:, after which it is the value
+ @discussion This is nil until the task receives ‑finishWithResult:, after which it is the value
      of that message’s result parameter.
  */
 @property (nonatomic, strong, readonly) id result;
 
 /*!
  @abstract The error that caused the task to fail. 
- @discussion This is nil until the task receives -failWithError:, after which it is the value of
+ @discussion This is nil until the task receives ‑failWithError:, after which it is the value of
      that message’s error parameter.
  */
 @property (nonatomic, strong, readonly) NSError *error;
@@ -197,10 +197,10 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 /*!
  @abstract Performs the task’s work.
- @discussion The default implementation of this method simply invokes -finishWithResult: with a nil
+ @discussion The default implementation of this method simply invokes ‑finishWithResult: with a nil
      parameter. You should override this method to perform any work necessary to complete your task. 
      In your implementation, do not invoke super. When your work is complete, it is imperative that 
-     the receiver be sent either -finishWithResult: or -failWithError:. Failing to do so will 
+     the receiver be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will 
      prevent dependent tasks from executing.
      
      Subclass implementations of this method should periodically check whether the task is in the 
@@ -209,9 +209,9 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 - (void)main;
 
 /*!
- @abstract Executes the task’s -main method if the task is in the ready state.
+ @abstract Executes the task’s ‑main method if the task is in the ready state.
  @discussion More accurately, the receiver will enqueue an operation on its graph’s operation queue
-     that executes the task’s -main method if and only if the task is ready when the operation is 
+     that executes the task’s ‑main method if and only if the task is ready when the operation is 
      executed.
      
      This method should not be invoked if the task has not yet been added to a graph. Subclasses 
@@ -221,11 +221,11 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 /*!
  @abstract Sets the task’s state to cancelled if it is pending, ready, or executing. 
- @discussion Regardless of the receiver’s state, sends the -cancel message to all of the
+ @discussion Regardless of the receiver’s state, sends the ‑cancel message to all of the
      receiver’s dependent tasks.
  
      Note that this only marks the task as cancelled. It is up individual subclasses of TSKTask to
-     stop executing when a task is marked as cancelled. See the documentation of -main for more
+     stop executing when a task is marked as cancelled. See the documentation of ‑main for more
      information.
      
      Subclasses should not override this method.
@@ -235,7 +235,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
      starts the task if its prerequisite tasks have all finished successfully.
- @discussion Regardless of the receiver’s state, sends the -reset message to all of the
+ @discussion Regardless of the receiver’s state, sends the ‑reset message to all of the
      receiver’s dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
@@ -245,7 +245,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 /*!
  @abstract Sets the task’s state to pending if it is pending, ready, cancelled or failed, and
      starts the task if its prerequisite tasks have all finished successfully.
- @discussion Regardless of the receiver’s state, sends the -retry message to all of the receiver’s
+ @discussion Regardless of the receiver’s state, sends the ‑retry message to all of the receiver’s
      dependent tasks.
 
      Subclasses should not override this method.
@@ -257,7 +257,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
  @discussion Subclasses should ensure that this message is sent to the task when the task’s work
      finishes successfully.
  
-     If the receiver’s delegate implements -task:didFinishWithResult:, it is sent that message
+     If the receiver’s delegate implements ‑task:didFinishWithResult:, it is sent that message
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
@@ -268,7 +268,7 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
  @discussion Subclasses should ensure that this message is sent to the task when the task’s work
      fails. 
 
-     If the receiver’s delegate implements -task:didFailWithError:, it is sent that message
+     If the receiver’s delegate implements ‑task:didFailWithError:, it is sent that message
      after the task’s state is updated.
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.

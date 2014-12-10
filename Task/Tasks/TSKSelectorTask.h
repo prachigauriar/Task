@@ -44,8 +44,8 @@
  @abstract The selector that the task’s target performs in order to do the task’s work. 
  @discussion May not be NULL. This selector must take a single parameter of type TSKTask *. 
  
-     The method corresponding to this selector takes the place of a TSKTask’s -main method. As such,
-     the method must invoke -finishWithResult: or -failWithError: on the supplied task parameter
+     The method corresponding to this selector takes the place of a TSKTask’s ‑main method. As such,
+     the method must invoke ‑finishWithResult: or ‑failWithError: on the supplied task parameter
      upon success and failure, respectively. Failing to do so will prevent dependent tasks from
      executing.
      
@@ -57,7 +57,7 @@
 /*!
  @abstract Initializes a newly created TSKSelectorTask instance with the specified target and
      selector.
- @discussion A default name will be given to the task as specified by TSKTask’s -initWithName:.
+ @discussion A default name will be given to the task as specified by TSKTask’s ‑initWithName:.
  @param target The receiver of the task’s message-send. May not be nil.
  @param selector The selector that the task’s target performs in order to do the task’s work. 
      May not be NULL.
@@ -70,7 +70,7 @@
      selector.
  @discussion This is the class’s designated initializer.
  @param name The name of the task. If nil, a default name will be given to the task as specified by
-     TSKTask’s -initWithName:.
+     TSKTask’s ‑initWithName:.
  @param target The receiver of the task’s message-send. May not be nil.
  @param selector The selector that the task’s target performs in order to do the task’s work. 
      May not be NULL.
