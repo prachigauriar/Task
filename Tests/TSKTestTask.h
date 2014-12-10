@@ -26,6 +26,7 @@
 
 #import <Task/Task.h>
 
+
 #pragma mark Constants
 
 extern NSString *const TSKTestTaskDidStartNotification;
@@ -37,15 +38,16 @@ extern NSString *const TSKTestTaskDidCancelNotification;
 
 
 #pragma mark -
+
 /*!
- TSKTestTask provides notifications for major events to enable testing with expectations.
- It can take a block that executes in -main after the TSKTestTaskDidStartNotification is posted. (The class is similar to TSKBlock, but it allows the block to be nil.)
+ TSKTestTask posts notifications for major events to ease testing. Each TSKTestTask has an optional block
+ that executes -main after the TSKTestTaskDidStartNotification is posted.
 */
 @interface TSKTestTask : TSKTask
 
 @property (nonatomic, copy, readonly) void (^block)(TSKTask *task);
 
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block;
-- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block;
+- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block NS_DESIGNATED_INITIALIZER;
 
 @end

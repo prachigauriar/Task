@@ -26,6 +26,7 @@
 
 #import "TSKTestTask.h"
 
+
 NSString *const TSKTestTaskDidStartNotification = @"Task did start";
 NSString *const TSKTestTaskDidFinishNotification = @"Task did finish";
 NSString *const TSKTestTaskDidFailNotification = @"Task did fail";
@@ -35,6 +36,11 @@ NSString *const TSKTestTaskDidCancelNotification = @"Task did cancel";
 
 
 @implementation TSKTestTask
+
+- (instancetype)initWithName:(NSString *)name
+{
+    return [self initWithName:name block:nil];
+}
 
 
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block
@@ -53,7 +59,6 @@ NSString *const TSKTestTaskDidCancelNotification = @"Task did cancel";
     return self;
 }
 
-#pragma mark - Execution
 
 - (void)main
 {

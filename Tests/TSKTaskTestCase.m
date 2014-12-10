@@ -27,12 +27,12 @@
 #import "TSKRandomizedTestCase.h"
 
 
-#pragma mark - Constants
+#pragma mark Constants
 
 static const NSTimeInterval kFinishDateTolerance = 0.1;
 
 
-#pragma mark - TSKTaskTestCase
+#pragma mark - 
 
 @interface TSKTaskTestCase : TSKRandomizedTestCase
 

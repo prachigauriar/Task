@@ -361,7 +361,7 @@
 }
 
 
-#pragma mark Helper methods
+#pragma mark - Helper methods
 
 - (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock
 {

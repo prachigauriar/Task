@@ -37,6 +37,7 @@
 
 @end
 
+
 @implementation TSKTaskDelegateFinish
 
 - (void)task:(TSKTask *)task didFinishWithResult:(id)result
@@ -57,6 +58,7 @@
 
 @end
 
+
 @implementation TSKTaskDelegateFail
 
 - (void)task:(TSKTask *)task didFailWithError:(NSError *)error
@@ -76,6 +78,7 @@
 
 @end
 
+
 @implementation TSKTaskDelegateFinishAndFail
 
 - (void)task:(TSKTask *)task didFailWithError:(NSError *)error
@@ -88,7 +91,7 @@
 @end
 
 
-# pragma mark Helper Classes for Graph Delegates
+# pragma mark - Helper Classes for Graph Delegates
 
 @interface TSKGraphDelegateFinish : NSObject <TSKGraphDelegate>
 
@@ -96,6 +99,7 @@
 @property (nonatomic, strong) TSKGraph *graph;
 
 @end
+
 
 @implementation TSKGraphDelegateFinish
 
@@ -116,6 +120,7 @@
 @property (nonatomic, strong) TSKTask *task;
 
 @end
+
 
 @implementation TSKGraphDelegateFail
 
@@ -138,6 +143,7 @@
 
 @end
 
+
 @implementation TSKGraphDelegateFinishAndFail
 
 - (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
@@ -151,7 +157,7 @@
 @end
 
 
-#pragma mark Tests for Delegate Methods
+#pragma mark - Tests for Delegate Methods
 
 @interface TSKDelegateTestCase : TSKRandomizedTestCase
 
@@ -162,6 +168,7 @@
 - (void)testGraphDelegateNoTasks;
 
 @end
+
 
 @implementation TSKDelegateTestCase
 
@@ -317,7 +324,8 @@
     XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
 }
 
-#pragma mark Helper methods
+
+#pragma mark - Helper methods
 
 - (TSKTask *)taskExecutingWithDelegate:(id)delegate
 {
@@ -374,6 +382,4 @@
     return task;
 }
 
-
 @end
-
