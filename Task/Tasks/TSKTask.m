@@ -66,7 +66,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 /*!
  @abstract A dispatch queue to control changes to task state.
- @discussion This queue is only used within -transitionFromStateInSet:toState:andExecuteBlock: to 
+ @discussion This queue is only used within ‑transitionFromStateInSet:toState:andExecuteBlock: to 
      perform data synchronization.
  */
 @property (nonatomic, strong, readonly) dispatch_queue_t stateQueue;
@@ -191,11 +191,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 + (BOOL)automaticallyNotifiesObserversOfState
 {
-    // This avoids a deadlock condition in -transitionFromStateInSet:toState:andExecuteBlock: in which
+    // This avoids a deadlock condition in ‑transitionFromStateInSet:toState:andExecuteBlock: in which
     // the stateQueue is in use, but KVO observers are notified of the change before the state transition
     // block exits the queue. This is a problem when, e.g., upon task failure, a KVO observer is notified
     // on the same thread as the aforementioned method. If the KVO observer immediately sends the task
-    // -retry, that message will result in -transitionFromStateInSet:toState:andExecuteBlock: being
+    // ‑retry, that message will result in ‑transitionFromStateInSet:toState:andExecuteBlock: being
     // invoked again before the block from the original invocation exits the stateQueue, thus resulting
     // in deadlock.
     return NO;
@@ -323,10 +323,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
     // Because the operation queue is asynchronous, we need to be sure to do the state transition
     // after the operation starts executing. The alternative of adding the operation inside of the
-    // state transition’s block could lead to a weird situation in which -main is invoked, but the
-    // task has already been marked cancelled. This shouldn’t be an issue, since -main should be
+    // state transition’s block could lead to a weird situation in which ‑main is invoked, but the
+    // task has already been marked cancelled. This shouldn’t be an issue, since ‑main should be
     // checking if the task is cancelled and exiting as soon as possible, but that’s not always
-    // possible. Doing the check inside the operation’s block before invoking -main avoids that.
+    // possible. Doing the check inside the operation’s block before invoking ‑main avoids that.
     [self.operationQueue addOperationWithBlock:^{
         [self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
             [self main];

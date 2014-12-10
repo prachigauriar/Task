@@ -43,7 +43,7 @@
 /*!
  @abstract Indicates that the external condition is fulfilled.
  @param result The result that the task should finish with. May be nil.
- @discussion Automatically sends itself the -retry message, thus starting itself if possible
+ @discussion Automatically sends itself the ‑retry message, thus starting itself if possible
      and allowing its dependent tasks to be retried. Does nothing if the receiver is already
      finished.
  */
