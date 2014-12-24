@@ -29,6 +29,18 @@
 #import <Task/TSKTask+GraphInterface.h>
 
 
+#pragma mark Constants
+
+NSString *const TSKGraphDidCancelNotification = @"TSKGraphDidCancelNotification";
+NSString *const TSKGraphDidFinishNotification = @"TSKGraphDidFinishNotification";
+NSString *const TSKGraphDidRetryNotification = @"TSKGraphDidRetryNotification";
+NSString *const TSKGraphDidStartNotification = @"TSKGraphDidStartNotification";
+NSString *const TSKGraphTaskDidFailNotification = @"TSKGraphTaskDidFailNotification";
+NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
+
+
+#pragma mark -
+
 @interface TSKGraph ()
 
 /*!
@@ -96,21 +108,26 @@
 
 - (instancetype)initWithName:(NSString *)name operationQueue:(NSOperationQueue *)operationQueue
 {
+    return [self initWithName:name operationQueue:operationQueue notificationCenter:nil];
+}
+
+
+- (instancetype)initWithName:(NSString *)name
+              operationQueue:(NSOperationQueue *)operationQueue
+          notificationCenter:(NSNotificationCenter *)notificationCenter
+{
     self = [super init];
     if (self) {
-        // If no name was provided, use the default
-        if (!name) {
-            name = [[NSString alloc] initWithFormat:@"TSKGraph %p", self];
-        }
-
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
             operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKGraph.%@", name];
         }
 
-        _name = [name copy];
+        _name = name ? [name copy] : [[NSString alloc] initWithFormat:@"TSKGraph %p", self];
         _operationQueue = operationQueue;
+        _notificationCenter = notificationCenter ? notificationCenter : [NSNotificationCenter defaultCenter];
+
         _tasks = [[NSMutableSet alloc] init];
         _finishedTasks = [[NSMutableSet alloc] init];
 
@@ -243,35 +260,43 @@
 
 #pragma mark -
 
-- (void)start
+- (BOOL)finishImmediatelyIfNoSubtasks
 {
-    if (self.tasks.count == 0) {
-        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
-            [self.delegate graphDidFinish:self];
-        }
-        return;
+    if (self.tasks.count != 0) {
+        return NO;
     }
 
-    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
+    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
+        [self.delegate graphDidFinish:self];
+    }
+
+    [self.notificationCenter postNotificationName:TSKGraphDidFinishNotification object:self];
+    return YES;
+}
+
+
+- (void)start
+{
+    [self.notificationCenter postNotificationName:TSKGraphDidStartNotification object:self];
+    if (![self finishImmediatelyIfNoSubtasks]) {
+        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
+    }
 }
 
 
 - (void)cancel
 {
+    [self.notificationCenter postNotificationName:TSKGraphDidCancelNotification object:self];
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(cancel)];
 }
 
 
 - (void)retry
 {
-    if (self.tasks.count == 0) {
-        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
-            [self.delegate graphDidFinish:self];
-        }
-        return;
+    [self.notificationCenter postNotificationName:TSKGraphDidRetryNotification object:self];
+    if (![self finishImmediatelyIfNoSubtasks]) {
+        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
     }
-
-    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
 }
 
 
@@ -285,8 +310,12 @@
         allTasksFinished = [self.tasksWithNoDependentTasks isSubsetOfSet:self.finishedTasks];
     });
 
-    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)] && allTasksFinished) {
-        [self.delegate graphDidFinish:self];
+    if (allTasksFinished) {
+        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
+            [self.delegate graphDidFinish:self];
+        }
+
+        [self.notificationCenter postNotificationName:TSKGraphDidFinishNotification object:self];
     }
 }
 
@@ -296,6 +325,8 @@
     if ([self.delegate respondsToSelector:@selector(graph:task:didFailWithError:)]) {
         [self.delegate graph:self task:task didFailWithError:error];
     }
+
+    [self.notificationCenter postNotificationName:TSKGraphTaskDidFailNotification object:self userInfo:@{ TSKGraphFailedTaskKey : task }];
 }
 
 

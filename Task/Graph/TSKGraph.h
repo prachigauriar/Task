@@ -27,6 +27,54 @@
 #import <Foundation/Foundation.h>
 
 
+#pragma mark Constants
+
+/*!
+ @abstract Notification posted when a graph is cancelled.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑cancel
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphDidCancelNotification;
+
+/*!
+ @abstract Notification posted when all a graph’s tasks finished.
+ @discussion This notification is posted immediately after the graph’s delegate is sent the
+     ‑graphDidFinish: message. The object of the notification is the graph. It has no userInfo
+     dictionary.
+ */
+extern NSString *const TSKGraphDidFinishNotification;
+
+/*!
+ @abstract Notification posted when a graph is retried.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑retry
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphDidRetryNotification;
+
+/*!
+ @abstract Notification posted when a graph is started.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑start
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphDidStartNotification;
+
+/*!
+ @abstract Notification posted when all a graph’s tasks finished.
+ @discussion This notification is posted immediately after the graph’s delegate is sent the
+     ‑graph:task:didFailWithError: message. The object of the notification is the graph. Its
+     userInfo dictionary contains a single key, TSKGraphFailedTaskKey, whose value is the task that
+     failed.
+ */
+extern NSString *const TSKGraphTaskDidFailNotification;
+
+/*!
+ @abstract Notification userInfo key whose value is a TSKTask object that failed.
+ */
+extern NSString *const TSKGraphFailedTaskKey;
+
+
+#pragma mark -
+
 @class TSKTask;
 @protocol TSKGraphDelegate;
 
@@ -67,6 +115,13 @@
  */
 @property (nonatomic, strong, readonly) NSOperationQueue *operationQueue;
 
+/*!
+ @abstract The task graph’s notification center.
+ @discussion All notifications posted by the graph and its tasks will be posted to this notification
+     center. By default, this is the default notification center.
+ */
+@property (nonatomic, strong, readonly) NSNotificationCenter *notificationCenter;
+
 /*! The task graph’s current set of tasks. */
 @property (nonatomic, copy, readonly) NSSet *allTasks;
 
@@ -102,8 +157,7 @@
 /*!
  @abstract Initializes a newly created TSKGraph instance with the specified name and operation
      queue.
- @discussion This is the class’s designated initializer.
- @param name The name of the task graph. If nil, the instance’s name will be set to 
+ @param name The name of the task graph. If nil, the instance’s name will be set to
      “TSKGraph «id»”, where «id» is the memory address of the task.
  @param operationQueue The operation queue the graph’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task graph with the default
@@ -111,7 +165,26 @@
      form “com.twotoasters.TSKGraph.«name»”, where «name» is the name of the task graph.
  @result A newly initialized TSKGraph instance with the specified name and operation queue.
  */
-- (instancetype)initWithName:(NSString *)name operationQueue:(NSOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name operationQueue:(NSOperationQueue *)operationQueue;
+
+/*!
+ @abstract Initializes a newly created TSKGraph instance with the specified name, operation
+     queue, and notification center.
+ @discussion This is the class’s designated initializer.
+ @param name The name of the task graph. If nil, the instance’s name will be set to
+     “TSKGraph «id»”, where «id» is the memory address of the task.
+ @param operationQueue The operation queue the graph’s tasks will use to execute their ‑main
+     methods. If nil, a new operation queue will be created for the task graph with the default
+     quality of service and maximum concurrent operations count. The queue’s name will be of the
+     form “com.twotoasters.TSKGraph.«name»”, where «name» is the name of the task graph.
+ @param notificationCenter The notification center the graph and its tasks will use to post 
+     notifications. If nil, the default notification center will be used.
+ @result A newly initialized TSKGraph instance with the specified name, operation queue,
+     and notification center.
+ */
+- (instancetype)initWithName:(NSString *)name
+              operationQueue:(NSOperationQueue *)operationQueue
+          notificationCenter:(NSNotificationCenter *)notificationCenter NS_DESIGNATED_INITIALIZER;
 
 /*!
  @abstract Adds the specified task to the task graph with the specified set of prerequisite tasks.

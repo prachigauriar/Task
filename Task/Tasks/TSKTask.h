@@ -61,6 +61,54 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
 extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 
 
+/*!
+ @abstract Notification posted when a task is cancelled.
+ @discussion This notification is posted immediately after the task goes into the cancelled state.
+     The object of the notification is the task. It has no userInfo dictionary.
+ */
+extern NSString *const TSKTaskDidCancelNotification;
+
+/*!
+ @abstract Notification posted when a task fails.
+ @discussion This notification is posted immediately after the task’s delegate is sent the
+     ‑task:didFailWithError: message. The object of the notification is the task. It has no userInfo
+     dictionary.
+ */
+extern NSString *const TSKTaskDidFailNotification;
+
+/*!
+ @abstract Notification posted when a task finishes successfully.
+ @discussion This notification is posted immediately after the task’s delegate is sent the
+     ‑task:didFinishWithResult: message. The object of the notification is the task. It has no userInfo
+     dictionary.
+ */
+extern NSString *const TSKTaskDidFinishNotification;
+
+/*!
+ @abstract Notification posted when a task is reset.
+ @discussion This notification is posted immediately after the task is reset but before it is
+     automatically restarted. The object of the notification is the task. It has no userInfo
+     dictionary.
+ */
+extern NSString *const TSKTaskDidResetNotification;
+
+/*!
+ @abstract Notification posted when a task is retried.
+ @discussion This notification is posted immediately after the task is put back into the pending
+     state. The object of the notification is the task. It has no userInfo dictionary.
+ */
+extern NSString *const TSKTaskDidRetryNotification;
+
+/*!
+ @abstract Notification posted when a task starts.
+ @discussion This notification is posted immediately after the task goes into the executing state,
+     but before the task’s main method begins executing. The object of the notification is the task.
+     It has no userInfo dictionary.
+ */
+extern NSString *const TSKTaskDidStartNotification;
+
+
+
 #pragma mark -
 
 @class TSKGraph;
@@ -235,8 +283,9 @@ extern NSString *const TSKTaskStateDescription(TSKTaskState state);
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
      starts the task if its prerequisite tasks have all finished successfully.
- @discussion Regardless of the receiver’s state, sends the ‑reset message to all of the
-     receiver’s dependent tasks.
+ @discussion If, after being reset, the task’s prerequisites are complete, it is automatically 
+     started. Regardless of the receiver’s state, sends the ‑reset message to all of the receiver’s 
+     dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
  */
