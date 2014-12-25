@@ -42,12 +42,51 @@
     unsigned seed = (unsigned)random();
     NSLog(@"Using seed %d", seed);
     srandom(seed);
+    self.notificationCenter = [[NSNotificationCenter alloc] init];
 }
 
 
 - (NSString *)defaultNameForTask:(TSKTask *)task
 {
     return [NSString stringWithFormat:@"TSKTask %p", task];
+}
+
+
+- (TSKGraph *)graphForNotificationTesting
+{
+    return [[TSKGraph alloc] initWithName:nil operationQueue:nil notificationCenter:self.notificationCenter];
+}
+
+
+- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName task:(TSKTask *)task
+{
+    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", task, notificationName]];
+
+    __weak typeof(self) weak_self = self;
+    __block id observer = [self.notificationCenter addObserverForName:notificationName object:task queue:nil usingBlock:^(NSNotification *note) {
+        [notificationExpectation fulfill];
+        [weak_self.notificationCenter removeObserver:observer name:notificationName object:task];
+    }];
+
+    return notificationExpectation;
+}
+
+
+- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName graph:(TSKGraph *)graph block:(void (^)(NSNotification *))block
+{
+    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", graph, notificationName]];
+
+    __weak typeof(self) weak_self = self;
+    __block id observer = [self.notificationCenter addObserverForName:notificationName object:graph queue:nil usingBlock:^(NSNotification *note) {
+        if (block) {
+            block(note);
+        }
+
+        [notificationExpectation fulfill];
+        [weak_self.notificationCenter removeObserver:observer name:notificationName object:graph];
+    }];
+
+    return notificationExpectation;
 }
 
 @end

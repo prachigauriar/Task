@@ -118,13 +118,19 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 {
     self = [super init];
     if (self) {
+        // If no name was provided, use the default. Initialize this here, because we use it to generate the operation
+        // queue’s name below
+        if (!name) {
+            name = [[NSString alloc] initWithFormat:@"TSKGraph %p", self];
+        }
+
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
             operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKGraph.%@", name];
         }
 
-        _name = name ? [name copy] : [[NSString alloc] initWithFormat:@"TSKGraph %p", self];
+        _name = [name copy];
         _operationQueue = operationQueue;
         _notificationCenter = notificationCenter ? notificationCenter : [NSNotificationCenter defaultCenter];
 
