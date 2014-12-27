@@ -37,7 +37,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 @interface TSKTaskTestCase : TSKRandomizedTestCase
 
 - (void)testInit;
-- (void)testGraph;
+- (void)testWorkflow;
 - (void)testStart;
 - (void)testOperationQueue;
 - (void)testFinish;
@@ -61,7 +61,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     NSString *notName = UMKRandomUnicodeString();
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
@@ -71,7 +71,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.name, name, @"name not set to default");
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
@@ -79,24 +79,24 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     task = [[TSKTask alloc] initWithName:nil];
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
 }
 
 
-- (void)testGraph
+- (void)testWorkflow
 {
-    TSKGraph *graph = [self graphForNotificationTesting];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
     TSKTask *task = [[TSKTask alloc] init];
-    [graph addTask:task prerequisites:nil];
+    [workflow addTask:task prerequisites:nil];
 
-    XCTAssertEqual(graph, task.graph, @"graph not set properly");
+    XCTAssertEqual(workflow, task.workflow, @"workflow not set properly");
     XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prereqs not empty");
     XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependents not empty");
 
     TSKTask *dependent = [[TSKTask alloc] init];
-    [graph addTask:dependent prerequisites:task, nil];
+    [workflow addTask:dependent prerequisites:task, nil];
 
     XCTAssertEqualObjects(task.dependentTasks, [NSSet setWithObject:dependent], @"dependents not set properly");
     XCTAssertEqualObjects(dependent.prerequisiteTasks, [NSSet setWithObject:task], @"prereqs not set property");
@@ -108,8 +108,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testStart
 {
     TSKTestTask *task = [[TSKTestTask alloc] init];
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
 
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
@@ -125,7 +125,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testOperationQueue
 {
     NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
-    TSKGraph *graph = [[TSKGraph alloc] initWithOperationQueue:operationQueue];
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithOperationQueue:operationQueue];
     XCTestExpectation *testDidRunExpectation = [self expectationWithDescription:@"test for operation queue did run"];
 
     TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
@@ -133,8 +133,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
         [testDidRunExpectation fulfill];
     }];
 
-    [graph addTask:task prerequisites:nil];
-    [graph start];
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
@@ -145,8 +145,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [task finishWithResult:resultString];
     }];
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
     [self expectationForNotification:TSKTaskDidFinishNotification task:task];
@@ -166,8 +166,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [task failWithError:error];
     }];
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     [self expectationForNotification:TSKTestTaskDidFailNotification object:task handler:nil];
     [self expectationForNotification:TSKTaskDidFailNotification task:task];
@@ -184,8 +184,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testRetry
 {
     TSKTestTask *task = [[TSKTestTask alloc] init];
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     // Put task in a typical state for retry
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
@@ -207,16 +207,16 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [task finishWithResult:nil];
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
 
-    graph = [self graphForNotificationTesting];
+    workflow = [self workflowForNotificationTesting];
 
     // Test that when task receives retry, it sends to dependents
     task = [[TSKTestTask alloc] init];
     TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
     TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
 
-    [graph addTask:task prerequisites:nil];
-    [graph addTask:dependent1 prerequisites:task, nil];
-    [graph addTask:dependent2 prerequisites:task, nil];
+    [workflow addTask:task prerequisites:nil];
+    [workflow addTask:dependent1 prerequisites:task, nil];
+    [workflow addTask:dependent2 prerequisites:task, nil];
 
     // Don’t expect that the dependent tasks will get a retry message, because they’re already in the
     // pending state and thus won’t re-transition to that state
@@ -241,15 +241,17 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
         [didCancelLock unlock];
     }];
 
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     // Lock to ensure state transitions to cancelled before -finishWithResult: is called
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [self expectationForNotification:TSKTaskDidStartNotification task:task];
     [didCancelLock lock];
     [task start];
-    [self waitForExpectationsWithTimeout:1 handler:nil]; // Confirms that task is mid-execution when -cancel is called
+
+    // Confirms that task is mid-execution when -cancel is called
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 
     // Call cancel only after main has been entered
     [task cancel];
@@ -265,16 +267,16 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     [didCancelLock unlock];
 
-    graph = [self graphForNotificationTesting];
+    workflow = [self workflowForNotificationTesting];
 
     // Test that when task receives cancel, it sends to dependents
     task = [[TSKTestTask alloc] init];
     TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
     TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
 
-    [graph addTask:task prerequisites:nil];
-    [graph addTask:dependent1 prerequisites:task, nil];
-    [graph addTask:dependent2 prerequisites:task, nil];
+    [workflow addTask:task prerequisites:nil];
+    [workflow addTask:dependent1 prerequisites:task, nil];
+    [workflow addTask:dependent2 prerequisites:task, nil];
 
     [self expectationForNotification:TSKTaskDidCancelNotification task:task];
     [self expectationForNotification:TSKTaskDidCancelNotification task:dependent1];
@@ -299,14 +301,16 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
         [didCancelLock unlock];
     }];
 
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [self expectationForNotification:TSKTaskDidStartNotification task:task];
     [didCancelLock lock];
     [task start];
-    [self waitForExpectationsWithTimeout:1 handler:nil];   // Ensure task is executing before cancel is called
+
+    // Ensure task is executing before cancel is called
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 
     [task cancel];
     [didCancelLock unlock];
@@ -325,8 +329,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 - (void)testReset
 {
     TSKTestTask *task = [[TSKTestTask alloc] init];
-    TSKGraph *graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
 
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [self expectationForNotification:TSKTaskDidStartNotification task:task];
@@ -350,7 +354,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     [task reset];
 
-    [self waitForExpectationsWithTimeout:1 handler:nil];  // Wait for task to reset and start executing before testing that results were reset
+    // Wait for task to reset and start executing before testing that results were reset
+    [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
     XCTAssertNil(task.finishDate, @"finish date was not reset");
     XCTAssertNil(task.result, @"result was not reset to nil");
@@ -365,10 +370,10 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     task = [[TSKTestTask alloc] init];
     TSKTestTask *dependent1 = [[TSKTestTask alloc] init];
     TSKTestTask *dependent2 = [[TSKTestTask alloc] init];
-    graph = [self graphForNotificationTesting];
-    [graph addTask:task prerequisites:nil];
-    [graph addTask:dependent1 prerequisites:task, nil];
-    [graph addTask:dependent2 prerequisites:task, nil];
+    workflow = [self workflowForNotificationTesting];
+    [workflow addTask:task prerequisites:nil];
+    [workflow addTask:dependent1 prerequisites:task, nil];
+    [workflow addTask:dependent2 prerequisites:task, nil];
 
     // Don’t expect the tasks to post did reset notifications, because they’re not in a resettable state
     [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
@@ -387,7 +392,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 //     Pending -> Ready: All of task’s prerequisite tasks are finished (-startIfReady)
 //     Pending -> Cancelled: Task is cancelled (-cancel)
 //
-//     Ready -> Pending: Task is added to a graph with at least one prerequisite task (-didAddPrerequisiteTask)
+//     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
 //     Ready -> Executing: Task starts (-start)
 //     Ready -> Cancelled: Task is cancelled (-cancel)
 //

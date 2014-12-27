@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2318A7A08B7FB4850B72D91E /* libPods-Task Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */; };
-		4C1EDF6319F4784F0041A1D9 /* TSKGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKGraph.m */; };
-		4C1EDF6419F478500041A1D9 /* TSKGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKGraph.m */; };
+		4C1EDF6319F4784F0041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
+		4C1EDF6419F478500041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
 		4C1EDFBF19F48E1D0041A1D9 /* Task.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1EDFB419F48E1C0041A1D9 /* Task.framework */; };
 		4C1EDFCD19F48E620041A1D9 /* Task.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5B419F2E96800C898AF /* Task.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C1EDFCE19F48E6E0041A1D9 /* TaskErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -17,17 +17,17 @@
 		4C1EDFD019F48E6E0041A1D9 /* TSKBlockTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D62E19F2F79900C898AF /* TSKBlockTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C1EDFD119F48E6E0041A1D9 /* TSKSelectorTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63219F2F79900C898AF /* TSKSelectorTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C1EDFD219F48E6E0041A1D9 /* TSKExternalConditionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63019F2F79900C898AF /* TSKExternalConditionTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4C1EDFD319F48E6E0041A1D9 /* TSKGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4C1EDFD419F48E720041A1D9 /* TSKTask+GraphInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63419F2F79900C898AF /* TSKTask+GraphInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4C1EDFD319F48E6E0041A1D9 /* TSKWorkflow.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C1EDFD419F48E720041A1D9 /* TSKTask+WorkflowInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4C1EDFD519F48E7F0041A1D9 /* TaskErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5FC19F2EC0C00C898AF /* TaskErrors.m */; };
 		4C1EDFD619F48E7F0041A1D9 /* TSKTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63619F2F79900C898AF /* TSKTask.m */; };
 		4C1EDFD719F48E7F0041A1D9 /* TSKBlockTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D62F19F2F79900C898AF /* TSKBlockTask.m */; };
 		4C1EDFD819F48E7F0041A1D9 /* TSKSelectorTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63319F2F79900C898AF /* TSKSelectorTask.m */; };
 		4C1EDFD919F48E7F0041A1D9 /* TSKExternalConditionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */; };
-		4C1EDFDA19F48E7F0041A1D9 /* TSKGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKGraph.m */; };
+		4C1EDFDA19F48E7F0041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
 		4C86D5B519F2E96800C898AF /* Task.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5B419F2E96800C898AF /* Task.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D5BB19F2E96800C898AF /* Task.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C86D5AF19F2E96800C898AF /* Task.framework */; };
-		4C86D5F019F2EA8B00C898AF /* TSKGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKGraph.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C86D5F019F2EA8B00C898AF /* TSKWorkflow.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D5FD19F2EC0C00C898AF /* TaskErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D5FE19F2EC0C00C898AF /* TaskErrors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5FC19F2EC0C00C898AF /* TaskErrors.m */; };
 		4C86D60E19F2ED6300C898AF /* libTask.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C86D60319F2ED6300C898AF /* libTask.a */; };
@@ -38,28 +38,28 @@
 		4C86D63A19F2F79900C898AF /* TSKExternalConditionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */; };
 		4C86D63B19F2F79900C898AF /* TSKSelectorTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63219F2F79900C898AF /* TSKSelectorTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D63C19F2F79900C898AF /* TSKSelectorTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63319F2F79900C898AF /* TSKSelectorTask.m */; };
-		4C86D63D19F2F79900C898AF /* TSKTask+GraphInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63419F2F79900C898AF /* TSKTask+GraphInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4C86D63D19F2F79900C898AF /* TSKTask+WorkflowInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4C86D63E19F2F79900C898AF /* TSKTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63519F2F79900C898AF /* TSKTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D63F19F2F79900C898AF /* TSKTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63619F2F79900C898AF /* TSKTask.m */; };
 		4C86D64019F2F7EE00C898AF /* TSKTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63619F2F79900C898AF /* TSKTask.m */; };
 		4C86D64119F2F7EE00C898AF /* TSKBlockTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D62F19F2F79900C898AF /* TSKBlockTask.m */; };
 		4C86D64219F2F7EE00C898AF /* TSKSelectorTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63319F2F79900C898AF /* TSKSelectorTask.m */; };
 		4C86D64319F2F7EE00C898AF /* TSKExternalConditionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */; };
-		4CB6CAE21A197B1000E68A6C /* TSKGraph+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKGraph+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		4CB6CAE31A197B1000E68A6C /* TSKGraph+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKGraph+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
 		4CD396F01A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
 		4CD396F11A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
 		710AAA811A377AC900512286 /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
-		7153184D1A3796130088290C /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
-		7153184E1A3796140088290C /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
+		7153184D1A3796130088290C /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
+		7153184E1A3796140088290C /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
 		7153184F1A3796180088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		715318501A3796190088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
-		71E1002E1A096D6B00AD73F4 /* TSKGraphTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */; };
+		71E1002E1A096D6B00AD73F4 /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
 		71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
 		71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
 		71FE68021A0AA264009684FE /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */; };
@@ -116,8 +116,8 @@
 		4C86D5B419F2E96800C898AF /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
 		4C86D5BA19F2E96800C898AF /* Task Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5C019F2E96800C898AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		4C86D5E419F2EA8B00C898AF /* TSKGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKGraph.h; sourceTree = "<group>"; };
-		4C86D5E519F2EA8B00C898AF /* TSKGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKGraph.m; sourceTree = "<group>"; };
+		4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKWorkflow.h; sourceTree = "<group>"; };
+		4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflow.m; sourceTree = "<group>"; };
 		4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TaskErrors.h; sourceTree = "<group>"; };
 		4C86D5FC19F2EC0C00C898AF /* TaskErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TaskErrors.m; sourceTree = "<group>"; };
 		4C86D60319F2ED6300C898AF /* libTask.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTask.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,10 +128,10 @@
 		4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKExternalConditionTask.m; sourceTree = "<group>"; };
 		4C86D63219F2F79900C898AF /* TSKSelectorTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKSelectorTask.h; sourceTree = "<group>"; };
 		4C86D63319F2F79900C898AF /* TSKSelectorTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSelectorTask.m; sourceTree = "<group>"; };
-		4C86D63419F2F79900C898AF /* TSKTask+GraphInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKTask+GraphInterface.h"; sourceTree = "<group>"; };
+		4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKTask+WorkflowInterface.h"; sourceTree = "<group>"; };
 		4C86D63519F2F79900C898AF /* TSKTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTask.h; sourceTree = "<group>"; };
 		4C86D63619F2F79900C898AF /* TSKTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTask.m; sourceTree = "<group>"; };
-		4CB6CAE01A197B1000E68A6C /* TSKGraph+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKGraph+TaskInterface.h"; sourceTree = "<group>"; };
+		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
 		4CD396ED1A02F8AE008F6037 /* TSKRandomizedTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKRandomizedTestCase.h; sourceTree = "<group>"; };
 		4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKRandomizedTestCase.m; sourceTree = "<group>"; };
 		710AAA7F1A377AC900512286 /* TSKTestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTestTask.h; sourceTree = "<group>"; };
@@ -139,7 +139,7 @@
 		7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTaskTestCase.m; sourceTree = "<group>"; };
 		717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKDelegateTestCase.m; sourceTree = "<group>"; };
 		7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBlockTaskTestCase.m; sourceTree = "<group>"; };
-		71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKGraphTestCase.m; sourceTree = "<group>"; };
+		71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflowTestCase.m; sourceTree = "<group>"; };
 		71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSelectorTaskTestCase.m; sourceTree = "<group>"; };
 		7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7C350BA202EBF78C8BB741CF /* Pods-Task Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task Tests/Pods-Task Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -235,7 +235,7 @@
 				4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */,
 				4C86D5FC19F2EC0C00C898AF /* TaskErrors.m */,
 				4C86D62D19F2F79900C898AF /* Tasks */,
-				4C86D5E319F2EA8B00C898AF /* Graph */,
+				4C86D5E319F2EA8B00C898AF /* Workflow */,
 				4C86D5B219F2E96800C898AF /* Supporting Files */,
 			);
 			path = Task;
@@ -259,7 +259,7 @@
 				7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */,
 				7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */,
 				71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */,
-				71E1002D1A096D6B00AD73F4 /* TSKGraphTestCase.m */,
+				71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */,
 				717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */,
 				4C86D5BF19F2E96800C898AF /* Supporting Files */,
 			);
@@ -274,14 +274,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		4C86D5E319F2EA8B00C898AF /* Graph */ = {
+		4C86D5E319F2EA8B00C898AF /* Workflow */ = {
 			isa = PBXGroup;
 			children = (
-				4C86D5E419F2EA8B00C898AF /* TSKGraph.h */,
-				4C86D5E519F2EA8B00C898AF /* TSKGraph.m */,
-				4CB6CAE01A197B1000E68A6C /* TSKGraph+TaskInterface.h */,
+				4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */,
+				4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */,
+				4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */,
 			);
-			path = Graph;
+			path = Workflow;
 			sourceTree = "<group>";
 		};
 		4C86D62D19F2F79900C898AF /* Tasks */ = {
@@ -289,7 +289,7 @@
 			children = (
 				4C86D63519F2F79900C898AF /* TSKTask.h */,
 				4C86D63619F2F79900C898AF /* TSKTask.m */,
-				4C86D63419F2F79900C898AF /* TSKTask+GraphInterface.h */,
+				4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */,
 				4C86D62E19F2F79900C898AF /* TSKBlockTask.h */,
 				4C86D62F19F2F79900C898AF /* TSKBlockTask.m */,
 				4C86D63219F2F79900C898AF /* TSKSelectorTask.h */,
@@ -330,11 +330,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CB6CAE31A197B1000E68A6C /* TSKGraph+TaskInterface.h in Headers */,
+				4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */,
 				4C1EDFD019F48E6E0041A1D9 /* TSKBlockTask.h in Headers */,
-				4C1EDFD419F48E720041A1D9 /* TSKTask+GraphInterface.h in Headers */,
+				4C1EDFD419F48E720041A1D9 /* TSKTask+WorkflowInterface.h in Headers */,
 				4C1EDFD219F48E6E0041A1D9 /* TSKExternalConditionTask.h in Headers */,
-				4C1EDFD319F48E6E0041A1D9 /* TSKGraph.h in Headers */,
+				4C1EDFD319F48E6E0041A1D9 /* TSKWorkflow.h in Headers */,
 				4C1EDFCE19F48E6E0041A1D9 /* TaskErrors.h in Headers */,
 				4C1EDFCF19F48E6E0041A1D9 /* TSKTask.h in Headers */,
 				4C1EDFCD19F48E620041A1D9 /* Task.h in Headers */,
@@ -346,13 +346,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CB6CAE21A197B1000E68A6C /* TSKGraph+TaskInterface.h in Headers */,
+				4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */,
 				4C86D63919F2F79900C898AF /* TSKExternalConditionTask.h in Headers */,
 				4C86D63B19F2F79900C898AF /* TSKSelectorTask.h in Headers */,
 				4C86D63719F2F79900C898AF /* TSKBlockTask.h in Headers */,
-				4C86D63D19F2F79900C898AF /* TSKTask+GraphInterface.h in Headers */,
+				4C86D63D19F2F79900C898AF /* TSKTask+WorkflowInterface.h in Headers */,
 				4C86D63E19F2F79900C898AF /* TSKTask.h in Headers */,
-				4C86D5F019F2EA8B00C898AF /* TSKGraph.h in Headers */,
+				4C86D5F019F2EA8B00C898AF /* TSKWorkflow.h in Headers */,
 				4C86D5B519F2E96800C898AF /* Task.h in Headers */,
 				4C86D5FD19F2EC0C00C898AF /* TaskErrors.h in Headers */,
 			);
@@ -666,7 +666,7 @@
 				4C1EDFD919F48E7F0041A1D9 /* TSKExternalConditionTask.m in Sources */,
 				4C1EDFD519F48E7F0041A1D9 /* TaskErrors.m in Sources */,
 				4C1EDFD619F48E7F0041A1D9 /* TSKTask.m in Sources */,
-				4C1EDFDA19F48E7F0041A1D9 /* TSKGraph.m in Sources */,
+				4C1EDFDA19F48E7F0041A1D9 /* TSKWorkflow.m in Sources */,
 				4C1EDFD819F48E7F0041A1D9 /* TSKSelectorTask.m in Sources */,
 				4C1EDFD719F48E7F0041A1D9 /* TSKBlockTask.m in Sources */,
 			);
@@ -682,7 +682,7 @@
 				71FE68091A0AD255009684FE /* TSKSelectorTaskTestCase.m in Sources */,
 				71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */,
 				71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
-				7153184D1A3796130088290C /* TSKGraphTestCase.m in Sources */,
+				7153184D1A3796130088290C /* TSKWorkflowTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,7 +693,7 @@
 				4C86D63A19F2F79900C898AF /* TSKExternalConditionTask.m in Sources */,
 				4C86D63F19F2F79900C898AF /* TSKTask.m in Sources */,
 				4C86D5FE19F2EC0C00C898AF /* TaskErrors.m in Sources */,
-				4C1EDF6419F478500041A1D9 /* TSKGraph.m in Sources */,
+				4C1EDF6419F478500041A1D9 /* TSKWorkflow.m in Sources */,
 				4C86D63819F2F79900C898AF /* TSKBlockTask.m in Sources */,
 				4C86D63C19F2F79900C898AF /* TSKSelectorTask.m in Sources */,
 			);
@@ -709,7 +709,7 @@
 				4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
 				7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */,
 				71FE680A1A0AD297009684FE /* TSKSelectorTaskTestCase.m in Sources */,
-				71E1002E1A096D6B00AD73F4 /* TSKGraphTestCase.m in Sources */,
+				71E1002E1A096D6B00AD73F4 /* TSKWorkflowTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,7 +720,7 @@
 				4C86D61A19F2ED9B00C898AF /* TaskErrors.m in Sources */,
 				4C86D64119F2F7EE00C898AF /* TSKBlockTask.m in Sources */,
 				4C86D64319F2F7EE00C898AF /* TSKExternalConditionTask.m in Sources */,
-				4C1EDF6319F4784F0041A1D9 /* TSKGraph.m in Sources */,
+				4C1EDF6319F4784F0041A1D9 /* TSKWorkflow.m in Sources */,
 				4C86D64019F2F7EE00C898AF /* TSKTask.m in Sources */,
 				4C86D64219F2F7EE00C898AF /* TSKSelectorTask.m in Sources */,
 			);
@@ -736,7 +736,7 @@
 				71FE680B1A0AD298009684FE /* TSKSelectorTaskTestCase.m in Sources */,
 				71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */,
 				71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
-				7153184E1A3796140088290C /* TSKGraphTestCase.m in Sources */,
+				7153184E1A3796140088290C /* TSKWorkflowTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

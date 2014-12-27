@@ -52,9 +52,9 @@
 }
 
 
-- (TSKGraph *)graphForNotificationTesting
+- (TSKWorkflow *)workflowForNotificationTesting
 {
-    return [[TSKGraph alloc] initWithName:nil operationQueue:nil notificationCenter:self.notificationCenter];
+    return [[TSKWorkflow alloc] initWithName:nil operationQueue:nil notificationCenter:self.notificationCenter];
 }
 
 
@@ -72,18 +72,18 @@
 }
 
 
-- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName graph:(TSKGraph *)graph block:(void (^)(NSNotification *))block
+- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName workflow:(TSKWorkflow *)workflow block:(void (^)(NSNotification *))block
 {
-    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", graph, notificationName]];
+    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", workflow, notificationName]];
 
     __weak typeof(self) weak_self = self;
-    __block id observer = [self.notificationCenter addObserverForName:notificationName object:graph queue:nil usingBlock:^(NSNotification *note) {
+    __block id observer = [self.notificationCenter addObserverForName:notificationName object:workflow queue:nil usingBlock:^(NSNotification *note) {
         if (block) {
             block(note);
         }
 
         [notificationExpectation fulfill];
-        [weak_self.notificationCenter removeObserver:observer name:notificationName object:graph];
+        [weak_self.notificationCenter removeObserver:observer name:notificationName object:workflow];
     }];
 
     return notificationExpectation;

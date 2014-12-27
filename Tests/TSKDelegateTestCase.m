@@ -91,51 +91,51 @@
 @end
 
 
-#pragma mark - Helper Classes for Graph Delegates
+#pragma mark - Helper Classes for Workflow Delegates
 
-@interface TSKGraphDelegateFinish : NSObject <TSKGraphDelegate>
+@interface TSKWorkflowDelegateFinish : NSObject <TSKWorkflowDelegate>
 
 @property (nonatomic, assign) NSUInteger didReceiveFinishCount;
-@property (nonatomic, strong) TSKGraph *graph;
+@property (nonatomic, strong) TSKWorkflow *workflow;
 
 @end
 
 
-@implementation TSKGraphDelegateFinish
+@implementation TSKWorkflowDelegateFinish
 
-- (void)graphDidFinish:(TSKGraph *)graph
+- (void)workflowDidFinish:(TSKWorkflow *)workflow
 {
     self.didReceiveFinishCount++;
-    self.graph = graph;
+    self.workflow = workflow;
 }
 
 @end
 
 
-@interface TSKGraphDelegateFail : NSObject <TSKGraphDelegate>
+@interface TSKWorkflowDelegateFail : NSObject <TSKWorkflowDelegate>
 
 @property (nonatomic, assign) NSUInteger didReceiveFailCount;
 @property (nonatomic, strong) NSError *error;
-@property (nonatomic, strong) TSKGraph *graph;
+@property (nonatomic, strong) TSKWorkflow *workflow;
 @property (nonatomic, strong) TSKTask *task;
 
 @end
 
 
-@implementation TSKGraphDelegateFail
+@implementation TSKWorkflowDelegateFail
 
-- (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error
 {
     self.didReceiveFailCount++;
     self.error = error;
-    self.graph = graph;
+    self.workflow = workflow;
     self.task = task;
 }
 
 @end
 
 
-@interface TSKGraphDelegateFinishAndFail : TSKGraphDelegateFinish
+@interface TSKWorkflowDelegateFinishAndFail : TSKWorkflowDelegateFinish
 
 @property (nonatomic, assign) NSUInteger didReceiveFailCount;
 @property (nonatomic, strong) NSError *error;
@@ -144,13 +144,13 @@
 @end
 
 
-@implementation TSKGraphDelegateFinishAndFail
+@implementation TSKWorkflowDelegateFinishAndFail
 
-- (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error
 {
     self.didReceiveFailCount++;
     self.error = error;
-    self.graph = graph;
+    self.workflow = workflow;
     self.task = task;
 }
 
@@ -163,9 +163,9 @@
 
 - (void)testTaskDelegateFinish;
 - (void)testTaskDelegateFail;
-- (void)testGraphDelegateFinish;
-- (void)testGraphDelegateFail;
-- (void)testGraphDelegateNoTasks;
+- (void)testWorkflowDelegateFinish;
+- (void)testWorkflowDelegateFail;
+- (void)testWorkflowDelegateNoTasks;
 
 @end
 
@@ -252,91 +252,91 @@
 }
 
 
-- (void)testGraphDelegateFinish
+- (void)testWorkflowDelegateFinish
 {
     // Test delegate only implementing finish
-    TSKGraphDelegateFinish *finishDelegate = [[TSKGraphDelegateFinish alloc] init];
-    TSKGraph *graph = [self finishGraphWithDelegate:finishDelegate];
+    TSKWorkflowDelegateFinish *finishDelegate = [[TSKWorkflowDelegateFinish alloc] init];
+    TSKWorkflow *workflow = [self finishWorkflowWithDelegate:finishDelegate];
 
     XCTAssertEqual(finishDelegate.didReceiveFinishCount, 1, @"delegate method not sent exactly once to delegate implementing it");
-    XCTAssertEqual(finishDelegate.graph, graph, @"correct graph not sent");
+    XCTAssertEqual(finishDelegate.workflow, workflow, @"correct workflow not sent");
 
     // Test delegate only implementing fail
-    TSKGraphDelegateFail *failDelegate = [[TSKGraphDelegateFail alloc] init];
-    XCTAssertNoThrow([self finishGraphWithDelegate:failDelegate], @"messages the delegate a method it doesn't implement");
+    TSKWorkflowDelegateFail *failDelegate = [[TSKWorkflowDelegateFail alloc] init];
+    XCTAssertNoThrow([self finishWorkflowWithDelegate:failDelegate], @"messages the delegate a method it doesn't implement");
     XCTAssertEqual(failDelegate.didReceiveFailCount, 0, @"wrong delegate method sent");
 
     // Test delegate implementing both optional methods
-    TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    graph = [self finishGraphWithDelegate:finishAndFailDelegate];
+    TSKWorkflowDelegateFinishAndFail *finishAndFailDelegate = [[TSKWorkflowDelegateFinishAndFail alloc] init];
+    workflow = [self finishWorkflowWithDelegate:finishAndFailDelegate];
     XCTAssertEqual(finishAndFailDelegate.didReceiveFinishCount, 1, @"delegate method not sent exactly once to delegate implementing it");
-    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertEqual(finishAndFailDelegate.workflow, workflow, @"correct workflow not passed");
     XCTAssertEqual(finishAndFailDelegate.didReceiveFailCount, 0, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.error, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
 }
 
 
-- (void)testGraphDelegateFail
+- (void)testWorkflowDelegateFail
 {
     NSError *error = UMKRandomError();
 
     // Test delegate only implementing fail
-    TSKGraphDelegateFail *failDelegate = [[TSKGraphDelegateFail alloc] init];
-    TSKTask *task = [self failedTaskWithGraphDelegate:failDelegate error:error];
+    TSKWorkflowDelegateFail *failDelegate = [[TSKWorkflowDelegateFail alloc] init];
+    TSKTask *task = [self failedTaskWithWorkflowDelegate:failDelegate error:error];
 
     XCTAssertEqual(failDelegate.didReceiveFailCount, 1, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(failDelegate.graph, task.graph, @"correct graph not sent");
+    XCTAssertEqual(failDelegate.workflow, task.workflow, @"correct workflow not sent");
     XCTAssertEqual(failDelegate.task, task, @"correct task not sent");
     XCTAssertEqual(failDelegate.error, error, @"correct error not sent");
 
     // Test with nil error
-    failDelegate = [[TSKGraphDelegateFail alloc] init];
-    task = [self failedTaskWithGraphDelegate:failDelegate error:nil];
+    failDelegate = [[TSKWorkflowDelegateFail alloc] init];
+    task = [self failedTaskWithWorkflowDelegate:failDelegate error:nil];
     XCTAssertEqual(failDelegate.didReceiveFailCount, 1, @"delegate method not sent to delegate implementing it");
-    XCTAssertEqual(failDelegate.graph, task.graph, @"correct graph not sent");
+    XCTAssertEqual(failDelegate.workflow, task.workflow, @"correct workflow not sent");
     XCTAssertEqual(failDelegate.task, task, @"correct task not sent");
     XCTAssertNil(failDelegate.error, @"error is non-nil");
 
     // Test delegate only implementing finish
-    TSKGraphDelegateFinish *finishDelegate = [[TSKGraphDelegateFinish alloc] init];
-    XCTAssertNoThrow([self failedTaskWithGraphDelegate:finishDelegate error:error], @"messages the delegate a method it doesn't implement");
+    TSKWorkflowDelegateFinish *finishDelegate = [[TSKWorkflowDelegateFinish alloc] init];
+    XCTAssertNoThrow([self failedTaskWithWorkflowDelegate:finishDelegate error:error], @"messages the delegate a method it doesn't implement");
     XCTAssertEqual(finishDelegate.didReceiveFinishCount, 0, @"wrong delegate method sent");
 
     // Test delegate implementing both optional methods
-    TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    task = [self failedTaskWithGraphDelegate:finishAndFailDelegate error:error];
+    TSKWorkflowDelegateFinishAndFail *finishAndFailDelegate = [[TSKWorkflowDelegateFinishAndFail alloc] init];
+    task = [self failedTaskWithWorkflowDelegate:finishAndFailDelegate error:error];
 
     XCTAssertEqual(finishAndFailDelegate.didReceiveFailCount, 1, @"delegate method not sent to delegate implementing it");
     XCTAssertEqualObjects(error, finishAndFailDelegate.error, @"correct error not passed");
-    XCTAssertEqual(finishAndFailDelegate.graph, task.graph, @"correct graph not passed");
+    XCTAssertEqual(finishAndFailDelegate.workflow, task.workflow, @"correct workflow not passed");
     XCTAssertEqual(finishAndFailDelegate.task, task, @"correct task not passed");
     XCTAssertEqual(finishAndFailDelegate.didReceiveFinishCount, 0, @"wrong delegate method sent");
 }
 
 
-- (void)testGraphDelegateNoTasks
+- (void)testWorkflowDelegateNoTasks
 {
-    TSKGraph *graph = [[TSKGraph alloc] init];
-    TSKGraphDelegateFinishAndFail *finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    graph.delegate = finishAndFailDelegate;
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    TSKWorkflowDelegateFinishAndFail *finishAndFailDelegate = [[TSKWorkflowDelegateFinishAndFail alloc] init];
+    workflow.delegate = finishAndFailDelegate;
 
-    [graph start];
+    [workflow start];
 
     XCTAssertEqual(finishAndFailDelegate.didReceiveFinishCount, 1, @"delegate method not sent exactly once to delegate implementing it");
-    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertEqual(finishAndFailDelegate.workflow, workflow, @"correct workflow not passed");
     XCTAssertEqual(finishAndFailDelegate.didReceiveFailCount, 0, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.error, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
 
-    graph = [[TSKGraph alloc] init];
-    finishAndFailDelegate = [[TSKGraphDelegateFinishAndFail alloc] init];
-    graph.delegate = finishAndFailDelegate;
+    workflow = [[TSKWorkflow alloc] init];
+    finishAndFailDelegate = [[TSKWorkflowDelegateFinishAndFail alloc] init];
+    workflow.delegate = finishAndFailDelegate;
 
-    [graph retry];
+    [workflow retry];
 
     XCTAssertEqual(finishAndFailDelegate.didReceiveFinishCount, 1, @"delegate method not sent exactly once to delegate implementing it");
-    XCTAssertEqual(finishAndFailDelegate.graph, graph, @"correct graph not passed");
+    XCTAssertEqual(finishAndFailDelegate.workflow, workflow, @"correct workflow not passed");
     XCTAssertEqual(finishAndFailDelegate.didReceiveFailCount, 0, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.error, @"wrong delegate method sent");
     XCTAssertNil(finishAndFailDelegate.task, @"wrong delegate method sent");
@@ -353,8 +353,8 @@
     }];
     task.delegate = delegate;
 
-    TSKGraph *graph = [[TSKGraph alloc] init];
-    [graph addTask:task prerequisites:nil];
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    [workflow addTask:task prerequisites:nil];
     [task start];
 
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -363,10 +363,10 @@
 }
 
 
-- (TSKGraph *)finishGraphWithDelegate:(id)delegate
+- (TSKWorkflow *)finishWorkflowWithDelegate:(id)delegate
 {
-    TSKGraph *graph = [[TSKGraph alloc] init];
-    graph.delegate = delegate;
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    workflow.delegate = delegate;
 
     XCTestExpectation *didFinishExpectation = [self expectationWithDescription:@"task did finish"];
     TSKTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
@@ -374,18 +374,18 @@
         [didFinishExpectation fulfill];
     }];
 
-    [graph addTask:task prerequisites:nil];
-    [graph start];
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
-    return graph;
+    return workflow;
 }
 
 
-- (TSKTask *)failedTaskWithGraphDelegate:(id)delegate error:(NSError *)error
+- (TSKTask *)failedTaskWithWorkflowDelegate:(id)delegate error:(NSError *)error
 {
-    TSKGraph *graph = [[TSKGraph alloc] init];
-    graph.delegate = delegate;
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    workflow.delegate = delegate;
 
     XCTestExpectation *didFinishExpectation = [self expectationWithDescription:@"task did finish"];
     TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
@@ -393,8 +393,8 @@
         [didFinishExpectation fulfill];
     }];
 
-    [graph addTask:task prerequisites:nil];
-    [graph start];
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
     return task;

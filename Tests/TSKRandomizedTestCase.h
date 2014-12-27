@@ -33,11 +33,11 @@
 
 
 /*!
- TSKRandomizedTestCases override +setUp to call srandomdev() and -setUp to generate and log a random seed
- value before calling srandom(). Subclasses that override +setUp or -setUp should invoke the superclass 
- implementation.
- 
- It also has a notification center that may be used with TSKGraphs to post notifications on.
+ TSKRandomizedTestCases override +setUp to call srandomdev() and -setUp to generate and log a random
+ seed value before calling srandom(). Subclasses that override +setUp or -setUp should invoke the
+ superclass implementation.
+
+ It also has a notification center that may be used with TSKWorkflows to post notifications on.
  */
 @interface TSKRandomizedTestCase : XCTestCase
 
@@ -45,9 +45,9 @@
 
 - (NSString *)defaultNameForTask:(TSKTask *)task;
 
-- (TSKGraph *)graphForNotificationTesting;
+- (TSKWorkflow *)workflowForNotificationTesting;
 
 - (XCTestExpectation *)expectationForNotification:(NSString *)notificationName task:(TSKTask *)task;
-- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName graph:(TSKGraph *)graph block:(void (^)(NSNotification *))block;
+- (XCTestExpectation *)expectationForNotification:(NSString *)notificationName workflow:(TSKWorkflow *)workflow block:(void (^)(NSNotification *))block;
 
 @end

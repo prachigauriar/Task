@@ -33,4 +33,4 @@
 #import <Task/TSKExternalConditionTask.h>
 #import <Task/TSKSelectorTask.h>
 
-#import <Task/TSKGraph.h>
+#import <Task/TSKWorkflow.h>

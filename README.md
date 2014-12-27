@@ -43,15 +43,15 @@ directory.
 
 The Task framework makes it easy to express your app’s workflows and manage the various tasks within
 them. There are two types of objects in the Task framework: `TSKTasks` represent the individual
-steps in a workflow, while `TSKGraphs` represent the workflows themselves. Tasks are defined by the  
-work they do and their current state; graphs are defined by the tasks they contain and the 
-relationships between them. Tasks are not particularly useful without graphs. 
+steps in a workflow, while `TSKWorkflows` represent the workflows themselves. Tasks are defined by
+the work they do and their current state; workflows are defined by the tasks they contain and the
+relationships between them. Tasks are not particularly useful without workflows. 
 
-While `TSKTask` and `TSKGraph` seem similar to `NSOperation` and `NSOperationQueue`, they represent
-very different concepts. Operations model *single executions* of work, with operation queues
-controlling the order and concurrency of those executions. Operations don’t model the concepts of
-success and failure, and they can’t be retried or re-run. Operations are essentially transient:
-their usefulness ends as soon as they’re done executing.
+While `TSKTask` and `TSKWorkflow` seem similar to `NSOperation` and `NSOperationQueue`, they
+represent very different concepts. Operations model *single executions* of work, with operation
+queues controlling the order and concurrency of those executions. Operations don’t model the
+concepts of success and failure, and they can’t be retried or re-run. Operations are essentially
+transient: their usefulness ends as soon as they’re done executing.
 
 Tasks on the other hand model *the concept* of work. Even after a task executes, its status can be
 checked and it can be re-executed. The expectation is that you can create them once, start executing
@@ -60,22 +60,22 @@ them at the appropriate time, monitor their progress, and re-run or retry tasks 
 
 ### Modeling a Workflow
 
-To model a workflow with Task, you first need to create a graph. Each graph can be initialized with
-a name — useful when debugging — and an operation queue on which the graph’s tasks run. If you don’t
-provide a queue, one will be created for you, which is what we do below: 
+To model a workflow with Task, you first need to create a workflow object. Each workflow can be
+initialized with a name — useful when debugging — and an operation queue on which the workflow’s
+tasks run. If you don’t provide a queue, one will be created for you, which is what we do below: 
 
 ```objc
-TSKGraph *graph = [[TSKGraph alloc] initWithName:@"Workflow"];
+TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow"];
 ```
 
-Once you’ve created a graph, you need to create tasks that represent your work. `TSKTask` is an 
+Once you’ve created a workflow, you need to create tasks that represent your work. `TSKTask` is an 
 abstract class which means you can’t use it directly. For reusable tasks, you’ll probably want to 
 subclass `TSKTask` and override its `‑main` method, but Task also includes two subclasses that can
 be used to create tasks without subclassing. `TSKBlockTask` uses a block in place of its `‑main` 
 method. When the block completes its work successfully, it should invoke `‑finishWithResult:` on its
 task parameter. If the work failed, it should invoke `‑failWithError:` instead. The block task below 
 invokes some imaginary API request and executes `‑finishWithResult:` and `‑failWithError:` in the 
-API request’s success and failure blocks, respectively. We then add it to the task graph with no
+API request’s success and failure blocks, respectively. We then add it to the task workflow with no
 prerequisites.
 
 ```objc
@@ -87,7 +87,7 @@ TSKTask *blockTask = [[TSKBlockTask alloc] initWithName:@"Block Task" block:^(TS
     }];
 }];
     
-[graph addTask:blockTask prerequisites:nil];
+[workflow addTask:blockTask prerequisites:nil];
 ```
 
 We can also create a task that performs a selector using `TSKSelectorTask`. The selector takes a
@@ -101,7 +101,7 @@ TSKTask *selectorTask = [[TSKSelectorTask alloc] initWithName:@"Selector Task"
                                                        target:self
                                                      selector:@selector(mapResultFromTask:)];
 
-[graph addTask:selectorTask prerequisites:blockTask, nil];
+[workflow addTask:selectorTask prerequisites:blockTask, nil];
 
 …
 
@@ -123,17 +123,17 @@ TSKTask *selectorTask = [[TSKSelectorTask alloc] initWithName:@"Selector Task"
 Again, the work that the task is actually doing is imaginary, but you get the idea.
 
 Finally, there is a third built-in `TSKTask` subclass called `TSKExternalConditionTask`. Tasks
-of this type do no real work, but instead gate progress in a graph until some external condition 
+of this type do no real work, but instead gate progress in a workflow until some external condition 
 is fulfilled. This is ideal for tasks that require some user input before being able to run. For
 example, suppose a REST API call requires user data as a parameter. You could represent the API 
 call as a `TSKTask`, and create an external condition task as a prerequisite:
 
 ```objc
 TSKExternalConditionTask *dataTask = [[TSKExternalConditionTask alloc] initWithName:@"dataTask"];
-[graph addTask:dataTask prerequisites:nil];
+[workflow addTask:dataTask prerequisites:nil];
 
 TSKTask *APIRequestTask = … ;
-[graph addTask:APIRequestTask prerequisites:dataTask, nil];
+[workflow addTask:APIRequestTask prerequisites:dataTask, nil];
 
 …
 
@@ -146,30 +146,30 @@ In this example, when the external condition task is fulfilled, the API task aut
 
 ### Changing the Execution State of Tasks
 
-Once you have a task graph set up, you can very easily start executing it by sending the graph the
-`‑start` message. This will find all tasks in the graph that have no prerequisite tasks and start
-them. If you subsequently wish to cancel a task (or a whole graph), you can send it the `‑cancel`
-message. Retrying failed tasks is as simple as sending them the `‑retry` message, and if you wish to
-reset and re-run a successfully finished task, send it the `‑reset` message. As alluded to earlier,
-tasks propagate these messages down to their dependents, which propagate them to their dependents,
-and so on, so that, e.g., canceling a task also cancels all of its dependent tasks.
+Once you have a task workflow set up, you can very easily start executing it by sending the workflow
+the `‑start` message. This will find all tasks in the workflow that have no prerequisite tasks and
+start them. If you subsequently wish to cancel a task (or a whole workflow), you can send it the
+`‑cancel` message. Retrying failed tasks is as simple as sending them the `‑retry` message, and if
+you wish to reset and re-run a successfully finished task, send it the `‑reset` message. As alluded
+to earlier, tasks propagate these messages down to their dependents, which propagate them to their
+dependents, and so on, so that, e.g., canceling a task also cancels all of its dependent tasks.
 
 
 ### Being Notified of Task Completion or Failure
 
 Every task has an optional delegate that it can notify of success or failure. If you’re more
-interested in the completion or failure of an entire graph, you can be a graph’s delegate. Graph
-delegates receive messages when all the tasks in a graph are complete and when a single task in a
-graph fails.
+interested in the completion or failure of an entire workflow, you can be a workflow’s delegate.
+Workflow delegates receive messages when all the tasks in a workflow are complete and when a single
+task in a workflow fails.
 
 
 ### More Info
 
 Task.framework is fully documented, so if you’d like more information about how a class works, take
 a look at the class header. Also, the `Example-iOS` subdirectory contains a fairly involved example
-that includes a custom `TSKTask` subclass, external conditions, and task graph delegate methods. 
-In particular, `‑[TaskViewController initializeGraph]` is a great place to experiment with your own
-task graph configurations, whose progress can be visualized by running the example app.
+that includes a custom `TSKTask` subclass, external conditions, and task workflow delegate methods.
+In particular, `‑[TaskViewController initializeWorkflow]` is a great place to experiment with your
+own task workflow configurations, whose progress can be visualized by running the example app.
 
 
 ## Contributing, Filing Bugs, and Requesting Enhancements

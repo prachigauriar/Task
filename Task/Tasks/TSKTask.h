@@ -79,8 +79,8 @@ extern NSString *const TSKTaskDidFailNotification;
 /*!
  @abstract Notification posted when a task finishes successfully.
  @discussion This notification is posted immediately after the task’s delegate is sent the
-     ‑task:didFinishWithResult: message. The object of the notification is the task. It has no userInfo
-     dictionary.
+     ‑task:didFinishWithResult: message. The object of the notification is the task. It has no
+     userInfo dictionary.
  */
 extern NSString *const TSKTaskDidFinishNotification;
 
@@ -111,29 +111,30 @@ extern NSString *const TSKTaskDidStartNotification;
 
 #pragma mark -
 
-@class TSKGraph;
+@class TSKWorkflow;
 @protocol TSKTaskDelegate;
 
 /*!
  TSKTask objects model units of work that can finish successfully or fail. While similar to
- NSOperations, the additional concepts of success and failure enable a greater range of behavior 
+ NSOperations, the additional concepts of success and failure enable a greater range of behavior
  when executing a series of related tasks.
 
- For tasks to be useful, they must be added to a task graph — a TSKGraph object. Task graphs
- provide an execution context for tasks and keep track of prerequisite and dependent relationships
- between them. While tasks can be started directly (using ‑start), they are more typically started
- by sending their graph the ‑start message, which begins executing all tasks in the graph that have
- no prerequisite tasks. When all of a task’s prerequisite tasks have finished successfully, the task
- will automatically be enqueued for execution. A task cannot be executed until all of its
- prerequisite tasks have completed successfully. If a task fails, it can be retried using the ‑retry
- message. See the TSKGraph documentation for more information on running tasks.
- 
- To make a task perform useful work, you must subclass TSKTask and override ‑main. Your implementation
- should execute any operations necessary to complete your task, and invoke either ‑finishWithResult: or
-  ‑failWithError: when complete. TSKTask has three built-in subclasses — TSKBlockTask, TSKSelectorTask, 
- and TSKExternalConditionTask — which can generally be used as an alternative to subclassing TSKTask 
- yourself. See their respective class documentation for more information.
- 
+ For tasks to be useful, they must be added to a task workflow — a TSKWorkflow object. Task
+ workflows provide an execution context for tasks and keep track of prerequisite and dependent
+ relationships between them. While tasks can be started directly (using ‑start), they are more
+ typically started by sending their workflow the ‑start message, which begins executing all tasks in
+ the workflow that have no prerequisite tasks. When all of a task’s prerequisite tasks have finished
+ successfully, the task will automatically be enqueued for execution. A task cannot be executed
+ until all of its prerequisite tasks have completed successfully. If a task fails, it can be retried
+ using the ‑retry message. See the TSKWorkflow documentation for more information on running tasks.
+
+ To make a task perform useful work, you must subclass TSKTask and override ‑main. Your
+ implementation should execute any operations necessary to complete your task, and invoke either
+ ‑finishWithResult: or ‑failWithError: when complete. TSKTask has three built-in subclasses —
+ TSKBlockTask, TSKSelectorTask, and TSKExternalConditionTask — which can generally be used as an
+ alternative to subclassing TSKTask yourself. See their respective class documentation for more
+ information.
+
  Every TSKTask has an optional delegate that can be informed when a task succeeds or fails. See the
  documentation for TSKTaskDelegate for more information.
  */
@@ -151,21 +152,21 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*!
  @abstract The task’s operation queue.
- @discussion If not explicitly set, the task’s queue will be the same as its graph’s.
+ @discussion If not explicitly set, the task’s queue will be the same as its workflow’s.
  */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 /*! 
- @abstract The task’s graph. 
- @discussion This property is set when the task is added to a graph. Once a task has been added to a
-     graph, it may not be added (or moved) to another graph.
+ @abstract The task’s workflow. 
+ @discussion This property is set when the task is added to a workflow. Once a task has been added to a
+     workflow, it may not be added (or moved) to another workflow.
  */
-@property (nonatomic, weak, readonly) TSKGraph *graph;
+@property (nonatomic, weak, readonly) TSKWorkflow *workflow;
 
 /*!
  @abstract The task’s prerequisite tasks.
- @discussion A task’s prerequisite tasks can only be set when the task is added to a graph via
-     -[TSKGraph addTask:prerequisiteTasks:] or -[TSKGraph addTask:prerequisites:]. Until
+ @discussion A task’s prerequisite tasks can only be set when the task is added to a workflow via
+     -[TSKWorkflow addTask:prerequisiteTasks:] or -[TSKWorkflow addTask:prerequisites:]. Until
      then, this property is nil.
      
      This property is not key-value observable.
@@ -175,8 +176,8 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract The task’s dependent tasks.
  @discussion A task’s dependent tasks can only be affected when a dependent task is added to a
-     graph via -[TSKGraph addTask:prerequisiteTasks:] or -[TSKGraph addTask:prerequisites:].
-     If the task is not in a task graph, this property is nil.
+     workflow via -[TSKWorkflow addTask:prerequisiteTasks:] or -[TSKWorkflow
+     addTask:prerequisites:]. If the task is not in a task workflow, this property is nil.
 
      This property is not key-value observable.
  */
@@ -185,7 +186,7 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract The task’s state.
  @discussion When a task is created, this property is initialized to TSKTaskStateReady. The value
-     changes automatically in response to the state of the task’s graph and its execution state.
+     changes automatically in response to the state of the task’s workflow and its execution state.
  */
 @property (nonatomic, assign, readonly) TSKTaskState state;
 
@@ -246,31 +247,31 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract Performs the task’s work.
  @discussion The default implementation of this method simply invokes ‑finishWithResult: with a nil
-     parameter. You should override this method to perform any work necessary to complete your task. 
-     In your implementation, do not invoke super. When your work is complete, it is imperative that 
-     the receiver be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will 
+     parameter. You should override this method to perform any work necessary to complete your task.
+     In your implementation, do not invoke super. When your work is complete, it is imperative that
+     the receiver be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will
      prevent dependent tasks from executing.
-     
-     Subclass implementations of this method should periodically check whether the task is in the 
+
+     Subclass implementations of this method should periodically check whether the task is in the
      executing state (-isExecuting) and, if not, stop executing at the earliest possible moment.
  */
 - (void)main;
 
 /*!
  @abstract Executes the task’s ‑main method if the task is in the ready state.
- @discussion More accurately, the receiver will enqueue an operation on its graph’s operation queue
-     that executes the task’s ‑main method if and only if the task is ready when the operation is 
-     executed.
-     
-     This method should not be invoked if the task has not yet been added to a graph. Subclasses 
+ @discussion More accurately, the receiver will enqueue an operation on its workflow’s operation
+     queue that executes the task’s ‑main method if and only if the task is ready when the operation
+     is executed.
+
+     This method should not be invoked if the task has not yet been added to a workflow. Subclasses
      should not override this method.
  */
 - (void)start;
 
 /*!
  @abstract Sets the task’s state to cancelled if it is pending, ready, or executing. 
- @discussion Regardless of the receiver’s state, sends the ‑cancel message to all of the
-     receiver’s dependent tasks.
+ @discussion Regardless of the receiver’s state, sends the ‑cancel message to all of the receiver’s
+     dependent tasks.
  
      Note that this only marks the task as cancelled. It is up individual subclasses of TSKTask to
      stop executing when a task is marked as cancelled. See the documentation of ‑main for more
@@ -283,8 +284,8 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
      starts the task if its prerequisite tasks have all finished successfully.
- @discussion If, after being reset, the task’s prerequisites are complete, it is automatically 
-     started. Regardless of the receiver’s state, sends the ‑reset message to all of the receiver’s 
+ @discussion If, after being reset, the task’s prerequisites are complete, it is automatically
+     started. Regardless of the receiver’s state, sends the ‑reset message to all of the receiver’s
      dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.

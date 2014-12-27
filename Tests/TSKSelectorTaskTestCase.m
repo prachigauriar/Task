@@ -50,7 +50,7 @@
     XCTAssertEqual(task.target, self, @"target not set propertly");
     XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
 
@@ -59,7 +59,7 @@
     XCTAssertEqual(task.target, self, @"target not set propertly");
     XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
     XCTAssertEqualObjects(task.name, name, @"name not set properly");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");

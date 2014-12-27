@@ -1,8 +1,8 @@
 //
-//  TSKTask+GraphInterface.h
+//  TSKWorkflow+TaskInterface.h
 //  Task
 //
-//  Created by Prachi Gauriar on 10/14/2014.
+//  Created by Prachi Gauriar on 11/16/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,29 +24,33 @@
 //  THE SOFTWARE.
 //
 
-#import <Task/TSKTask.h>
+#import <Task/TSKWorkflow.h>
 
 
 /*!
- The GraphInterface category of TSKTask declares a messages that must be exposed so that TSKGraphs
- can modify the internal state of their TSKTasks.
+ The TaskInterface category of TSKWorkflow declares a messages that must be exposed so that TSKTasks
+ can notify their workflows of state changes.
  */
-@interface TSKTask (GraphInterface)
-
-@property (nonatomic, weak, readwrite) TSKGraph *graph;
+@interface TSKWorkflow (TaskInterface)
 
 /*!
- @abstract Returns a recursive description of the task and its dependent tasks starting at the
-     specified depth.
- @param depth The number of levels deep this task is in the recursive description.
- @result A recursive description of the task and its dependent tasks starting at the specified depth.
+ @abstract Indicates to the receiver that the specified task finished successfully.
+ @param task The task that finished. May not be nil.
+ @param result The result that the task finished with.
  */
-- (NSString *)recursiveDescriptionWithDepth:(NSUInteger)depth;
+- (void)subtask:(TSKTask *)task didFinishWithResult:(id)result;
 
 /*!
- @abstract Indicates to the receiver that it has a prerequisite.
- @discussion This has the effect of transitioning the receiver from the ready state to the pending state.
+ @abstract Indicates to the receiver that the specified task failed.
+ @param task The task that failed. May not be nil.
+ @param error The error that caused the task to fail.
  */
-- (void)didAddPrerequisiteTask;
+- (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
+
+/*!
+ @abstract Indicates to the receiver that the specified task was reset.
+ @param task The task that was reset. May not be nil.
+ */
+- (void)subtaskDidReset:(TSKTask *)task;
 
 @end
