@@ -45,6 +45,11 @@
 		4C86D64119F2F7EE00C898AF /* TSKBlockTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D62F19F2F79900C898AF /* TSKBlockTask.m */; };
 		4C86D64219F2F7EE00C898AF /* TSKSelectorTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63319F2F79900C898AF /* TSKSelectorTask.m */; };
 		4C86D64319F2F7EE00C898AF /* TSKExternalConditionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */; };
+		4C9B8BC41A4F3A310035B91A /* TSKSubworkflowTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C9B8BC51A4F3A310035B91A /* TSKSubworkflowTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C9B8BC61A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
+		4C9B8BC71A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
+		4C9B8BC81A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
 		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
@@ -131,6 +136,8 @@
 		4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKTask+WorkflowInterface.h"; sourceTree = "<group>"; };
 		4C86D63519F2F79900C898AF /* TSKTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTask.h; sourceTree = "<group>"; };
 		4C86D63619F2F79900C898AF /* TSKTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTask.m; sourceTree = "<group>"; };
+		4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKSubworkflowTask.h; sourceTree = "<group>"; };
+		4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSubworkflowTask.m; sourceTree = "<group>"; };
 		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
 		4CD396ED1A02F8AE008F6037 /* TSKRandomizedTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKRandomizedTestCase.h; sourceTree = "<group>"; };
 		4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKRandomizedTestCase.m; sourceTree = "<group>"; };
@@ -292,10 +299,12 @@
 				4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */,
 				4C86D62E19F2F79900C898AF /* TSKBlockTask.h */,
 				4C86D62F19F2F79900C898AF /* TSKBlockTask.m */,
-				4C86D63219F2F79900C898AF /* TSKSelectorTask.h */,
-				4C86D63319F2F79900C898AF /* TSKSelectorTask.m */,
 				4C86D63019F2F79900C898AF /* TSKExternalConditionTask.h */,
 				4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */,
+				4C86D63219F2F79900C898AF /* TSKSelectorTask.h */,
+				4C86D63319F2F79900C898AF /* TSKSelectorTask.m */,
+				4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */,
+				4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */,
 			);
 			path = Tasks;
 			sourceTree = "<group>";
@@ -334,6 +343,7 @@
 				4C1EDFD019F48E6E0041A1D9 /* TSKBlockTask.h in Headers */,
 				4C1EDFD419F48E720041A1D9 /* TSKTask+WorkflowInterface.h in Headers */,
 				4C1EDFD219F48E6E0041A1D9 /* TSKExternalConditionTask.h in Headers */,
+				4C9B8BC51A4F3A310035B91A /* TSKSubworkflowTask.h in Headers */,
 				4C1EDFD319F48E6E0041A1D9 /* TSKWorkflow.h in Headers */,
 				4C1EDFCE19F48E6E0041A1D9 /* TaskErrors.h in Headers */,
 				4C1EDFCF19F48E6E0041A1D9 /* TSKTask.h in Headers */,
@@ -350,6 +360,7 @@
 				4C86D63919F2F79900C898AF /* TSKExternalConditionTask.h in Headers */,
 				4C86D63B19F2F79900C898AF /* TSKSelectorTask.h in Headers */,
 				4C86D63719F2F79900C898AF /* TSKBlockTask.h in Headers */,
+				4C9B8BC41A4F3A310035B91A /* TSKSubworkflowTask.h in Headers */,
 				4C86D63D19F2F79900C898AF /* TSKTask+WorkflowInterface.h in Headers */,
 				4C86D63E19F2F79900C898AF /* TSKTask.h in Headers */,
 				4C86D5F019F2EA8B00C898AF /* TSKWorkflow.h in Headers */,
@@ -669,6 +680,7 @@
 				4C1EDFDA19F48E7F0041A1D9 /* TSKWorkflow.m in Sources */,
 				4C1EDFD819F48E7F0041A1D9 /* TSKSelectorTask.m in Sources */,
 				4C1EDFD719F48E7F0041A1D9 /* TSKBlockTask.m in Sources */,
+				4C9B8BC71A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -696,6 +708,7 @@
 				4C1EDF6419F478500041A1D9 /* TSKWorkflow.m in Sources */,
 				4C86D63819F2F79900C898AF /* TSKBlockTask.m in Sources */,
 				4C86D63C19F2F79900C898AF /* TSKSelectorTask.m in Sources */,
+				4C9B8BC61A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -723,6 +736,7 @@
 				4C1EDF6319F4784F0041A1D9 /* TSKWorkflow.m in Sources */,
 				4C86D64019F2F7EE00C898AF /* TSKTask.m in Sources */,
 				4C86D64219F2F7EE00C898AF /* TSKSelectorTask.m in Sources */,
+				4C9B8BC81A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

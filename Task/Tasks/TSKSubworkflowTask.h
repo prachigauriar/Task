@@ -1,8 +1,8 @@
 //
-//  Task.h
+//  TSKSubworkflowTask.h
 //  Task
 //
-//  Created by Prachi Gauriar on 10/18/2014.
+//  Created by Prachi Gauriar on 12/27/2014.
 //  Copyright (c) 2014 Two Toasters, LLC.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,14 +24,14 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
-
-#import <Task/TaskErrors.h>
-
 #import <Task/TSKTask.h>
-#import <Task/TSKBlockTask.h>
-#import <Task/TSKExternalConditionTask.h>
-#import <Task/TSKSelectorTask.h>
-#import <Task/TSKSubworkflowTask.h>
 
-#import <Task/TSKWorkflow.h>
+
+@interface TSKSubworkflowTask : TSKTask
+
+@property (nonatomic, strong, readonly) TSKWorkflow *subworkflow;
+
+- (instancetype)initWithSubworkflow:(TSKWorkflow *)subworkflow;
+- (instancetype)initWithName:(NSString *)name subworkflow:(TSKWorkflow *)subworkflow NS_DESIGNATED_INITIALIZER;
+
+@end
