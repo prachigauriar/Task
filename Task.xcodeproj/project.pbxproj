@@ -50,29 +50,30 @@
 		4C9B8BC61A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
 		4C9B8BC71A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
 		4C9B8BC81A4F3A310035B91A /* TSKSubworkflowTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */; };
+		4C9B8BD71A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BCE1A4F50410035B91A /* TSKRandomizedTestCase.m */; };
+		4C9B8BD81A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BCE1A4F50410035B91A /* TSKRandomizedTestCase.m */; };
+		4C9B8BD91A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BCE1A4F50410035B91A /* TSKRandomizedTestCase.m */; };
+		4C9B8BDA1A4F50410035B91A /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD01A4F50410035B91A /* TSKTestTask.m */; };
+		4C9B8BDB1A4F50410035B91A /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD01A4F50410035B91A /* TSKTestTask.m */; };
+		4C9B8BDC1A4F50410035B91A /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD01A4F50410035B91A /* TSKTestTask.m */; };
+		4C9B8BDD1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */; };
+		4C9B8BDE1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */; };
+		4C9B8BDF1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */; };
+		4C9B8BE01A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */; };
+		4C9B8BE11A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */; };
+		4C9B8BE21A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */; };
+		4C9B8BE31A4F50410035B91A /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */; };
+		4C9B8BE41A4F50410035B91A /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */; };
+		4C9B8BE51A4F50410035B91A /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */; };
+		4C9B8BE61A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */; };
+		4C9B8BE71A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */; };
+		4C9B8BE81A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */; };
+		4C9B8BEA1A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
 		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
-		4CD396F01A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
-		4CD396F11A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */; };
-		710AAA811A377AC900512286 /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
-		7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
-		7153184D1A3796130088290C /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
-		7153184E1A3796140088290C /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
-		7153184F1A3796180088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
-		715318501A3796190088290C /* TSKTestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 710AAA801A377AC900512286 /* TSKTestTask.m */; };
 		717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
-		71E1002E1A096D6B00AD73F4 /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */; };
-		71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
-		71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */; };
-		71FE68021A0AA264009684FE /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */; };
-		71FE68091A0AD255009684FE /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */; };
-		71FE680A1A0AD297009684FE /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */; };
-		71FE680B1A0AD298009684FE /* TSKSelectorTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */; };
-		71FE680C1A0AD2A6009684FE /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */; };
-		71FE680D1A0AD2A7009684FE /* TSKBlockTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */; };
 		EA59875C4B69635842657D44 /* libPods-Task (iOS) Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD50394D2FEC3796A2A81B26 /* libPods-Task (iOS) Tests.a */; };
 		FE05E92155425646C37D8310 /* libPods-libTask Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6F642574517502C6FD6B2DB /* libPods-libTask Tests.a */; };
 /* End PBXBuildFile section */
@@ -138,16 +139,17 @@
 		4C86D63619F2F79900C898AF /* TSKTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTask.m; sourceTree = "<group>"; };
 		4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKSubworkflowTask.h; sourceTree = "<group>"; };
 		4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSubworkflowTask.m; sourceTree = "<group>"; };
+		4C9B8BCD1A4F50410035B91A /* TSKRandomizedTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKRandomizedTestCase.h; sourceTree = "<group>"; };
+		4C9B8BCE1A4F50410035B91A /* TSKRandomizedTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKRandomizedTestCase.m; sourceTree = "<group>"; };
+		4C9B8BCF1A4F50410035B91A /* TSKTestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTestTask.h; sourceTree = "<group>"; };
+		4C9B8BD01A4F50410035B91A /* TSKTestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTestTask.m; sourceTree = "<group>"; };
+		4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBlockTaskTestCase.m; sourceTree = "<group>"; };
+		4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSelectorTaskTestCase.m; sourceTree = "<group>"; };
+		4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTaskTestCase.m; sourceTree = "<group>"; };
+		4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflowTestCase.m; sourceTree = "<group>"; };
+		4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKExternalConditionTaskTestCase.m; sourceTree = "<group>"; };
 		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
-		4CD396ED1A02F8AE008F6037 /* TSKRandomizedTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKRandomizedTestCase.h; sourceTree = "<group>"; };
-		4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKRandomizedTestCase.m; sourceTree = "<group>"; };
-		710AAA7F1A377AC900512286 /* TSKTestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKTestTask.h; sourceTree = "<group>"; };
-		710AAA801A377AC900512286 /* TSKTestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTestTask.m; sourceTree = "<group>"; };
-		7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTaskTestCase.m; sourceTree = "<group>"; };
 		717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKDelegateTestCase.m; sourceTree = "<group>"; };
-		7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBlockTaskTestCase.m; sourceTree = "<group>"; };
-		71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflowTestCase.m; sourceTree = "<group>"; };
-		71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSelectorTaskTestCase.m; sourceTree = "<group>"; };
 		7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7C350BA202EBF78C8BB741CF /* Pods-Task Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task Tests/Pods-Task Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Task Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -259,14 +261,9 @@
 		4C86D5BE19F2E96800C898AF /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				4CD396ED1A02F8AE008F6037 /* TSKRandomizedTestCase.h */,
-				4CD396EE1A02F8AE008F6037 /* TSKRandomizedTestCase.m */,
-				710AAA7F1A377AC900512286 /* TSKTestTask.h */,
-				710AAA801A377AC900512286 /* TSKTestTask.m */,
-				7133D0211A08065F00F6D137 /* TSKTaskTestCase.m */,
-				7188954C1A0A9D0E00AD4FAD /* TSKBlockTaskTestCase.m */,
-				71FE68041A0AD038009684FE /* TSKSelectorTaskTestCase.m */,
-				71E1002D1A096D6B00AD73F4 /* TSKWorkflowTestCase.m */,
+				4C9B8BCC1A4F50400035B91A /* Base */,
+				4C9B8BD11A4F50410035B91A /* Tasks */,
+				4C9B8BD51A4F50410035B91A /* Workflows */,
 				717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */,
 				4C86D5BF19F2E96800C898AF /* Supporting Files */,
 			);
@@ -307,6 +304,36 @@
 				4C9B8BC31A4F3A310035B91A /* TSKSubworkflowTask.m */,
 			);
 			path = Tasks;
+			sourceTree = "<group>";
+		};
+		4C9B8BCC1A4F50400035B91A /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				4C9B8BCD1A4F50410035B91A /* TSKRandomizedTestCase.h */,
+				4C9B8BCE1A4F50410035B91A /* TSKRandomizedTestCase.m */,
+				4C9B8BCF1A4F50410035B91A /* TSKTestTask.h */,
+				4C9B8BD01A4F50410035B91A /* TSKTestTask.m */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		4C9B8BD11A4F50410035B91A /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */,
+				4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */,
+				4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */,
+				4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */,
+			);
+			path = Tasks;
+			sourceTree = "<group>";
+		};
+		4C9B8BD51A4F50410035B91A /* Workflows */ = {
+			isa = PBXGroup;
+			children = (
+				4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */,
+			);
+			path = Workflows;
 			sourceTree = "<group>";
 		};
 		7D0CBD34DCFAC686B4D10850 /* Frameworks */ = {
@@ -688,13 +715,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CD396F01A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
-				71FE68021A0AA264009684FE /* TSKBlockTaskTestCase.m in Sources */,
-				7153184F1A3796180088290C /* TSKTestTask.m in Sources */,
-				71FE68091A0AD255009684FE /* TSKSelectorTaskTestCase.m in Sources */,
+				4C9B8BDB1A4F50410035B91A /* TSKTestTask.m in Sources */,
+				4C9B8BDE1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
 				71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */,
-				71EF9D941A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
-				7153184D1A3796130088290C /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BE71A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BD81A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
+				4C9B8BE11A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,
+				4C9B8BE41A4F50410035B91A /* TSKTaskTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,13 +743,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71FE680D1A0AD2A7009684FE /* TSKBlockTaskTestCase.m in Sources */,
+				4C9B8BEA1A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m in Sources */,
+				4C9B8BDA1A4F50410035B91A /* TSKTestTask.m in Sources */,
+				4C9B8BDD1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
 				717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */,
-				710AAA811A377AC900512286 /* TSKTestTask.m in Sources */,
-				4CD396EF1A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
-				7133D0221A08065F00F6D137 /* TSKTaskTestCase.m in Sources */,
-				71FE680A1A0AD297009684FE /* TSKSelectorTaskTestCase.m in Sources */,
-				71E1002E1A096D6B00AD73F4 /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BE61A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BD71A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
+				4C9B8BE01A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,
+				4C9B8BE31A4F50410035B91A /* TSKTaskTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -744,13 +772,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71FE680C1A0AD2A6009684FE /* TSKBlockTaskTestCase.m in Sources */,
-				4CD396F11A02F8AE008F6037 /* TSKRandomizedTestCase.m in Sources */,
-				715318501A3796190088290C /* TSKTestTask.m in Sources */,
-				71FE680B1A0AD298009684FE /* TSKSelectorTaskTestCase.m in Sources */,
+				4C9B8BDC1A4F50410035B91A /* TSKTestTask.m in Sources */,
+				4C9B8BDF1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
 				71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */,
-				71EF9D951A310DAA0088C907 /* TSKTaskTestCase.m in Sources */,
-				7153184E1A3796140088290C /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BE81A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
+				4C9B8BD91A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
+				4C9B8BE21A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,
+				4C9B8BE51A4F50410035B91A /* TSKTaskTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,7 +28,7 @@
 
 
 /*!
- The TaskInterface category of TSKWorkflow declares a messages that must be exposed so that TSKTasks
+ The TaskInterface category of TSKWorkflow declares messages that must be exposed so that TSKTasks
  can notify their workflows of state changes.
  */
 @interface TSKWorkflow (TaskInterface)
