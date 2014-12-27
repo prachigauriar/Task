@@ -277,16 +277,16 @@ extern NSString *const TSKTaskDidStartNotification;
      stop executing when a task is marked as cancelled. See the documentation of ‑main for more
      information.
      
-     Subclasses should not override this method.
+     Subclasses should invoke the superclass implementation of this method.
  */
 - (void)cancel;
 
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
      starts the task if its prerequisite tasks have all finished successfully.
- @discussion If, after being reset, the task’s prerequisites are complete, it is automatically
-     started. Regardless of the receiver’s state, sends the ‑reset message to all of the receiver’s
-     dependent tasks.
+ @discussion If, after being reset, the receiver’s prerequisite tasks have all finished successfully,
+     the receiver is automatically put into the ready state. Regardless of the receiver’s state, sends
+     the ‑reset message to all of the receiver’s dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
  */
@@ -298,7 +298,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @discussion Regardless of the receiver’s state, sends the ‑retry message to all of the receiver’s
      dependent tasks.
 
-     Subclasses should not override this method.
+     Subclasses should invoke the superclass implementation of this method.
  */
 - (void)retry;
 

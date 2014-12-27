@@ -31,11 +31,12 @@
 
 #pragma mark Constants
 
-NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
 NSString *const TSKWorkflowDidFinishNotification = @"TSKWorkflowDidFinishNotification";
+NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
+NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
+NSString *const TSKWorkflowWillResetNotification = @"TSKWorkflowWillResetNotification";
 NSString *const TSKWorkflowWillRetryNotification = @"TSKWorkflowWillRetryNotification";
 NSString *const TSKWorkflowWillStartNotification = @"TSKWorkflowWillStartNotification";
-NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
 NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 
@@ -294,6 +295,13 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 {
     [self.notificationCenter postNotificationName:TSKWorkflowWillCancelNotification object:self];
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(cancel)];
+}
+
+
+- (void)reset
+{
+    [self.notificationCenter postNotificationName:TSKWorkflowWillResetNotification object:self];
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(reset)];
 }
 
 

@@ -38,6 +38,7 @@
 - (void)testStartOnePrerequisite;
 - (void)testStartMultiplePrerequisites;
 - (void)testStartMultipleDependents;
+- (void)testReset;
 - (void)testRetry;
 - (void)testCancel;
 
@@ -324,6 +325,35 @@
     XCTAssertEqual(dependentTask1.state, TSKTaskStateFinished, "state is not finished");
     XCTAssertEqual(dependentTask2.state, TSKTaskStateFinished, "state is not finished");
     XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
+}
+
+
+- (void)testReset
+{
+    NSLock *willFinishLock = [[NSLock alloc] init];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
+    [workflow addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKWorkflowWillStartNotification workflow:workflow block:nil];
+    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
+
+    // Put task in typical state for reset
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+    XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
+
+    // Test that workflow sends retry to its task
+    [self expectationForNotification:TSKWorkflowWillResetNotification workflow:workflow block:nil];
+    [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
+    [willFinishLock lock];
+    [workflow reset];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssert((task.state == TSKTaskStatePending || task.state == TSKTaskStateReady), @"state is not ready or executing");
+    XCTAssertTrue(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is not true");
+    [willFinishLock unlock];
 }
 
 

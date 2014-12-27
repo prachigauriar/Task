@@ -348,17 +348,23 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     // Test that reset occurs and properties are reset
     [self expectationForNotification:TSKTaskDidResetNotification task:task];
-    [self expectationForNotification:TSKTaskDidStartNotification task:task];
     [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
-    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
 
     [task reset];
 
-    // Wait for task to reset and start executing before testing that results were reset
+    // Wait for task to reset before testing that results were reset
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertNil(task.finishDate, @"finish date was not reset");
     XCTAssertNil(task.result, @"result was not reset to nil");
+
+    [self expectationForNotification:TSKTaskDidStartNotification task:task];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
+
+    [task start];
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
 
     // Test task finishes correctly with new date and result
     [task finishWithResult:newResult];
@@ -380,30 +386,8 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent1 handler:nil];
     [self expectationForNotification:TSKTestTaskDidResetNotification object:dependent2 handler:nil];
 
-
     [task reset];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
 @end
-
-
-// State transitions:
-//     Pending -> Ready: All of task’s prerequisite tasks are finished (-startIfReady)
-//     Pending -> Cancelled: Task is cancelled (-cancel)
-//
-//     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
-//     Ready -> Executing: Task starts (-start)
-//     Ready -> Cancelled: Task is cancelled (-cancel)
-//
-//     Executing -> Pending: Task is reset (-reset)
-//     Executing -> Cancelled: Task is cancelled (-cancel)
-//     Executing -> Finished: Task finishes (-finishWithResult:)
-//     Executing -> Failed: Task fails (-failWithError:)
-//
-//     Cancelled -> Pending: Task is retried (-retry) or reset (-reset)
-//
-//     Finished -> Pending: Task is reset (-reset)
-//
-//     Failed -> Pending: Task is retried (-retry) or reset (-reset)
-

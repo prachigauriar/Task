@@ -104,6 +104,12 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 - (BOOL)allPrerequisiteTasksFinished;
 
 /*!
+ @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from
+     pending to ready and executes the specified block.
+ */
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block;
+
+/*!
  @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from 
      pending to ready and starts the task.
  */
@@ -257,7 +263,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     NSParameterAssert(validFromStates);
 
     // State transitions:
-    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-startIfReady)
+    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-transitionToReadyStateAndExecuteBlock:)
     //     Pending -> Cancelled: Task is cancelled (-cancel)
     //
     //     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
@@ -356,13 +362,19 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (void)startIfReady
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block
 {
     if ([self allPrerequisiteTasksFinished]) {
-        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:^{
-            [self start];
-        }];
+        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:block];
     }
+}
+
+
+- (void)startIfReady
+{
+    [self transitionToReadyStateAndExecuteBlock:^{
+        [self start];
+    }];
 }
 
 
@@ -396,7 +408,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.error = nil;
         [self.workflow subtaskDidReset:self];
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
-        [self startIfReady];
+        [self transitionToReadyStateAndExecuteBlock:nil];
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
