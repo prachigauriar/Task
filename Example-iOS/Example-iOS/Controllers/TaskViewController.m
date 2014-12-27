@@ -41,7 +41,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 #pragma mark -
 
-@interface TaskViewController () <UITableViewDataSource, UITableViewDelegate, TSKGraphDelegate>
+@interface TaskViewController () <UITableViewDataSource, UITableViewDelegate, TSKWorkflowDelegate>
 
 /*! Our table view of tasks. */
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
@@ -52,8 +52,8 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 /*! A cell we use to dynamically calculate heights for each row. */
 @property (nonatomic, strong) TaskTableViewCell *prototypeCell;
 
-/*! Our task graph and tasks (in the order we want them displayed). */
-@property (nonatomic, strong) TSKGraph *taskGraph;
+/*! Our task workflow and tasks (in the order we want them displayed). */
+@property (nonatomic, strong) TSKWorkflow *workflow;
 @property (nonatomic, copy) NSArray *tasks;
 
 @end
@@ -67,10 +67,10 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 {
     [super viewDidLoad];
 
-    // Create our task graph and tasks
-    [self initializeGraph];
+    // Create our task workflow and tasks
+    [self initializeWorkflow];
 
-    self.title = self.taskGraph.name;
+    self.title = self.workflow.name;
 
     // Create a cell controller for each task
     NSMutableArray *cellControllers = [[NSMutableArray alloc] initWithCapacity:self.tasks.count];
@@ -87,44 +87,44 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-- (void)initializeGraph
+- (void)initializeWorkflow
 {
-    self.taskGraph = [[TSKGraph alloc] initWithName:@"Order Product Workflow"];
-    self.taskGraph.delegate = self;
+    self.workflow = [[TSKWorkflow alloc] initWithName:@"Order Product Workflow"];
+    self.workflow.delegate = self;
 
     // This task is completely independent of other tasks. Imagine that this creates a server resource that
     // we are going to update with additional data
     TimeSlicedTask *createProjectTask = [[TimeSlicedTask alloc] initWithName:@"Create Project" timeRequired:2.0];
     createProjectTask.probabilityOfFailure = 0.1;
-    [self.taskGraph addTask:createProjectTask prerequisites:nil];
+    [self.workflow addTask:createProjectTask prerequisites:nil];
 
     // This is an external condition task that indicates that a photo is available. Imagine that this is
     // fulfilled when the user takes a photo or chooses a photo from their library for this project.
     TSKTask *photo1AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 1 Available"];
-    [self.taskGraph addTask:photo1AvailableCondition prerequisites:nil];
+    [self.workflow addTask:photo1AvailableCondition prerequisites:nil];
 
     // This uploads the first photo. It can’t run until the project is created and the photo is available
     TimeSlicedTask *uploadPhoto1Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 1" timeRequired:5.0];
     uploadPhoto1Task.probabilityOfFailure = 0.15;
-    [self.taskGraph addTask:uploadPhoto1Task prerequisites:createProjectTask, photo1AvailableCondition, nil];
+    [self.workflow addTask:uploadPhoto1Task prerequisites:createProjectTask, photo1AvailableCondition, nil];
 
     // These are analagous to the previous two tasks, but for a second photo
     TSKTask *photo2AvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Photo 2 Available"];
     TimeSlicedTask *uploadPhoto2Task = [[TimeSlicedTask alloc] initWithName:@"Upload Photo 2" timeRequired:6.0];
     uploadPhoto1Task.probabilityOfFailure = 0.15;
 
-    [self.taskGraph addTask:photo2AvailableCondition prerequisites:nil];
-    [self.taskGraph addTask:uploadPhoto2Task prerequisites:createProjectTask, photo2AvailableCondition, nil];
+    [self.workflow addTask:photo2AvailableCondition prerequisites:nil];
+    [self.workflow addTask:uploadPhoto2Task prerequisites:createProjectTask, photo2AvailableCondition, nil];
 
     // This is an external condition task that indicates that some metadata has been entered. Imagine that
     // once the two photos are uploaded, the user is asked to name the project.
     TSKTask *metadataAvailableCondition = [[TSKExternalConditionTask alloc] initWithName:@"Metadata Available"];
-    [self.taskGraph addTask:metadataAvailableCondition prerequisites:nil];
+    [self.workflow addTask:metadataAvailableCondition prerequisites:nil];
 
     // This submits an order. It can’t run until the photos are uploaded and the metadata is provided.
     TimeSlicedTask *submitOrderTask = [[TimeSlicedTask alloc] initWithName:@"Submit Order" timeRequired:2.0];
     submitOrderTask.probabilityOfFailure = 0.1;
-    [self.taskGraph addTask:submitOrderTask prerequisites:uploadPhoto1Task, uploadPhoto2Task, metadataAvailableCondition, nil];
+    [self.workflow addTask:submitOrderTask prerequisites:uploadPhoto1Task, uploadPhoto2Task, metadataAvailableCondition, nil];
 
     self.tasks = @[ createProjectTask,
                     photo1AvailableCondition, uploadPhoto1Task,
@@ -135,7 +135,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 
 - (void)dealloc
 {
-    for (TSKTask *task in [self.taskGraph allTasks]) {
+    for (TSKTask *task in [self.workflow allTasks]) {
         [task removeObserver:self forKeyPath:@"state" context:taskStateContext];
     }
 }
@@ -206,9 +206,9 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-#pragma mark - Task Graph Delegate
+#pragma mark - Task Workflow Delegate
 
-- (void)graphDidFinish:(TSKGraph *)graph
+- (void)workflowDidFinish:(TSKWorkflow *)workflow
 {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Tasks Finished"
@@ -222,7 +222,7 @@ static NSString *const kTaskCellReuseIdentifier = @"TSKTaskViewController.TaskCe
 }
 
 
-- (void)graph:(TSKGraph *)graph task:(TSKTask *)task didFailWithError:(NSError *)error
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error
 {
     if ([task isKindOfClass:[TSKExternalConditionTask class]]) {
         return;
