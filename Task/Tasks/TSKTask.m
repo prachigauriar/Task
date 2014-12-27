@@ -31,7 +31,15 @@
 #import <Task/TSKTask+GraphInterface.h>
 
 
-#pragma mark Functions
+#pragma mark Constants and Functions
+
+NSString *const TSKTaskDidCancelNotification = @"TSKTaskDidCancelNotification";
+NSString *const TSKTaskDidFailNotification = @"TSKTaskDidFailNotification";
+NSString *const TSKTaskDidFinishNotification = @"TSKTaskDidFinishNotification";
+NSString *const TSKTaskDidResetNotification = @"TSKTaskDidResetNotification";
+NSString *const TSKTaskDidRetryNotification = @"TSKTaskDidRetryNotification";
+NSString *const TSKTaskDidStartNotification = @"TSKTaskDidStartNotification";
+
 
 NSString *const TSKTaskStateDescription(TSKTaskState state)
 {
@@ -329,6 +337,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     // possible. Doing the check inside the operation’s block before invoking ‑main avoids that.
     [self.operationQueue addOperationWithBlock:^{
         [self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
+            [self.graph.notificationCenter postNotificationName:TSKTaskDidStartNotification object:self];
             [self main];
         }];
     }];
@@ -365,7 +374,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStatePending), @(TSKTaskStateReady), @(TSKTaskStateExecuting), nil];
     });
 
-    [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:nil];
+    [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:^{
+        [self.graph.notificationCenter postNotificationName:TSKTaskDidCancelNotification object:self];
+    }];
+    
     [self.dependentTasks makeObjectsPerformSelector:@selector(cancel)];
 }
 
@@ -383,6 +395,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.result = nil;
         self.error = nil;
         [self.graph subtaskDidReset:self];
+        [self.graph.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
         [self startIfReady];
     }];
 
@@ -402,6 +415,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
+        [self.graph.notificationCenter postNotificationName:TSKTaskDidRetryNotification object:self];
         [self startIfReady];
     }];
 
@@ -419,8 +433,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFinishWithResult:result];
         }
 
+        [self.graph.notificationCenter postNotificationName:TSKTaskDidFinishNotification object:self];
         [self.graph subtask:self didFinishWithResult:result];
-
         [self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
     }];
 }
@@ -436,6 +450,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFailWithError:error];
         }
 
+        [self.graph.notificationCenter postNotificationName:TSKTaskDidFailNotification object:self];
         [self.graph subtask:self didFailWithError:error];
     }];
 }
