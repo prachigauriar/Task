@@ -31,10 +31,10 @@
 
 #pragma mark Constants
 
-NSString *const TSKGraphDidCancelNotification = @"TSKGraphDidCancelNotification";
+NSString *const TSKGraphWillCancelNotification = @"TSKGraphWillCancelNotification";
 NSString *const TSKGraphDidFinishNotification = @"TSKGraphDidFinishNotification";
-NSString *const TSKGraphDidRetryNotification = @"TSKGraphDidRetryNotification";
-NSString *const TSKGraphDidStartNotification = @"TSKGraphDidStartNotification";
+NSString *const TSKGraphWillRetryNotification = @"TSKGraphWillRetryNotification";
+NSString *const TSKGraphWillStartNotification = @"TSKGraphWillStartNotification";
 NSString *const TSKGraphTaskDidFailNotification = @"TSKGraphTaskDidFailNotification";
 NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
@@ -283,7 +283,7 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
 - (void)start
 {
-    [self.notificationCenter postNotificationName:TSKGraphDidStartNotification object:self];
+    [self.notificationCenter postNotificationName:TSKGraphWillStartNotification object:self];
     if (![self finishImmediatelyIfNoSubtasks]) {
         [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
     }
@@ -292,14 +292,14 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
 - (void)cancel
 {
-    [self.notificationCenter postNotificationName:TSKGraphDidCancelNotification object:self];
+    [self.notificationCenter postNotificationName:TSKGraphWillCancelNotification object:self];
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(cancel)];
 }
 
 
 - (void)retry
 {
-    [self.notificationCenter postNotificationName:TSKGraphDidRetryNotification object:self];
+    [self.notificationCenter postNotificationName:TSKGraphWillRetryNotification object:self];
     if (![self finishImmediatelyIfNoSubtasks]) {
         [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
     }

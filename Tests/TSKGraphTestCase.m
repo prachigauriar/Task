@@ -181,7 +181,7 @@
 
     XCTAssertEqual(task.state, TSKTaskStateReady, "state is not ready");
 
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [graph start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -201,7 +201,7 @@
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
@@ -245,7 +245,7 @@
     XCTAssertEqual(task2.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task1 handler:nil];
     [self expectationForNotification:TSKTestTaskDidFinishNotification object:task2 handler:nil]; // task2 has no lock, so it will finish
     [willFinishLock lock];
@@ -292,7 +292,7 @@
     XCTAssertEqual(dependentTask1.state, TSKTaskStatePending, @"dependent state is not pending");
     XCTAssertEqual(dependentTask2.state, TSKTaskStatePending, @"dependent state is not pending");
 
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
@@ -332,7 +332,7 @@
     TSKTestTask *task = [self failingTaskWithLock:willFailLock];
     [graph addTask:task prerequisites:nil];
 
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKGraphTaskDidFailNotification graph:graph block:^(NSNotification *note) {
         XCTAssertNotNil(note, @"notification has nil userInfo dictionary");
         XCTAssertEqual(note.userInfo[TSKGraphFailedTaskKey], task, @"notification has incorrect failed task");
@@ -347,7 +347,7 @@
     XCTAssertTrue(graph.hasFailedTasks, @"graph.hasFailedTasks is not true");
 
     // Test that graph sends retry to its task
-    [self expectationForNotification:TSKGraphDidRetryNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillRetryNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
     [willFailLock lock];
     [graph retry];
@@ -367,7 +367,7 @@
     [graph addTask:task prerequisites:nil];
 
     // Put task mid-execution
-    [self expectationForNotification:TSKGraphDidStartNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillStartNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
     [willFinishLock lock];
     [graph start];
@@ -375,7 +375,7 @@
     XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
 
     // Test that graph sends cancel to its task
-    [self expectationForNotification:TSKGraphDidCancelNotification graph:graph block:nil];
+    [self expectationForNotification:TSKGraphWillCancelNotification graph:graph block:nil];
     [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
     [graph cancel];
     [willFinishLock unlock];

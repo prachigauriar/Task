@@ -30,33 +30,12 @@
 #pragma mark Constants
 
 /*!
- @abstract Notification posted when a graph is cancelled.
- @discussion This notification is posted immediately before the graph’s tasks are sent the ‑cancel
-     message. The object of the notification is the graph. It has no userInfo dictionary.
- */
-extern NSString *const TSKGraphDidCancelNotification;
-
-/*!
  @abstract Notification posted when all a graph’s tasks finished.
  @discussion This notification is posted immediately after the graph’s delegate is sent the
      ‑graphDidFinish: message. The object of the notification is the graph. It has no userInfo
      dictionary.
  */
 extern NSString *const TSKGraphDidFinishNotification;
-
-/*!
- @abstract Notification posted when a graph is retried.
- @discussion This notification is posted immediately before the graph’s tasks are sent the ‑retry
-     message. The object of the notification is the graph. It has no userInfo dictionary.
- */
-extern NSString *const TSKGraphDidRetryNotification;
-
-/*!
- @abstract Notification posted when a graph is started.
- @discussion This notification is posted immediately before the graph’s tasks are sent the ‑start
-     message. The object of the notification is the graph. It has no userInfo dictionary.
- */
-extern NSString *const TSKGraphDidStartNotification;
 
 /*!
  @abstract Notification posted when all a graph’s tasks finished.
@@ -66,6 +45,27 @@ extern NSString *const TSKGraphDidStartNotification;
      failed.
  */
 extern NSString *const TSKGraphTaskDidFailNotification;
+
+/*!
+ @abstract Notification posted when a graph is about to cancel its tasks.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑cancel
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphWillCancelNotification;
+
+/*!
+ @abstract Notification posted when a graph about to retry its tasks.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑retry
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphWillRetryNotification;
+
+/*!
+ @abstract Notification posted when a graph is about to start its tasks.
+ @discussion This notification is posted immediately before the graph’s tasks are sent the ‑start
+     message. The object of the notification is the graph. It has no userInfo dictionary.
+ */
+extern NSString *const TSKGraphWillStartNotification;
 
 /*!
  @abstract Notification userInfo key whose value is a TSKTask object that failed.
