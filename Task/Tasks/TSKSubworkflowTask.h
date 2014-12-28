@@ -34,8 +34,8 @@
 
  A subworkflow task’s state reflects that of the tasks in its subworkflow. When the entire
  subworkflow finishes, the subworkflow task finishes; when a single task in the subworkflow fails
- with an error, the subworkflow task fails with that error. Finally, when a task in the subworkflow
- is cancelled, the entire subworkflow task is marked as cancelled.
+ with an error, the subworkflow task fails. Finally, when a task in the subworkflow is cancelled,
+ the entire subworkflow task is cancelled.
 
  When a subworkflow task finishes, its result is the subworkflow itself. This allows dependent tasks
  to unpack the results of the subworkflow in any way they see fit. This underscores a drawback of

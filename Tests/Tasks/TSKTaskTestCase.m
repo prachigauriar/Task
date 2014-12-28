@@ -27,13 +27,6 @@
 #import "TSKRandomizedTestCase.h"
 
 
-#pragma mark Constants
-
-static const NSTimeInterval kFinishDateTolerance = 0.1;
-
-
-#pragma mark - 
-
 @interface TSKTaskTestCase : TSKRandomizedTestCase
 
 - (void)testInit;
@@ -91,14 +84,14 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     TSKTask *task = [[TSKTask alloc] init];
     [workflow addTask:task prerequisites:nil];
 
-    XCTAssertEqual(workflow, task.workflow, @"workflow not set properly");
+    XCTAssertEqual(workflow, task.workflow, @"workflow is set incorrectly");
     XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prereqs not empty");
     XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependents not empty");
 
     TSKTask *dependent = [[TSKTask alloc] init];
     [workflow addTask:dependent prerequisites:task, nil];
 
-    XCTAssertEqualObjects(task.dependentTasks, [NSSet setWithObject:dependent], @"dependents not set properly");
+    XCTAssertEqualObjects(task.dependentTasks, [NSSet setWithObject:dependent], @"dependents is set incorrectly");
     XCTAssertEqualObjects(dependent.prerequisiteTasks, [NSSet setWithObject:task], @"prereqs not set property");
 
     XCTAssertEqual(dependent.state, TSKTaskStatePending, @"dependent state not set to pending");
@@ -156,7 +149,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertEqual(task.result, resultString, @"result not set correctly");
-    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
+    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kTSKRandomizedTestCaseDateTolerance, @"finish date not set correctly");
 }
 
 
@@ -177,7 +170,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     XCTAssertEqual(task.state, TSKTaskStateFailed, @"state  is not failed");
     XCTAssertEqualObjects(task.error, error, @"error not returned correcctly");
-    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
+    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kTSKRandomizedTestCaseDateTolerance, @"finish date not set correctly");
 }
 
 
@@ -218,10 +211,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     [workflow addTask:dependent1 prerequisites:task, nil];
     [workflow addTask:dependent2 prerequisites:task, nil];
 
-    // Don’t expect that the dependent tasks will get a retry message, because they’re already in the
-    // pending state and thus won’t re-transition to that state
-    [self expectationForNotification:TSKTaskDidRetryNotification task:task];
-
+    // Don’t expect that the tasks will retry, because they’re already pending or ready
     [self expectationForNotification:TSKTestTaskDidRetryNotification object:task handler:nil];
     [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent1 handler:nil];
     [self expectationForNotification:TSKTestTaskDidRetryNotification object:dependent2 handler:nil];
@@ -340,7 +330,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
 
     // Confirm task is finished and relevant properties have been set before resetting
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
-    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
+    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kTSKRandomizedTestCaseDateTolerance, @"finish date not set correctly");
     XCTAssertNotNil(task.result, @"result not set");
 
     NSString *newResult = UMKRandomAlphanumericString();
@@ -369,7 +359,7 @@ static const NSTimeInterval kFinishDateTolerance = 0.1;
     // Test task finishes correctly with new date and result
     [task finishWithResult:newResult];
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
-    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kFinishDateTolerance, @"finish date not set correctly");
+    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kTSKRandomizedTestCaseDateTolerance, @"finish date not set correctly");
     XCTAssertEqual(task.result, newResult, @"result not set correctly");
 
     // Test that when task receives reset, it sends to dependents

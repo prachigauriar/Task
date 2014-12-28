@@ -26,6 +26,7 @@
 
 #import <Task/TSKSubworkflowTask.h>
 
+#import <Task/TaskErrors.h>
 #import <Task/TSKWorkflow.h>
 
 
@@ -45,6 +46,8 @@
 
 - (instancetype)initWithName:(NSString *)name subworkflow:(TSKWorkflow *)subworkflow
 {
+    NSParameterAssert(subworkflow);
+
     self = [super initWithName:name];
     if (self) {
         _subworkflow = subworkflow;
@@ -100,7 +103,37 @@
 
 - (void)main
 {
-    [self.subworkflow start];
+    // If we don’t have any unfinished tasks, finish immediately
+    if (![self.subworkflow hasUnfinishedTasks]) {
+        [self finishWithResult:self.subworkflow];
+        return;
+    }
+
+    // If we were cancelled while checking to see if we have unfinished tasks, return
+    if (!self.isExecuting) {
+        return;
+    }
+
+    // Get the earliest failed task
+    __block NSDate *earliestFinishDate = [NSDate distantFuture];
+    __block TSKTask *failedTask = nil;
+    [self.subworkflow.allTasks enumerateObjectsUsingBlock:^(TSKTask *task, BOOL *stop) {
+        if (task.isFailed && [task.finishDate compare:earliestFinishDate] < NSOrderedSame) {
+            earliestFinishDate = task.finishDate;
+            failedTask = task;
+        }
+    }];
+
+    // If we were cancelled while getting the failed task set, return
+    if (!self.isExecuting) {
+        return;
+    }
+
+    if (failedTask) {
+        [self failWithFailedSubworkflowTask:failedTask];
+    } else {
+        [self.subworkflow start];
+    }
 }
 
 
@@ -125,6 +158,15 @@
 }
 
 
+- (void)failWithFailedSubworkflowTask:(TSKTask *)task
+{
+    NSParameterAssert(task);
+    [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain
+                                            code:TSKErrorCodeSubworkflowTaskFailed
+                                        userInfo:@{ TSKWorkflowFailedTaskKey : task }]];
+}
+
+
 #pragma mark - Subworkflow Task State
 
 - (void)subworkflowDidFinish:(NSNotification *)notification
@@ -135,7 +177,7 @@
 
 - (void)subworkflowTaskDidFail:(NSNotification *)notification
 {
-    [self failWithError:[notification.userInfo[TSKWorkflowFailedTaskKey] error]];
+    [self failWithFailedSubworkflowTask:notification.userInfo[TSKWorkflowFailedTaskKey]];
 }
 
 

@@ -29,17 +29,108 @@
 
 @interface TSKSubworkflowTaskTestCase : TSKRandomizedTestCase
 
+- (void)testInit;
+
+- (void)testMain;
+- (void)testCancel;
+- (void)testReset;
+- (void)testRetry;
+
+- (void)testSubworkflowDidFinish;
+- (void)testSubworkflowTaskDidCancel;
+- (void)testSubworkflowTaskDidCancelAddTask;
+- (void)testSubworkflowTaskDidFail;
+
 @end
 
 
 @implementation TSKSubworkflowTaskTestCase
 
-- (void)testNewTask
+- (void)testInit
 {
-    TSKWorkflow *subworkflow = [[TSKWorkflow alloc] initWithName:@"Test"];
-    TSKSubworkflowTask *subworkflowTask = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
-    [subworkflow addTask:[[TSKTask alloc] init] prerequisites:nil];
-    [subworkflow addTask:[[TSKTask alloc] init] prerequisites:nil];
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] init]), @"nil subworkflow does not throw exception");
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithName:UMKRandomAlphanumericString()]), @"nil subworkflow does not throw exception");
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithSubworkflow:nil]), @"nil subworkflow does not throw exception");
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithName:UMKRandomAlphanumericString() subworkflow:nil]), @"nil subworkflow does not throw exception");
+
+    TSKWorkflow *subworkflow = [[TSKWorkflow alloc] init];
+
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    XCTAssertNotNil(task, @"returns nil");
+    XCTAssertEqualObjects(task.subworkflow, subworkflow, @"subworkflow is set incorrectly");
+    XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
+    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+
+    NSString *name = UMKRandomUnicodeString();
+    task = [[TSKSubworkflowTask alloc] initWithName:name subworkflow:subworkflow];
+    XCTAssertNotNil(task, @"returns nil");
+    XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
+    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+}
+
+
+- (void)testMain
+{
+//    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+//    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+//
+//    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:subworkflow block:nil];
+//    [task main];
+//    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+
+- (void)testCancel
+{
+    NSLock *finishLock = [[NSLock alloc] init];
+    [finishLock lock];
+
+    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+    TSKTestTask *subworkflowFinishTask = [self finishingTaskWithLock:finishLock];
+    [subworkflow addTask:subworkflowFinishTask prerequisites:nil];
+
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    [workflow addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKWorkflowWillCancelNotification workflow:subworkflow block:nil];
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+
+    [task cancel];
+    [finishLock unlock];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertTrue(task.isCancelled, @"task is not cancelled");
+    XCTAssertTrue(subworkflowFinishTask.isCancelled, @"subworkflow task is not cancelled");
+}
+
+
+- (void)testReset
+{
+    NSLock *finishLock = [[NSLock alloc] init];
+
+    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+    TSKTestTask *subworkflowFinishTask = [self finishingTaskWithLock:finishLock];
+    [subworkflow addTask:subworkflowFinishTask prerequisites:nil];
+
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    [workflow addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKWorkflowWillCancelNotification workflow:subworkflow block:nil];
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+
+    [task cancel];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertTrue(task.isCancelled, @"task is not cancelled");
+    XCTAssertTrue(subworkflowFinishTask.isCancelled, @"subworkflow task is not cancelled");
 }
 
 @end

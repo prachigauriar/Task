@@ -259,9 +259,9 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*!
  @abstract Executes the task’s ‑main method if the task is in the ready state.
- @discussion More accurately, the receiver will enqueue an operation on its workflow’s operation
-     queue that executes the task’s ‑main method if and only if the task is ready when the operation
-     is executed.
+ @discussion More accurately, if the receiver is in the ready state, it will enqueue an operation on
+     its workflow’s operation queue that executes the task’s ‑main method if and only if the task is
+     ready when the operation begins executing.
 
      This method should not be invoked if the task has not yet been added to a workflow. Subclasses
      should not override this method.
@@ -293,8 +293,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)reset;
 
 /*!
- @abstract Sets the task’s state to pending if it is pending, ready, cancelled or failed, and
-     starts the task if its prerequisite tasks have all finished successfully.
+ @abstract Sets the task’s state to pending if it is cancelled or failed, and starts the task if its
+     prerequisite tasks have all finished successfully.
  @discussion Regardless of the receiver’s state, sends the ‑retry message to all of the receiver’s
      dependent tasks.
 

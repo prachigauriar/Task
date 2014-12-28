@@ -335,6 +335,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 {
     NSAssert(self.workflow, @"Tasks must be in a workflow before they can be started");
 
+    if (!self.isReady) {
+        return;
+    }
+
     // Because the operation queue is asynchronous, we need to be sure to do the state transition
     // after the operation starts executing. The alternative of adding the operation inside of the
     // state transition’s block could lead to a weird situation in which ‑main is invoked, but the
@@ -420,7 +424,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     static NSSet *fromStates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStatePending), @(TSKTaskStateReady), @(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
+        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{

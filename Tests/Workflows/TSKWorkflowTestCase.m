@@ -64,16 +64,16 @@
     workflow = [[TSKWorkflow alloc] initWithName:workflowName operationQueue:queue];
     XCTAssertNotNil(workflow, @"returns nil");
     XCTAssertEqualObjects(workflow.allTasks, [NSSet set]);
-    XCTAssertEqualObjects(workflow.name, workflowName, @"name not set properly");
-    XCTAssertEqualObjects(workflow.operationQueue, queue, @"operation queue not set properly");
+    XCTAssertEqualObjects(workflow.name, workflowName, @"name is set incorrectly");
+    XCTAssertEqualObjects(workflow.operationQueue, queue, @"operation queue is set incorrectly");
     XCTAssertEqualObjects(workflow.operationQueue.name, queueName, @"operation queue name changed");
     XCTAssertEqualObjects(workflow.notificationCenter, [NSNotificationCenter defaultCenter], @"notificationCenter not set to default");
 
     workflow = [[TSKWorkflow alloc] initWithName:workflowName operationQueue:queue notificationCenter:self.notificationCenter];
     XCTAssertNotNil(workflow, @"returns nil");
     XCTAssertEqualObjects(workflow.allTasks, [NSSet set]);
-    XCTAssertEqualObjects(workflow.name, workflowName, @"name not set properly");
-    XCTAssertEqualObjects(workflow.operationQueue, queue, @"operation queue not set properly");
+    XCTAssertEqualObjects(workflow.name, workflowName, @"name is set incorrectly");
+    XCTAssertEqualObjects(workflow.operationQueue, queue, @"operation queue is set incorrectly");
     XCTAssertEqualObjects(workflow.operationQueue.name, queueName, @"operation queue name changed");
     XCTAssertEqualObjects(workflow.notificationCenter, self.notificationCenter, @"notificationCenter not set to default");
 }

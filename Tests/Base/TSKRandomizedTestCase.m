@@ -27,6 +27,13 @@
 #import "TSKRandomizedTestCase.h"
 
 
+#pragma mark Constants
+
+const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
+
+
+#pragma mark -
+
 @implementation TSKRandomizedTestCase
 
 + (void)setUp
@@ -62,10 +69,9 @@
 {
     XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", task, notificationName]];
 
-    __weak typeof(self) weak_self = self;
-    __block id observer = [self.notificationCenter addObserverForName:notificationName object:task queue:nil usingBlock:^(NSNotification *note) {
+    __block id observer = [task.workflow.notificationCenter addObserverForName:notificationName object:task queue:nil usingBlock:^(NSNotification *note) {
         [notificationExpectation fulfill];
-        [weak_self.notificationCenter removeObserver:observer name:notificationName object:task];
+        [task.workflow.notificationCenter removeObserver:observer name:notificationName object:task];
     }];
 
     return notificationExpectation;
@@ -76,14 +82,14 @@
 {
     XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", workflow, notificationName]];
 
-    __weak typeof(self) weak_self = self;
-    __block id observer = [self.notificationCenter addObserverForName:notificationName object:workflow queue:nil usingBlock:^(NSNotification *note) {
+    __weak typeof(workflow) weak_workflow = workflow;
+    __block id observer = [workflow.notificationCenter addObserverForName:notificationName object:workflow queue:nil usingBlock:^(NSNotification *note) {
         if (block) {
             block(note);
         }
 
         [notificationExpectation fulfill];
-        [weak_self.notificationCenter removeObserver:observer name:notificationName object:workflow];
+        [weak_workflow.notificationCenter removeObserver:observer name:notificationName object:weak_workflow];
     }];
 
     return notificationExpectation;

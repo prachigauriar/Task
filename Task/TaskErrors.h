@@ -32,5 +32,8 @@ extern NSString *const TSKTaskErrorDomain;
 /*! TSKErrorCode enumerates the various error codes used by TSKTask. */
 typedef NS_ENUM(NSInteger, TSKErrorCode) {
     /*! Error code indicating that a TSKExternalConditionTask is not fulfilled. */
-    TSKErrorCodeExternalConditionNotFulfilled
+    TSKErrorCodeExternalConditionNotFulfilled,
+
+    /*! Error code indicating that a task in a TSKSubworkflowTask’s subworkflow failed. */
+    TSKErrorCodeSubworkflowTaskFailed
 };
