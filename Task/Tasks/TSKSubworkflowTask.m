@@ -57,6 +57,11 @@
                                            selector:@selector(subworkflowTaskDidFail:)
                                                name:TSKWorkflowTaskDidFailNotification
                                              object:subworkflow];
+
+        [subworkflow addObserver:self
+                      forKeyPath:@"allTasks"
+                         options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew
+                         context:@selector(allTasks)];
     }
 
     return self;
@@ -66,8 +71,32 @@
 - (void)dealloc
 {
     [self.subworkflow.notificationCenter removeObserver:self];
+    [self.subworkflow removeObserver:self forKeyPath:@"allTasks" context:@selector(allTasks)];
 }
 
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (context != @selector(allTasks)) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+
+    // If the change kind is set, observe cancel notifications for the new tasks. This should only happen
+    // the first time, but better safe than sorry
+    NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
+    if (changeKind == NSKeyValueChangeSetting) {
+        [self.subworkflow.notificationCenter removeObserver:self name:TSKTaskDidCancelNotification object:nil];
+    }
+
+    // Observe the new tasks
+    for (TSKTask *task in change[NSKeyValueChangeNewKey]) {
+        [self.subworkflow.notificationCenter addObserver:self selector:@selector(subworkflowTaskDidCancel:) name:TSKTaskDidCancelNotification object:task];
+    }
+}
+
+
+#pragma mark -
 
 - (void)main
 {
@@ -96,15 +125,25 @@
 }
 
 
+#pragma mark - Subworkflow Task State
+
 - (void)subworkflowDidFinish:(NSNotification *)notification
 {
-    [self finishWithResult:nil];
+    [self finishWithResult:self.subworkflow];
 }
 
 
 - (void)subworkflowTaskDidFail:(NSNotification *)notification
 {
     [self failWithError:[notification.userInfo[TSKWorkflowFailedTaskKey] error]];
+}
+
+
+- (void)subworkflowTaskDidCancel:(NSNotification *)notification
+{
+    // We only want to put ourselves into the cancelled state, not cascade the cancel down to
+    // our subworkflow. As such, invoke the superclass implementation, not our own
+    [super cancel];
 }
 
 @end

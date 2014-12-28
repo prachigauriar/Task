@@ -229,7 +229,6 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(dependentTask.state, TSKTaskStateFinished, "state is not finished");
     XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
-    [willFinishLock unlock];
 }
 
 
@@ -275,7 +274,6 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];  // dependentTask is waiting for lock and finishes
     XCTAssertEqual(dependentTask.state, TSKTaskStateFinished, "state is not finished");
     XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
-    [willFinishLock unlock];
 }
 
 
@@ -416,32 +414,6 @@
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"cancel not sent to task");
     XCTAssertTrue(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is not true");
     XCTAssertFalse(workflow.hasFailedTasks, @"workflow.hasFailedTasks is not false");
-}
-
-
-#pragma mark - Helper methods
-
-- (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock
-{
-    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
-        [lock lock];
-        [task finishWithResult:nil];
-        [lock unlock];
-    }];
-
-    return task;
-}
-
-
-- (TSKTestTask *)failingTaskWithLock:(NSLock *)lock
-{
-    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
-        [lock lock];
-        [task failWithError:nil];
-        [lock unlock];
-    }];
-    
-    return task;
 }
 
 @end

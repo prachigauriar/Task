@@ -89,4 +89,28 @@
     return notificationExpectation;
 }
 
+
+- (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock
+{
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
+        [lock lock];
+        [task finishWithResult:nil];
+        [lock unlock];
+    }];
+
+    return task;
+}
+
+
+- (TSKTestTask *)failingTaskWithLock:(NSLock *)lock
+{
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
+        [lock lock];
+        [task failWithError:nil];
+        [lock unlock];
+    }];
+
+    return task;
+}
+
 @end

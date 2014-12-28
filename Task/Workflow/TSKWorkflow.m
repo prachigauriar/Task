@@ -166,6 +166,12 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 }
 
 
++ (BOOL)automaticallyNotifiesObserversOfAllTasks
+{
+    return NO;
+}
+
+
 - (NSSet *)allTasks
 {
     return [self.tasks copy];
@@ -182,6 +188,9 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
     prerequisiteTasks = prerequisiteTasks ? [prerequisiteTasks copy] : [[NSSet alloc] init];
     NSAssert([prerequisiteTasks isSubsetOfSet:self.tasks], @"Prerequisite tasks have not been added to workflow");
 
+    NSSet *taskSet = [NSSet setWithObject:task];
+    [self willChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
+
     task.workflow = self;
     [self.tasks addObject:task];
     [self.prerequisiteTasks setObject:prerequisiteTasks forKey:task];
@@ -193,7 +202,7 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
         // We create an immutable set here, because -[TSKTask dependentTasks] just invokes
         // -[TSKWorkflow dependentTasksForTask:], which would need to return a copy of the set if
         // we stored mutable sets. Since -[TSKTask dependentTasks] is likely to be invoked many more
-        // times than this method, and creating copies of mutable sets is not cheap, we’re better of
+        // times than this method, and creating copies of mutable sets is not cheap, we’re better off
         // using immutable sets.
         [self.dependentTasks setObject:[dependentTasks setByAddingObject:task] forKey:prerequisiteTask];
     }
@@ -209,6 +218,8 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
     self.tasksWithNoDependentTasks = [self.tasks objectsPassingTest:^BOOL(TSKTask *task, BOOL *stop) {
         return task.dependentTasks.count == 0;
     }];
+
+    [self didChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
 }
 
 

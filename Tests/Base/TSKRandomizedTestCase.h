@@ -26,8 +26,8 @@
 
 @import XCTest;
 
-#import <URLMock/UMKTestUtilities.h>
 #import <Task/Task.h>
+#import <URLMock/UMKTestUtilities.h>
 
 #import "TSKTestTask.h"
 
@@ -41,13 +41,65 @@
  */
 @interface TSKRandomizedTestCase : XCTestCase
 
+/*! The notification center that TSKWorkflows can post notifications on. */
 @property (nonatomic, strong) NSNotificationCenter *notificationCenter;
 
+/*! 
+ @abstract Returns the default name for the specified task.
+ @param task The task whose default name will be returned.
+ @result The default name for the specified task.
+ */
 - (NSString *)defaultNameForTask:(TSKTask *)task;
 
+/*!
+ @abstract Returns a new workflow whose notification center is the same as the receiver’s.
+ @result A new workflow whose notification center is the same as the receiver’s.
+ */
 - (TSKWorkflow *)workflowForNotificationTesting;
 
+/*!
+ @abstract Creates and returns a new expectation to receive the specified notification from the
+     specified task.
+ @discussion This causes the receiver to register to observe the specified notification from the
+     task’s workflow’s notification center. Once the notification has been observed, the expectation
+     is fulfilled.
+ @param notificationName The notification to observe.
+ @param task The task that will post the notification.
+ @result A new expectation that will be fulfilled when the specified task posts the specified 
+     notification.
+ */
 - (XCTestExpectation *)expectationForNotification:(NSString *)notificationName task:(TSKTask *)task;
+
+/*!
+ @abstract Creates and returns a new expectation to receive the specified notification from the
+     specified workflow.
+ @discussion This causes the receiver to register to observe the specified notification from the
+     workflow’s notification center. Once the notification has been observed, the expectation
+     is fulfilled.
+ @param notificationName The notification to observe.
+ @param workflow The workflow that will post the notification.
+ @param block An optional block to execute upon receiving the notification.
+ @result A new expectation that will be fulfilled when the specified workflow posts the specified
+     notification.
+ */
 - (XCTestExpectation *)expectationForNotification:(NSString *)notificationName workflow:(TSKWorkflow *)workflow block:(void (^)(NSNotification *))block;
+
+/*!
+ @abstract Creates and returns a task that will lock the specified lock, finish with a nil result,
+     and then unlock the specified lock.
+ @discussion This can be useful when testing task state inside a ‑main method.
+ @param lock The lock that the task will lock and unlock.
+ @result A task that will finish after acquiring the specified lock.
+ */
+- (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock;
+
+/*!
+ @abstract Creates and returns a task that will lock the specified lock, fail with a nil result,
+     and then unlock the specified lock.
+ @discussion This can be useful when testing task state inside a ‑main method.
+ @param lock The lock that the task will lock and unlock.
+ @result A task that will fail after acquiring the specified lock.
+ */
+- (TSKTestTask *)failingTaskWithLock:(NSLock *)lock;
 
 @end

@@ -69,6 +69,9 @@
 		4C9B8BE71A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */; };
 		4C9B8BE81A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */; };
 		4C9B8BEA1A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
+		4C9B8BEC1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */; };
+		4C9B8BED1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */; };
+		4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */; };
 		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
@@ -148,6 +151,7 @@
 		4C9B8BD41A4F50410035B91A /* TSKTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKTaskTestCase.m; sourceTree = "<group>"; };
 		4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflowTestCase.m; sourceTree = "<group>"; };
 		4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKExternalConditionTaskTestCase.m; sourceTree = "<group>"; };
+		4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSubworkflowTaskTestCase.m; sourceTree = "<group>"; };
 		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
 		717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKDelegateTestCase.m; sourceTree = "<group>"; };
 		7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -324,6 +328,7 @@
 				4C9B8BD21A4F50410035B91A /* TSKBlockTaskTestCase.m */,
 				4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */,
 				4C9B8BD31A4F50410035B91A /* TSKSelectorTaskTestCase.m */,
+				4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */,
 			);
 			path = Tasks;
 			sourceTree = "<group>";
@@ -716,6 +721,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C9B8BDB1A4F50410035B91A /* TSKTestTask.m in Sources */,
+				4C9B8BED1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDE1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
 				71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */,
 				4C9B8BE71A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
@@ -743,6 +749,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C9B8BEC1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BEA1A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m in Sources */,
 				4C9B8BDA1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BDD1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
@@ -773,6 +780,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C9B8BDC1A4F50410035B91A /* TSKTestTask.m in Sources */,
+				4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDF1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
 				71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */,
 				4C9B8BE81A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
