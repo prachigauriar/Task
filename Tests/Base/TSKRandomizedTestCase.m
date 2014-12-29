@@ -159,4 +159,16 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
     return task;
 }
 
+
+- (TSKTestTask *)cancellingTaskWithLock:(NSLock *)lock
+{
+    TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
+        [lock lock];
+        [task cancel];
+        [lock unlock];
+    }];
+
+    return task;
+}
+
 @end

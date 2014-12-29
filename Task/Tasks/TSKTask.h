@@ -250,7 +250,8 @@ extern NSString *const TSKTaskDidStartNotification;
      parameter. You should override this method to perform any work necessary to complete your task.
      In your implementation, do not invoke super. When your work is complete, it is imperative that
      the receiver be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will
-     prevent dependent tasks from executing.
+     prevent dependent tasks from executing. When appropriate, you can send the receiver the ‑cancel
+     message to abort execution without completion.
 
      Subclass implementations of this method should periodically check whether the task is in the
      executing state (-isExecuting) and, if not, stop executing at the earliest possible moment.

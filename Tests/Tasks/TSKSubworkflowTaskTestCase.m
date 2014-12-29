@@ -41,8 +41,8 @@
 - (void)testSubworkflowFailsBefore;
 - (void)testSubworkflowFailsAfter;
 - (void)testSubworkflowCancelsBefore;
+- (void)testSubworkflowCancelsAndFailsBefore;
 - (void)testSubworkflowCancelsAfter;
-- (void)testSubworkflowAddsTaskThatCancels;
 
 @end
 
@@ -329,8 +329,87 @@
 }
 
 
-//- (void)testSubworkflowCancelsBefore;
-//- (void)testSubworkflowCancelsAfter;
-//- (void)testSubworkflowAddsTaskThatCancels;
+- (void)testSubworkflowCancelsBefore
+{
+    TSKTask *cancellingTask = [self cancellingTaskWithLock:nil];
+    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+    [subworkflow addTask:cancellingTask prerequisites:nil];
+
+    // Run the subworkflow and let it cancel
+    [self expectationForNotification:TSKWorkflowTaskDidCancelNotification workflow:subworkflow block:nil];
+    [subworkflow start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    // Run the subworkflow task, expecting it to fail immediately
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    [workflow addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+    [task start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertTrue(task.isCancelled, @"task is not cancelled");
+}
+
+
+- (void)testSubworkflowCancelsAndFailsBefore
+{
+    TSKTask *cancellingTask = [self cancellingTaskWithLock:nil];
+    NSError *error = UMKRandomError();
+    TSKTask *failingTask = [self failingTaskWithLock:nil error:error];
+
+    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+    [subworkflow addTask:cancellingTask prerequisites:nil];
+    [subworkflow addTask:failingTask prerequisites:nil];
+
+    // Run the subworkflow and let it cancel/fail
+    [self expectationForNotification:TSKWorkflowTaskDidFailNotification workflow:subworkflow block:nil];
+    [self expectationForNotification:TSKWorkflowTaskDidCancelNotification workflow:subworkflow block:nil];
+    [subworkflow start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    // Run the subworkflow task, expecting it to fail, not cancel, immediately
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    [workflow addTask:task prerequisites:nil];
+
+    [self expectationForNotification:TSKTaskDidFailNotification task:task];
+    [task start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertTrue(task.isFailed, @"task is not cancelled");
+    XCTAssertEqualWithAccuracy([task.finishDate timeIntervalSinceNow], 0, kTSKRandomizedTestCaseDateTolerance);
+    XCTAssertEqualObjects(task.error, error, @"error is set incorrectly");
+}
+
+
+- (void)testSubworkflowCancelsAfter
+{
+    // Create a subworkflow with a cancelling task in it
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKWorkflow *subworkflow = [self workflowForNotificationTesting];
+    TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
+    [workflow addTask:task prerequisites:nil];
+
+    NSLock *cancelLock = [[NSLock alloc] init];
+    [cancelLock lock];
+    TSKTask *subworkflowCancellingTask = [self cancellingTaskWithLock:cancelLock];
+    [subworkflow addTask:subworkflowCancellingTask prerequisites:nil];
+
+    // Start the subworkflow task, and thus the subworkflow cancelling task, but don’t allow it to cancel just yet
+    [self expectationForNotification:TSKTaskDidStartNotification task:task];
+    [self expectationForNotification:TSKTaskDidStartNotification task:subworkflowCancellingTask];
+    [task start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    // Allow the subworkflow failing task to fail. This should cause the subworkflow task to fail
+    [self expectationForNotification:TSKTaskDidCancelNotification task:subworkflowCancellingTask];
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+    [cancelLock unlock];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertTrue(task.isCancelled, @"task is not cancelled");
+}
 
 @end

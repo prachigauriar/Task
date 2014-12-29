@@ -90,7 +90,6 @@ extern const NSTimeInterval kTSKRandomizedTestCaseDateTolerance;
 /*!
  @abstract Creates and returns a task that will lock the specified lock, finish with a nil result,
      and then unlock the specified lock.
- @discussion This can be useful when testing task state inside a ‑main method.
  @param lock The lock that the task will lock and unlock.
  @result A task that will finish after acquiring the specified lock.
  */
@@ -99,7 +98,6 @@ extern const NSTimeInterval kTSKRandomizedTestCaseDateTolerance;
 /*!
  @abstract Creates and returns a task that will lock the specified lock, finish with the specified
      result, and then unlock the specified lock.
- @discussion This can be useful when testing task state inside a ‑main method.
  @param lock The lock that the task will lock and unlock.
  @param result The result that that the task will finish with
  @result A task that will finish after acquiring the specified lock.
@@ -109,7 +107,6 @@ extern const NSTimeInterval kTSKRandomizedTestCaseDateTolerance;
 /*!
  @abstract Creates and returns a task that will lock the specified lock, fail with a nil error,
      and then unlock the specified lock.
- @discussion This can be useful when testing task state inside a ‑main method.
  @param lock The lock that the task will lock and unlock.
  @result A task that will fail after acquiring the specified lock.
  */
@@ -118,11 +115,18 @@ extern const NSTimeInterval kTSKRandomizedTestCaseDateTolerance;
 /*!
  @abstract Creates and returns a task that will lock the specified lock, fail with the specified
      error, and then unlock the specified lock.
- @discussion This can be useful when testing task state inside a ‑main method.
  @param lock The lock that the task will lock and unlock.
  @param error The error to that the task will fail with
  @result A task that will fail after acquiring the specified lock.
  */
 - (TSKTestTask *)failingTaskWithLock:(NSLock *)lock error:(NSError *)error;
+
+/*!
+ @abstract Creates and returns a task that will lock the specified lock, cancel itself, and then
+     unlock the specified lock.
+ @param lock The lock that the task will lock and unlock.
+ @result A task that will cancel itself after acquiring the specified lock.
+ */
+- (TSKTestTask *)cancellingTaskWithLock:(NSLock *)lock;
 
 @end
