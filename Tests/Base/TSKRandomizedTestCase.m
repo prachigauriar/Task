@@ -59,6 +59,8 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
 }
 
 
+#pragma mark -
+
 - (TSKWorkflow *)workflowForNotificationTesting
 {
     return [[TSKWorkflow alloc] initWithName:nil operationQueue:nil notificationCenter:self.notificationCenter];
@@ -67,40 +69,72 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
 
 - (XCTestExpectation *)expectationForNotification:(NSString *)notificationName task:(TSKTask *)task
 {
-    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", task, notificationName]];
+    XCTestExpectation *expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", task, notificationName]];
 
-    __block id observer = [task.workflow.notificationCenter addObserverForName:notificationName object:task queue:nil usingBlock:^(NSNotification *note) {
-        [notificationExpectation fulfill];
-        [task.workflow.notificationCenter removeObserver:observer name:notificationName object:task];
-    }];
+    [self observeNotification:notificationName
+           notificationCenter:task.workflow.notificationCenter
+                       object:task
+                  expectation:expectation
+                        block:nil];
 
-    return notificationExpectation;
+    return expectation;
 }
 
 
 - (XCTestExpectation *)expectationForNotification:(NSString *)notificationName workflow:(TSKWorkflow *)workflow block:(void (^)(NSNotification *))block
 {
-    XCTestExpectation *notificationExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", workflow, notificationName]];
+    XCTestExpectation *expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Observe %p %@", workflow, notificationName]];
 
-    __weak typeof(workflow) weak_workflow = workflow;
-    __block id observer = [workflow.notificationCenter addObserverForName:notificationName object:workflow queue:nil usingBlock:^(NSNotification *note) {
+    [self observeNotification:notificationName
+           notificationCenter:workflow.notificationCenter
+                       object:workflow
+                  expectation:expectation
+                        block:block];
+
+    return expectation;
+}
+
+
+- (void)observeNotification:(NSString *)notificationName
+         notificationCenter:(NSNotificationCenter *)notificationCenter
+                     object:(id)object
+                expectation:(XCTestExpectation *)expectation
+                      block:(void (^)(NSNotification *))block
+{
+    __block BOOL isFulfilled = NO;
+    __weak typeof(notificationCenter) weak_notificationCenter = notificationCenter;
+    __block id observer = [notificationCenter addObserverForName:notificationName object:object queue:nil usingBlock:^(NSNotification *note) {
+        @synchronized (self) {
+            if (isFulfilled) {
+                return;
+            }
+
+            isFulfilled = YES;
+        }
+
         if (block) {
             block(note);
         }
 
-        [notificationExpectation fulfill];
-        [weak_workflow.notificationCenter removeObserver:observer name:notificationName object:weak_workflow];
+        [expectation fulfill];
+        [weak_notificationCenter removeObserver:observer name:notificationName object:object];
     }];
-
-    return notificationExpectation;
 }
 
 
+#pragma mark -
+
 - (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock
+{
+    return [self finishingTaskWithLock:lock result:nil];
+}
+
+
+- (TSKTestTask *)finishingTaskWithLock:(NSLock *)lock result:(id)result
 {
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [lock lock];
-        [task finishWithResult:nil];
+        [task finishWithResult:result];
         [lock unlock];
     }];
 
@@ -110,9 +144,15 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
 
 - (TSKTestTask *)failingTaskWithLock:(NSLock *)lock
 {
+    return [self failingTaskWithLock:lock error:nil];
+}
+
+
+- (TSKTestTask *)failingTaskWithLock:(NSLock *)lock error:(NSError *)error
+{
     TSKTestTask *task = [[TSKTestTask alloc] initWithBlock:^(TSKTask *task) {
         [lock lock];
-        [task failWithError:nil];
+        [task failWithError:error];
         [lock unlock];
     }];
 

@@ -105,7 +105,7 @@
 {
     // If we don’t have any unfinished tasks, finish immediately
     if (![self.subworkflow hasUnfinishedTasks]) {
-        [self finishWithResult:self.subworkflow];
+        [self finish];
         return;
     }
 
@@ -114,23 +114,26 @@
         return;
     }
 
-    // Get the earliest failed task
+    // Iterate over all the subworkflow’s tasks searching for the earliest failed task
+    // and whether any tasks have been cancelled
     __block NSDate *earliestFinishDate = [NSDate distantFuture];
     __block TSKTask *failedTask = nil;
+    __block BOOL foundCancelledTask = NO;
+
     [self.subworkflow.allTasks enumerateObjectsUsingBlock:^(TSKTask *task, BOOL *stop) {
         if (task.isFailed && [task.finishDate compare:earliestFinishDate] < NSOrderedSame) {
             earliestFinishDate = task.finishDate;
             failedTask = task;
         }
+
+        foundCancelledTask = foundCancelledTask || task.isCancelled;
     }];
 
-    // If we were cancelled while getting the failed task set, return
-    if (!self.isExecuting) {
-        return;
-    }
-
+    // Prioritize failure behavior over cancellation behavior. Otherwise start.
     if (failedTask) {
-        [self failWithFailedSubworkflowTask:failedTask];
+        [self failWithError:failedTask.error];
+    } else if (foundCancelledTask) {
+        [self cancelWithoutPropagationToSubworkflow];
     } else {
         [self.subworkflow start];
     }
@@ -158,12 +161,17 @@
 }
 
 
-- (void)failWithFailedSubworkflowTask:(TSKTask *)task
+#pragma mark - State Changes
+
+- (void)finish
 {
-    NSParameterAssert(task);
-    [self failWithError:[NSError errorWithDomain:TSKTaskErrorDomain
-                                            code:TSKErrorCodeSubworkflowTaskFailed
-                                        userInfo:@{ TSKWorkflowFailedTaskKey : task }]];
+    [self finishWithResult:self.subworkflow];
+}
+
+
+- (void)cancelWithoutPropagationToSubworkflow
+{
+    [super cancel];
 }
 
 
@@ -171,21 +179,19 @@
 
 - (void)subworkflowDidFinish:(NSNotification *)notification
 {
-    [self finishWithResult:self.subworkflow];
+    [self finish];
 }
 
 
 - (void)subworkflowTaskDidFail:(NSNotification *)notification
 {
-    [self failWithFailedSubworkflowTask:notification.userInfo[TSKWorkflowFailedTaskKey]];
+    [self failWithError:[notification.userInfo[TSKWorkflowFailedTaskKey] error]];
 }
 
 
 - (void)subworkflowTaskDidCancel:(NSNotification *)notification
 {
-    // We only want to put ourselves into the cancelled state, not cascade the cancel down to
-    // our subworkflow. As such, invoke the superclass implementation, not our own
-    [super cancel];
+    [self cancelWithoutPropagationToSubworkflow];
 }
 
 @end
