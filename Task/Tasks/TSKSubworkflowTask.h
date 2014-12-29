@@ -28,14 +28,22 @@
 
 
 /*!
- A TSKSubworkflowTask is a task that executes a whole workflow as its unit of work. This can be
- useful when creating highly complex workflows. Each subworkflow task has a subworkflow that it
- starts in its main method.
+ A TSKSubworkflowTask is a task that executes a whole workflow, called a subworkflow, as its unit 
+ of work. This is primarily intended for when you have an existing mechanism for creating a workflow
+ that you wish to incorporate as a part of a larger workflow. If this does not describe your scenario,
+ you are likely better off avoiding TSKSubworkflowTasks.
 
  A subworkflow task’s state reflects that of the tasks in its subworkflow. When the entire
  subworkflow finishes, the subworkflow task finishes; when a single task in the subworkflow fails
- with an error, the subworkflow task fails. Finally, when a task in the subworkflow is cancelled,
- the entire subworkflow task is cancelled.
+ with an error, the subworkflow task fails with that error. Finally, when a task in the subworkflow
+ is cancelled, the entire subworkflow task is cancelled.
+
+ Generally speaking, avoid starting a subworkflow task’s subworkflow before starting the subworkflow
+ task itself. If, when a subworkflow task starts, it finds that its subworkflow is already finished,
+ it will finish immediately. If the subworkflow contains one or more failed tasks, the subworkflow task
+ will fail immediately with the earliest failed task’s error. Finally, if the subworkflow contains no 
+ failed tasks but does contain one or more cancelled tasks, the subworkflow task will cancel itself
+ immediately.
 
  When a subworkflow task finishes, its result is the subworkflow itself. This allows dependent tasks
  to unpack the results of the subworkflow in any way they see fit. This underscores a drawback of
