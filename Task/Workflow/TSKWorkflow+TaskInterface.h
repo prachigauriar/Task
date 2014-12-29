@@ -48,6 +48,12 @@
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
 
 /*!
+ @abstract Indicates to the receiver that the specified task was cancelled.
+ @param task The task that was cancelled. May not be nil.
+ */
+- (void)subtaskDidCancel:(TSKTask *)task;
+
+/*!
  @abstract Indicates to the receiver that the specified task was reset.
  @param task The task that was reset. May not be nil.
  */

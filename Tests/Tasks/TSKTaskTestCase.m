@@ -26,6 +26,45 @@
 
 #import "TSKRandomizedTestCase.h"
 
+#import <URLMock/UMKMessageCountingProxy.h>
+
+
+#pragma mark - Test Delegate
+
+@interface TSKTestTaskDelegate : NSObject <TSKTaskDelegate>
+
+@property (nonatomic, strong) TSKTask *task;
+@property (nonatomic, strong) id result;
+@property (nonatomic, strong) NSError *error;
+
+@end
+
+
+@implementation TSKTestTaskDelegate
+
+- (void)task:(TSKTask *)task didFailWithError:(NSError *)error
+{
+    self.task = task;
+    self.error = error;
+}
+
+
+- (void)task:(TSKTask *)task didFinishWithResult:(id)result
+{
+    self.task = task;
+    self.result = result;
+}
+
+
+- (void)taskDidCancel:(TSKTask *)task
+{
+    self.task = task;
+}
+
+@end
+
+
+#pragma mark -
 
 @interface TSKTaskTestCase : TSKRandomizedTestCase
 
@@ -39,6 +78,10 @@
 - (void)testCancelAndFinish;
 - (void)testCancelAndFail;
 - (void)testReset;
+
+- (void)testTaskDelegateFinish;
+- (void)testTaskDelegateFail;
+- (void)testTaskDelegateCancel;
 
 @end
 
@@ -243,8 +286,13 @@
     // Confirms that task is mid-execution when -cancel is called
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
-    // Call cancel only after main has been entered
+    // Invoke cancel only after main has been entered
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+
     [task cancel];
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"state is not cancelled");
     [didCancelLock unlock];
 
@@ -302,7 +350,12 @@
     // Ensure task is executing before cancel is called
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
+    [self expectationForNotification:TSKTestTaskDidCancelNotification object:task handler:nil];
+    [self expectationForNotification:TSKTaskDidCancelNotification task:task];
+
     [task cancel];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
     [didCancelLock unlock];
 
     // Block is waiting for lock and executes before this continues
@@ -378,6 +431,101 @@
 
     [task reset];
     [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+
+#pragma mark -
+
+- (TSKTask *)taskExecutingWithDelegate:(id)delegate
+{
+    XCTestExpectation *didStartExpectation = [self expectationWithDescription:@"did start"];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        [didStartExpectation fulfill];
+    }];
+    task.delegate = delegate;
+
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    [workflow addTask:task prerequisites:nil];
+    [task start];
+
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    return task;
+}
+
+
+- (void)testTaskDelegateFinish
+{
+    NSString *result = UMKRandomUnicodeString();
+
+    // Test delegate only implementing finish
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestTaskDelegate alloc] init]];
+    TSKTask *task = [self taskExecutingWithDelegate:delegate];
+
+    [task finishWithResult:result];
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(task:didFinishWithResult:)],
+                   @"delegate received task:didFinishWithResult: incorrect number of times");
+    XCTAssertEqualObjects([delegate task], task, @"delegate message received with incorrect task parameter");
+    XCTAssertEqualObjects([delegate result], result, @"delegate message received with incorrect result parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(task:didFailWithError:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(taskDidCancel:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    task = [self taskExecutingWithDelegate:delegate];
+
+    XCTAssertNoThrow([task finishWithResult:result], @"delegate that does not implement messages is sent unexpected selector");
+}
+
+
+- (void)testTaskDelegateFail
+{
+    NSError *error = UMKRandomError();
+
+    // Test delegate only implementing finish
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestTaskDelegate alloc] init]];
+    TSKTask *task = [self taskExecutingWithDelegate:delegate];
+
+    [task failWithError:error];
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(task:didFailWithError:)],
+                   @"delegate received task:didFailWithError: incorrect number of times");
+    XCTAssertEqualObjects([delegate task], task, @"delegate message received with incorrect task parameter");
+    XCTAssertEqualObjects([delegate error], error, @"delegate message received with incorrect error parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(task:didFinishWithResult:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(taskDidCancel:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    task = [self taskExecutingWithDelegate:delegate];
+
+    XCTAssertNoThrow([task failWithError:error], @"delegate that does not implement messages is sent unexpected selector");
+}
+
+
+- (void)testTaskDelegateCancel
+{
+    // Test delegate only implementing finish
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestTaskDelegate alloc] init]];
+    TSKTask *task = [self taskExecutingWithDelegate:delegate];
+
+    [task cancel];
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(taskDidCancel:)],
+                   @"delegate received taskDidCancel: incorrect number of times");
+    XCTAssertEqualObjects([delegate task], task, @"delegate message received with incorrect task parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(task:didFinishWithResult:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(task:didFailWithError:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    task = [self taskExecutingWithDelegate:delegate];
+
+    XCTAssertNoThrow([task cancel], @"delegate that does not implement messages is sent unexpected selector");
 }
 
 @end

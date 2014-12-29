@@ -32,12 +32,13 @@
 #pragma mark Constants
 
 NSString *const TSKWorkflowDidFinishNotification = @"TSKWorkflowDidFinishNotification";
+NSString *const TSKWorkflowTaskDidCancelNotification = @"TSKWorkflowTaskDidCancelNotification";
 NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
 NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
 NSString *const TSKWorkflowWillResetNotification = @"TSKWorkflowWillResetNotification";
 NSString *const TSKWorkflowWillRetryNotification = @"TSKWorkflowWillRetryNotification";
 NSString *const TSKWorkflowWillStartNotification = @"TSKWorkflowWillStartNotification";
-NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
+NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 
 #pragma mark -
@@ -329,6 +330,8 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
 {
+    NSParameterAssert(task);
+
     __block BOOL allTasksFinished = NO;
     dispatch_barrier_sync(self.finishedTasksQueue, ^{
         [self.finishedTasks addObject:task];
@@ -347,16 +350,32 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
 {
+    NSParameterAssert(task);
+
     if ([self.delegate respondsToSelector:@selector(workflow:task:didFailWithError:)]) {
         [self.delegate workflow:self task:task didFailWithError:error];
     }
 
-    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidFailNotification object:self userInfo:@{ TSKWorkflowFailedTaskKey : task }];
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidFailNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
+}
+
+
+- (void)subtaskDidCancel:(TSKTask *)task
+{
+    NSParameterAssert(task);
+
+    if ([self.delegate respondsToSelector:@selector(workflow:taskDidCancel:)]) {
+        [self.delegate workflow:self taskDidCancel:task];
+    }
+
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidCancelNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
 }
 
 
 - (void)subtaskDidReset:(TSKTask *)task
 {
+    NSParameterAssert(task);
+
     dispatch_barrier_async(self.finishedTasksQueue, ^{
         [self.finishedTasks removeObject:task];
     });

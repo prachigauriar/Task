@@ -26,6 +26,46 @@
 
 #import "TSKRandomizedTestCase.h"
 
+#import <URLMock/UMKMessageCountingProxy.h>
+
+
+#pragma mark Test Delegate 
+
+@interface TSKTestWorkflowDelegate : NSObject <TSKWorkflowDelegate>
+
+@property (nonatomic, strong) TSKWorkflow *workflow;
+@property (nonatomic, strong) TSKTask *task;
+@property (nonatomic, strong) NSError *error;
+
+@end
+
+
+@implementation TSKTestWorkflowDelegate
+
+- (void)workflowDidFinish:(TSKWorkflow *)workflow
+{
+    self.workflow = workflow;
+}
+
+
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error
+{
+    self.workflow = workflow;
+    self.task = task;
+    self.error = error;
+}
+
+
+- (void)workflow:(TSKWorkflow *)workflow taskDidCancel:(TSKTask *)task
+{
+    self.workflow = workflow;
+    self.task = task;
+}
+
+@end
+
+
+#pragma mark -
 
 @interface TSKWorkflowTestCase : TSKRandomizedTestCase
 
@@ -41,6 +81,10 @@
 - (void)testReset;
 - (void)testRetry;
 - (void)testCancel;
+
+- (void)testWorkflowDelegateFinish;
+- (void)testWorkflowDelegateFail;
+- (void)testWorkflowDelegateCancel;
 
 @end
 
@@ -365,7 +409,7 @@
     [self expectationForNotification:TSKWorkflowWillStartNotification workflow:workflow block:nil];
     [self expectationForNotification:TSKWorkflowTaskDidFailNotification workflow:workflow block:^(NSNotification *note) {
         XCTAssertNotNil(note, @"notification has nil userInfo dictionary");
-        XCTAssertEqual(note.userInfo[TSKWorkflowFailedTaskKey], task, @"notification has incorrect failed task");
+        XCTAssertEqual(note.userInfo[TSKWorkflowTaskKey], task, @"notification has incorrect task");
     }];
 
     // Put task in typical state for retry
@@ -414,6 +458,152 @@
     XCTAssertEqual(task.state, TSKTaskStateCancelled, @"cancel not sent to task");
     XCTAssertTrue(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is not true");
     XCTAssertFalse(workflow.hasFailedTasks, @"workflow.hasFailedTasks is not false");
+}
+
+
+#pragma mark -
+
+- (TSKTask *)cancelledTaskInWorkflowWithDelegate:(id)delegate
+{
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    workflow.delegate = delegate;
+
+    XCTestExpectation *didCancelExpectation = [self expectationWithDescription:@"task did cancel"];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        [task cancel];
+        [didCancelExpectation fulfill];
+    }];
+
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    return task;
+}
+
+
+- (TSKTask *)failedTaskInWorkflowWithDelegate:(id)delegate error:(NSError *)error
+{
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    workflow.delegate = delegate;
+
+    XCTestExpectation *didFinishExpectation = [self expectationWithDescription:@"task did fail"];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        [task failWithError:error];
+        [didFinishExpectation fulfill];
+    }];
+
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    return task;
+}
+
+
+- (TSKWorkflow *)finishedWorkflowWithDelegate:(id)delegate
+{
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    workflow.delegate = delegate;
+
+    XCTestExpectation *didFinishExpectation = [self expectationWithDescription:@"task did finish"];
+    TSKTask *task = [[TSKBlockTask alloc] initWithBlock:^(TSKTask *task) {
+        [task finishWithResult:nil];
+        [didFinishExpectation fulfill];
+    }];
+
+    [workflow addTask:task prerequisites:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    return workflow;
+}
+
+
+- (void)testWorkflowDelegateFinish
+{
+    // Message-counting delegate
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestWorkflowDelegate alloc] init]];
+    TSKWorkflow *workflow = [self finishedWorkflowWithDelegate:delegate];
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(workflowDidFinish:)],
+                   @"delegate received workflowDidFinish: incorrect number of times");
+    XCTAssertEqualObjects([delegate workflow], workflow, @"delegate received incorrect workflow parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:task:didFailWithError:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:taskDidCancel:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    XCTAssertNoThrow([self finishedWorkflowWithDelegate:delegate], @"delegate that does not implement messages is sent unexpected selector");
+
+    // Empty workflow with message-counting delegate
+    delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestWorkflowDelegate alloc] init]];
+    workflow = [self workflowForNotificationTesting];
+    workflow.delegate = delegate;
+
+    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(workflowDidFinish:)],
+                   @"delegate received workflowDidFinish: incorrect number of times");
+    XCTAssertEqualObjects([delegate workflow], workflow, @"delegate received incorrect workflow parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:task:didFailWithError:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:taskDidCancel:)], @"delegate received unexpected selector");
+
+    // Empty workflow with object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    workflow = [self workflowForNotificationTesting];
+    workflow.delegate = delegate;
+
+    XCTAssertNoThrow([workflow start], @"delegate that does not implement messages is sent unexpected selector");
+}
+
+
+- (void)testWorkflowDelegateFail
+{
+    NSError *error = UMKRandomError();
+
+    // Message-counting delegate
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestWorkflowDelegate alloc] init]];
+    TSKTask *task = [self failedTaskInWorkflowWithDelegate:delegate error:error];
+    TSKWorkflow *workflow = task.workflow;
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(workflow:task:didFailWithError:)],
+                   @"delegate received workflow:task:didFailWithError: incorrect number of times");
+    XCTAssertEqualObjects([delegate workflow], workflow, @"delegate received incorrect workflow parameter");
+    XCTAssertEqualObjects([delegate task], task, @"delegate received incorrect task parameter");
+    XCTAssertEqualObjects([delegate error], error, @"delegate received incorrect error parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflowDidFinish:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:taskDidCancel:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    XCTAssertNoThrow([self failedTaskInWorkflowWithDelegate:delegate error:error], @"delegate that does not implement messages is sent unexpected selector");
+}
+
+
+- (void)testWorkflowDelegateCancel
+{
+    // Message-counting delegate
+    id delegate = [UMKMessageCountingProxy messageCountingProxyWithObject:[[TSKTestWorkflowDelegate alloc] init]];
+    TSKTask *task = [self cancelledTaskInWorkflowWithDelegate:delegate];
+    TSKWorkflow *workflow = task.workflow;
+
+    XCTAssertEqual((NSUInteger)1, [delegate receivedMessageCountForSelector:@selector(workflow:taskDidCancel:)],
+                   @"delegate received workflow:taskDidCancel: incorrect number of times");
+    XCTAssertEqualObjects([delegate workflow], workflow, @"delegate received incorrect workflow parameter");
+    XCTAssertEqualObjects([delegate task], task, @"delegate received incorrect task parameter");
+
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflowDidFinish:)], @"delegate received unexpected selector");
+    XCTAssertFalse([delegate hasReceivedSelector:@selector(workflow:task:didFailWithError:)], @"delegate received unexpected selector");
+
+    // Object that does not implement delegate messages
+    delegate = [[NSObject alloc] init];
+    XCTAssertNoThrow([self cancelledTaskInWorkflowWithDelegate:delegate], @"delegate that does not implement messages is sent unexpected selector");
 }
 
 @end

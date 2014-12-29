@@ -13,6 +13,6 @@ Target = Struct.new(:target, :platform, :platform_version)
     platform t.platform, t.platform_version
 
     # Pods for the test targets
-    pod 'URLMock/TestHelpers', '~> 1.2.1' 
+    pod 'URLMock/TestHelpers', '~> 1.2.2' 
   end
 end

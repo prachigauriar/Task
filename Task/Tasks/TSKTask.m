@@ -391,7 +391,12 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:^{
+        if ([self.delegate respondsToSelector:@selector(taskDidCancel:)]) {
+            [self.delegate taskDidCancel:self];
+        }
+
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidCancelNotification object:self];
+        [self.workflow subtaskDidCancel:self];
     }];
     
     [self.dependentTasks makeObjectsPerformSelector:@selector(cancel)];

@@ -74,9 +74,6 @@
 		4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */; };
 		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
-		71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
-		71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */; };
 		EA59875C4B69635842657D44 /* libPods-Task (iOS) Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD50394D2FEC3796A2A81B26 /* libPods-Task (iOS) Tests.a */; };
 		FE05E92155425646C37D8310 /* libPods-libTask Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6F642574517502C6FD6B2DB /* libPods-libTask Tests.a */; };
 /* End PBXBuildFile section */
@@ -153,7 +150,6 @@
 		4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKExternalConditionTaskTestCase.m; sourceTree = "<group>"; };
 		4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSubworkflowTaskTestCase.m; sourceTree = "<group>"; };
 		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
-		717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKDelegateTestCase.m; sourceTree = "<group>"; };
 		7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7C350BA202EBF78C8BB741CF /* Pods-Task Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task Tests/Pods-Task Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Task Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -268,7 +264,6 @@
 				4C9B8BCC1A4F50400035B91A /* Base */,
 				4C9B8BD11A4F50410035B91A /* Tasks */,
 				4C9B8BD51A4F50410035B91A /* Workflows */,
-				717CD1721A2FA5DD005715DF /* TSKDelegateTestCase.m */,
 				4C86D5BF19F2E96800C898AF /* Supporting Files */,
 			);
 			path = Tests;
@@ -723,7 +718,6 @@
 				4C9B8BDB1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BED1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDE1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
-				71CC82FE1A30B57100A41C03 /* TSKDelegateTestCase.m in Sources */,
 				4C9B8BE71A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
 				4C9B8BD81A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
 				4C9B8BE11A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,
@@ -753,7 +747,6 @@
 				4C9B8BEA1A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m in Sources */,
 				4C9B8BDA1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BDD1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
-				717CD1731A2FA5DD005715DF /* TSKDelegateTestCase.m in Sources */,
 				4C9B8BE61A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
 				4C9B8BD71A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
 				4C9B8BE01A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,
@@ -782,7 +775,6 @@
 				4C9B8BDC1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDF1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
-				71CC82FF1A30B57200A41C03 /* TSKDelegateTestCase.m in Sources */,
 				4C9B8BE81A4F50410035B91A /* TSKWorkflowTestCase.m in Sources */,
 				4C9B8BD91A4F50410035B91A /* TSKRandomizedTestCase.m in Sources */,
 				4C9B8BE21A4F50410035B91A /* TSKSelectorTaskTestCase.m in Sources */,

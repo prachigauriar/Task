@@ -282,8 +282,7 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)cancel;
 
 /*!
- @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled and
-     starts the task if its prerequisite tasks have all finished successfully.
+ @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled.
  @discussion If, after being reset, the receiver’s prerequisite tasks have all finished successfully,
      the receiver is automatically put into the ready state. Regardless of the receiver’s state, sends
      the ‑reset message to all of the receiver’s dependent tasks.
@@ -351,5 +350,11 @@ extern NSString *const TSKTaskDidStartNotification;
  @param error An error containing the reason the task failed. May be nil. 
  */
 - (void)task:(TSKTask *)task didFailWithError:(NSError *)error;
+
+/*!
+ @abstract Sent to the delegate when the specified task is cancelled.
+ @param task The task that was cancelled.
+ */
+- (void)taskDidCancel:(TSKTask *)task;
 
 @end
