@@ -93,18 +93,18 @@
 
     // Iterate over all the subworkflow’s tasks searching for the earliest failed task
     // and whether any tasks have been cancelled
-    __block NSDate *earliestFinishDate = [NSDate distantFuture];
-    __block TSKTask *failedTask = nil;
-    __block BOOL foundCancelledTask = NO;
+    NSDate *earliestFinishDate = [NSDate distantFuture];
+    TSKTask *failedTask = nil;
+    BOOL foundCancelledTask = NO;
 
-    [self.subworkflow.allTasks enumerateObjectsUsingBlock:^(TSKTask *task, BOOL *stop) {
+    for (TSKTask *task in self.subworkflow.allTasks) {
         if (task.isFailed && [task.finishDate compare:earliestFinishDate] < NSOrderedSame) {
             earliestFinishDate = task.finishDate;
             failedTask = task;
         }
 
         foundCancelledTask = foundCancelledTask || task.isCancelled;
-    }];
+    }
 
     // Prioritize failure behavior over cancellation behavior. Otherwise start.
     if (failedTask) {

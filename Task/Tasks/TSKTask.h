@@ -130,10 +130,8 @@ extern NSString *const TSKTaskDidStartNotification;
 
  To make a task perform useful work, you must subclass TSKTask and override ‑main. Your
  implementation should execute any operations necessary to complete your task, and invoke either
- ‑finishWithResult: or ‑failWithError: when complete. TSKTask has three built-in subclasses —
- TSKBlockTask, TSKSelectorTask, and TSKExternalConditionTask — which can generally be used as an
- alternative to subclassing TSKTask yourself. See their respective class documentation for more
- information.
+ ‑finishWithResult: or ‑failWithError: when complete. If you want to avoid subclassing, you can also
+ use TSKBlockTask and TSKSelectorTask. See their respective class documentation for more information.
 
  Every TSKTask has an optional delegate that can be informed when a task succeeds or fails. See the
  documentation for TSKTaskDelegate for more information.
@@ -158,8 +156,8 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*! 
  @abstract The task’s workflow. 
- @discussion This property is set when the task is added to a workflow. Once a task has been added to a
-     workflow, it may not be added (or moved) to another workflow.
+ @discussion This property is set when the task is added to a workflow. Once a task has been added
+     to a workflow, it may not be added (or moved) to another workflow.
  */
 @property (nonatomic, weak, readonly) TSKWorkflow *workflow;
 
@@ -285,8 +283,8 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled.
  @discussion If, after being reset, the receiver’s prerequisite tasks have all finished successfully,
-     the receiver is automatically put into the ready state. Regardless of the receiver’s state, sends
-     the ‑reset message to all of the receiver’s dependent tasks.
+     the receiver is automatically put into the ready state. Regardless of the receiver’s state,
+     sends the ‑reset message to all of the receiver’s dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
  */
