@@ -340,7 +340,7 @@
     [subworkflow start];
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
-    // Run the subworkflow task, expecting it to fail immediately
+    // Run the subworkflow task, expecting it to cancel immediately
     TSKWorkflow *workflow = [self workflowForNotificationTesting];
     TSKSubworkflowTask *task = [[TSKSubworkflowTask alloc] initWithSubworkflow:subworkflow];
     [workflow addTask:task prerequisites:nil];
@@ -403,7 +403,7 @@
     [task start];
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
-    // Allow the subworkflow failing task to fail. This should cause the subworkflow task to fail
+    // Allow the subworkflow cancelling task to cancel. This should cause the subworkflow task to cancel
     [self expectationForNotification:TSKTaskDidCancelNotification task:subworkflowCancellingTask];
     [self expectationForNotification:TSKTaskDidCancelNotification task:task];
     [cancelLock unlock];

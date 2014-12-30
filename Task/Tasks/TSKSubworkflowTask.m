@@ -26,7 +26,6 @@
 
 #import <Task/TSKSubworkflowTask.h>
 
-#import <Task/TaskErrors.h>
 #import <Task/TSKWorkflow.h>
 
 
