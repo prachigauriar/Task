@@ -25,6 +25,8 @@
 		4C1EDFD819F48E7F0041A1D9 /* TSKSelectorTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63319F2F79900C898AF /* TSKSelectorTask.m */; };
 		4C1EDFD919F48E7F0041A1D9 /* TSKExternalConditionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D63119F2F79900C898AF /* TSKExternalConditionTask.m */; };
 		4C1EDFDA19F48E7F0041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
+		4C2C27871A55C5700023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
+		4C2C27881A55C5710023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
 		4C86D5B519F2E96800C898AF /* Task.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5B419F2E96800C898AF /* Task.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D5BB19F2E96800C898AF /* Task.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C86D5AF19F2E96800C898AF /* Task.framework */; };
 		4C86D5F019F2EA8B00C898AF /* TSKWorkflow.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -715,6 +717,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C2C27871A55C5700023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */,
 				4C9B8BDB1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BED1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDE1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
@@ -772,6 +775,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C2C27881A55C5710023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */,
 				4C9B8BDC1A4F50410035B91A /* TSKTestTask.m in Sources */,
 				4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */,
 				4C9B8BDF1A4F50410035B91A /* TSKBlockTaskTestCase.m in Sources */,
