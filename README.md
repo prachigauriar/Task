@@ -16,12 +16,12 @@ that will break existing code. Thankfully, the changes are easy to accommodate.
 ### New Features
 
 * Notifications for important task- and workflow-related events. Every workflow has a reference to a
-  notification center that it and its tasks use to post notifications. By default, it is the default
-  notification center, but you can use a different one should you so desire. Tasks post
-  notifications when they start, finish, fail, cancel, retry, and reset. Workflows post
-  notifications when they start, retry, and reset, as well as when all their tasks finish, or a
-  single task fails or is cancelled.
+  notification center — by default, the default notification center — that it and its tasks use to 
+  post notifications. Tasks post notifications when they start, finish, fail, cancel, retry, and
+  reset. Notifications are also posted when workflows start, retry, and reset, as well as when all
+  their tasks finish, or a single task fails or is cancelled.
 * Delegate messages for workflow and task cancellation. 
+* Workflows can now be reset by sending them the `‑reset` message.
 * The new `TSKTask` subclass `TSKSubworkflowTask` lets you run an entire workflow as a single task.
 * Unit tests! We now have unit tests for all major functionality in the framework.
 
@@ -37,6 +37,7 @@ that will break existing code. Thankfully, the changes are easy to accommodate.
   though the dependent tasks still receive the `‑retry` message. If you wish to run a task that is
   in the ready state, send it the `‑start` message. Tasks in the pending state cannot be run, but
   will automatically be started when their prerequisites finish successfully.
+* Workflows that contain no tasks will finish immediately upon receiving `‑start`.
 * As a minor optimization, sending `‑start` to a task only enqueues an operation on its operation 
   queue if the task is in the ready state. The operation itself still ensures that the task is in
   the ready state before invoking the task’s `‑main` method, but this should lead to better
