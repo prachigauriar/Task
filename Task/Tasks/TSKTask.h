@@ -194,14 +194,14 @@ extern NSString *const TSKTaskDidStartNotification;
  */
 @property (nonatomic, assign, readonly, getter=isReady) BOOL ready;
 
-/*! Whether the task is executing. */
+/*! 
+ @abstract Whether the task is executing. 
+ @discussion Subclasses should periodically check this property during the execution of the ‑main
+     method and quit executing if it is set to NO.
+ */
 @property (nonatomic, assign, readonly, getter=isExecuting) BOOL executing;
 
-/*!
- @abstract Whether the task has been cancelled.
- @discussion Subclasses should periodically check this property during the execution of the ‑main
-     method and quit executing if it is set to YES.
- */
+/*! Whether the task has been cancelled. */
 @property (nonatomic, assign, readonly, getter=isCancelled) BOOL cancelled;
 
 /*! Whether the task finished successfully. */
