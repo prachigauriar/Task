@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2318A7A08B7FB4850B72D91E /* libPods-Task Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */; };
+		3784F78AEFF650C5EAD0B6CA /* libPods-Task-iOS Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AA54D513B8CAD1930D667C5 /* libPods-Task-iOS Tests.a */; };
 		4C1EDF6319F4784F0041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
 		4C1EDF6419F478500041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
 		4C1EDFBF19F48E1D0041A1D9 /* Task.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C1EDFB419F48E1C0041A1D9 /* Task.framework */; };
@@ -76,7 +77,6 @@
 		4C9B8BEE1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */; };
 		4CB6CAE21A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4CB6CAE31A197B1000E68A6C /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		EA59875C4B69635842657D44 /* libPods-Task (iOS) Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD50394D2FEC3796A2A81B26 /* libPods-Task (iOS) Tests.a */; };
 		FE05E92155425646C37D8310 /* libPods-libTask Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6F642574517502C6FD6B2DB /* libPods-libTask Tests.a */; };
 /* End PBXBuildFile section */
 
@@ -118,7 +118,7 @@
 
 /* Begin PBXFileReference section */
 		4C1EDFB419F48E1C0041A1D9 /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task (iOS) Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5AF19F2E96800C898AF /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5B319F2E96800C898AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4C86D5B419F2E96800C898AF /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
@@ -151,16 +151,18 @@
 		4C9B8BD61A4F50410035B91A /* TSKWorkflowTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflowTestCase.m; sourceTree = "<group>"; };
 		4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKExternalConditionTaskTestCase.m; sourceTree = "<group>"; };
 		4C9B8BEB1A4F5F610035B91A /* TSKSubworkflowTaskTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKSubworkflowTaskTestCase.m; sourceTree = "<group>"; };
+		4CA55B4F1A55CC0800F492B8 /* libPods-Task (iOS) Tests.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-Task (iOS) Tests.a"; path = "Pods/build/Debug-iphoneos/libPods-Task (iOS) Tests.a"; sourceTree = "<group>"; };
 		4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TSKWorkflow+TaskInterface.h"; sourceTree = "<group>"; };
 		7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		7C350BA202EBF78C8BB741CF /* Pods-Task Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task Tests/Pods-Task Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		8AA54D513B8CAD1930D667C5 /* libPods-Task-iOS Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Task-iOS Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF213C479A2C707F7E27055C /* Pods-Task-iOS Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task-iOS Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task-iOS Tests/Pods-Task-iOS Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Task Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C804884785543A9B966A8325 /* Pods-Task (iOS) Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task (iOS) Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Task (iOS) Tests/Pods-Task (iOS) Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		CCB6536C56ECB2E527F21374 /* Pods-Task-iOS Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task-iOS Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Task-iOS Tests/Pods-Task-iOS Tests.release.xcconfig"; sourceTree = "<group>"; };
 		D41E59CCE4DABA966687089F /* Pods-Task Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Task Tests/Pods-Task Tests.release.xcconfig"; sourceTree = "<group>"; };
 		F198F8C4137C2F9CC9A37A0F /* Pods-libTask Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-libTask Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-libTask Tests/Pods-libTask Tests.release.xcconfig"; sourceTree = "<group>"; };
 		F6F642574517502C6FD6B2DB /* libPods-libTask Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-libTask Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD50394D2FEC3796A2A81B26 /* libPods-Task (iOS) Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Task (iOS) Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF0C57999BC6B237B313D616 /* Pods-Task (iOS) Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Task (iOS) Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Task (iOS) Tests/Pods-Task (iOS) Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,7 +178,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C1EDFBF19F48E1D0041A1D9 /* Task.framework in Frameworks */,
-				EA59875C4B69635842657D44 /* libPods-Task (iOS) Tests.a in Frameworks */,
+				3784F78AEFF650C5EAD0B6CA /* libPods-Task-iOS Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,7 +236,7 @@
 				4C86D60319F2ED6300C898AF /* libTask.a */,
 				4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */,
 				4C1EDFB419F48E1C0041A1D9 /* Task.framework */,
-				4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */,
+				4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -341,9 +343,11 @@
 		7D0CBD34DCFAC686B4D10850 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4CA55B4F1A55CC0800F492B8 /* libPods-Task (iOS) Tests.a */,
 				FD50394D2FEC3796A2A81B26 /* libPods-Task (iOS) Tests.a */,
 				C557EE3204CE2F5BEBC6B92A /* libPods-Task Tests.a */,
 				F6F642574517502C6FD6B2DB /* libPods-libTask Tests.a */,
+				8AA54D513B8CAD1930D667C5 /* libPods-Task-iOS Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -351,12 +355,12 @@
 		8ABAFD04370C5AF0F5917E6C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C804884785543A9B966A8325 /* Pods-Task (iOS) Tests.debug.xcconfig */,
-				FF0C57999BC6B237B313D616 /* Pods-Task (iOS) Tests.release.xcconfig */,
 				7C350BA202EBF78C8BB741CF /* Pods-Task Tests.debug.xcconfig */,
 				D41E59CCE4DABA966687089F /* Pods-Task Tests.release.xcconfig */,
 				7A5DBD217E88DE74269AD2D1 /* Pods-libTask Tests.debug.xcconfig */,
 				F198F8C4137C2F9CC9A37A0F /* Pods-libTask Tests.release.xcconfig */,
+				AF213C479A2C707F7E27055C /* Pods-Task-iOS Tests.debug.xcconfig */,
+				CCB6536C56ECB2E527F21374 /* Pods-Task-iOS Tests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -401,9 +405,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		4C1EDFB319F48E1C0041A1D9 /* Task (iOS) */ = {
+		4C1EDFB319F48E1C0041A1D9 /* Task-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C1EDFCB19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task (iOS)" */;
+			buildConfigurationList = 4C1EDFCB19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS" */;
 			buildPhases = (
 				4C1EDFAF19F48E1C0041A1D9 /* Sources */,
 				4C1EDFB019F48E1C0041A1D9 /* Frameworks */,
@@ -414,14 +418,14 @@
 			);
 			dependencies = (
 			);
-			name = "Task (iOS)";
+			name = "Task-iOS";
 			productName = "Task (iOS)";
 			productReference = 4C1EDFB419F48E1C0041A1D9 /* Task.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		4C1EDFBD19F48E1D0041A1D9 /* Task (iOS) Tests */ = {
+		4C1EDFBD19F48E1D0041A1D9 /* Task-iOS Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task (iOS) Tests" */;
+			buildConfigurationList = 4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS Tests" */;
 			buildPhases = (
 				B72F793AFB218F82973900C9 /* Check Pods Manifest.lock */,
 				4C1EDFBA19F48E1D0041A1D9 /* Sources */,
@@ -434,9 +438,9 @@
 			dependencies = (
 				4C1EDFC119F48E1D0041A1D9 /* PBXTargetDependency */,
 			);
-			name = "Task (iOS) Tests";
+			name = "Task-iOS Tests";
 			productName = "Task (iOS)Tests";
-			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task (iOS) Tests.xctest */;
+			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4C86D5AE19F2E96800C898AF /* Task */ = {
@@ -559,8 +563,8 @@
 			targets = (
 				4C86D5AE19F2E96800C898AF /* Task */,
 				4C86D5B919F2E96800C898AF /* Task Tests */,
-				4C1EDFB319F48E1C0041A1D9 /* Task (iOS) */,
-				4C1EDFBD19F48E1D0041A1D9 /* Task (iOS) Tests */,
+				4C1EDFB319F48E1C0041A1D9 /* Task-iOS */,
+				4C1EDFBD19F48E1D0041A1D9 /* Task-iOS Tests */,
 				4C86D60219F2ED6300C898AF /* libTask */,
 				4C86D60C19F2ED6300C898AF /* libTask Tests */,
 			);
@@ -618,7 +622,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Task (iOS) Tests/Pods-Task (iOS) Tests-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Task-iOS Tests/Pods-Task-iOS Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		85FFB0FD5B049976B3DFF4A5 /* Copy Pods Resources */ = {
@@ -791,7 +795,7 @@
 /* Begin PBXTargetDependency section */
 		4C1EDFC119F48E1D0041A1D9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4C1EDFB319F48E1C0041A1D9 /* Task (iOS) */;
+			target = 4C1EDFB319F48E1C0041A1D9 /* Task-iOS */;
 			targetProxy = 4C1EDFC019F48E1D0041A1D9 /* PBXContainerItemProxy */;
 		};
 		4C86D5BD19F2E96800C898AF /* PBXTargetDependency */ = {
@@ -852,7 +856,7 @@
 		};
 		4C1EDFC919F48E1D0041A1D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C804884785543A9B966A8325 /* Pods-Task (iOS) Tests.debug.xcconfig */;
+			baseConfigurationReference = AF213C479A2C707F7E27055C /* Pods-Task-iOS Tests.debug.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -865,6 +869,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 			};
@@ -872,7 +877,7 @@
 		};
 		4C1EDFCA19F48E1D0041A1D9 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FF0C57999BC6B237B313D616 /* Pods-Task (iOS) Tests.release.xcconfig */;
+			baseConfigurationReference = CCB6536C56ECB2E527F21374 /* Pods-Task-iOS Tests.release.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -881,6 +886,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -1108,7 +1114,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4C1EDFCB19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task (iOS)" */ = {
+		4C1EDFCB19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C1EDFC719F48E1D0041A1D9 /* Debug */,
@@ -1117,7 +1123,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task (iOS) Tests" */ = {
+		4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C1EDFC919F48E1D0041A1D9 /* Debug */,
