@@ -323,6 +323,32 @@ extern NSString *const TSKTaskDidStartNotification;
  */
 - (void)failWithError:(NSError *)error;
 
+/*!
+ @abstract Returns the result of one of the receiver’s prerequisite tasks.
+ @discussion This is primarily useful if the receiver only has or expects one prerequisite. It
+     returns the equivalent of [[self.prerequisiteTasks anyObject] result]. No guarantee is made
+     that this method will return the same task’s result on repeated invocations.
+ @result The result of one of the receiver’s prerequisite tasks.
+ */
+- (id)anyPrerequisiteResult;
+
+/*!
+ @abstract Returns the results of all receiver’s prerequisite tasks in an array.
+ @discussion This is primarily useful if the receiver has many prerequisites that all produce the
+     same type of result and processes them uniformly. The returned array will contain NSNull 
+     elements for each task that returns nil. The order of the array is arbitrary.
+ @result An array containing the results of all the receiver’s prerequisite tasks.
+ */
+- (NSArray *)allPrerequisiteResults;
+
+/*!
+ @abstract Returns the results of all the receiver’s prerequisite tasks in a map table.
+ @discussion The keys in the map table are the prerequisite tasks; the values are their
+     corresponding results. The map table will contain NSNull values for each nil result.
+ @result A map table containing the results of all the receiver’s prerequisite tasks.
+ */
+- (NSMapTable *)prerequisiteResultsByTask;
+
 @end
 
 
