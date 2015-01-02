@@ -32,5 +32,6 @@
 #import <Task/TSKBlockTask.h>
 #import <Task/TSKExternalConditionTask.h>
 #import <Task/TSKSelectorTask.h>
+#import <Task/TSKSubworkflowTask.h>
 
 #import <Task/TSKWorkflow.h>

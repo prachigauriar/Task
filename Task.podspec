@@ -1,16 +1,18 @@
 Pod::Spec.new do |s|
   s.name         = "Task"
-  s.version      = "0.3"
+  s.version      = "1.0"
 
   s.summary      = <<-SUMMARY
-                   A simple Cocoa framework for representing interdependent units of work.
+                   A simple framework for expressing and executing your app’s workflows.
                    SUMMARY
   s.description  = <<-DESC
-                   Task is a simple framework for representing tasks — units of work that have prerequisites,
-                   dependencies, and can succeed or fail. The framework provides a straightforward way to 
-                   create multiple tasks with blocks, selectors, etc.; create relationships between them; and
-                   then execute them all together so that tasks only start once all their prerequisite tasks
-                   finish successfully.
+                   Task is a simple Cocoa framework for expressing and executing your application’s
+                   workflows. Using Task, you need only express each step in your workflow — called
+                   tasks — and what their prerequisite tasks are. After that, the framework handles
+                   the mechanics of executing the steps in the correct order with the appropriate
+                   level of concurrency, letting you know when tasks finish or fail. It also makes
+                   it easy to cancel tasks, retry failed tasks, and re-run previously completed
+                   tasks and workflows.
                    DESC
 
   s.author       = { "Two Toasters" => "general@twotoasters.com" }

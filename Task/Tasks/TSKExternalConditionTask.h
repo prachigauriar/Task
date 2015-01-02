@@ -32,8 +32,8 @@
  represents an external condition that is either fulfilled or not. When run, the task will either
  finish successfully if it is fulfilled, or fail immediately with an error.
 
- When a TSKExternalConditionTask is fulfilled, it will automatically retry itself and thus its
- dependent tasks.
+ When a TSKExternalConditionTask is fulfilled, it will automatically start or retry itself and thus
+ its dependent tasks.
  */
 @interface TSKExternalConditionTask : TSKTask
 
@@ -43,9 +43,8 @@
 /*!
  @abstract Indicates that the external condition is fulfilled.
  @param result The result that the task should finish with. May be nil.
- @discussion Automatically sends itself the ‑retry message, thus starting itself if possible
-     and allowing its dependent tasks to be retried. Does nothing if the receiver is already
-     finished.
+ @discussion If the task is in the cancelled or failed state, it will automatically retry itself.
+     Otherwise it will start itself if ready.
  */
 - (void)fulfillWithResult:(id)result;
 

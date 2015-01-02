@@ -38,11 +38,20 @@
 extern NSString *const TSKWorkflowDidFinishNotification;
 
 /*!
- @abstract Notification posted when all a workflow’s tasks finished.
+ @abstract Notification posted when a workflow’s task is cancelled.
+ @discussion This notification is posted immediately after the workflow’s delegate is sent the
+     ‑workflow:taskDidCancel: message. The object of the notification is the workflow. Its
+     userInfo dictionary contains a single key, TSKWorkflowTaskKey, whose value is the task that
+     was cancelled.
+ */
+extern NSString *const TSKWorkflowTaskDidCancelNotification;
+
+/*!
+ @abstract Notification posted when a workflow’s task fails.
  @discussion This notification is posted immediately after the workflow’s delegate is sent the
      ‑workflow:task:didFailWithError: message. The object of the notification is the workflow. Its
-     userInfo dictionary contains a single key, TSKWorkflowFailedTaskKey, whose value is the task
-     that failed.
+     userInfo dictionary contains a single key, TSKWorkflowTaskKey, whose value is the task that
+     failed.
  */
 extern NSString *const TSKWorkflowTaskDidFailNotification;
 
@@ -52,6 +61,13 @@ extern NSString *const TSKWorkflowTaskDidFailNotification;
      ‑cancel message. The object of the notification is the workflow. It has no userInfo dictionary.
  */
 extern NSString *const TSKWorkflowWillCancelNotification;
+
+/*!
+ @abstract Notification posted when a workflow about to reset its tasks.
+ @discussion This notification is posted immediately before the workflow’s tasks are sent the ‑reset
+     message. The object of the notification is the workflow. It has no userInfo dictionary.
+ */
+extern NSString *const TSKWorkflowWillResetNotification;
 
 /*!
  @abstract Notification posted when a workflow about to retry its tasks.
@@ -68,9 +84,12 @@ extern NSString *const TSKWorkflowWillRetryNotification;
 extern NSString *const TSKWorkflowWillStartNotification;
 
 /*!
- @abstract Notification userInfo key whose value is a TSKTask object that failed.
+ @abstract Notification userInfo key whose value is a TSKTask object pertaining to the workflow 
+     notification.
+ @discussion This key is present in userInfo dictionaries for TSKWorkflowDidCancelNotification and
+     TSKWorkflowDidFailNotification.
  */
-extern NSString *const TSKWorkflowFailedTaskKey;
+extern NSString *const TSKWorkflowTaskKey;
 
 
 #pragma mark -
@@ -246,11 +265,18 @@ extern NSString *const TSKWorkflowFailedTaskKey;
 - (void)cancel;
 
 /*!
+ @abstract Sends ‑reset to every prerequisite-less task in the receiver.
+ @discussion This serves to reset all the tasks in the receiver. The initial set of tasks will
+     propagate the reset to their dependent tasks and so on until all tasks that can be reset will
+     be.
+ */
+- (void)reset;
+
+/*!
  @abstract Sends ‑retry to every prerequisite-less task in the receiver. 
  @discussion This serves to retry all the tasks in the receiver that have failed. The initial set of 
      tasks will propagate the retry to their dependent tasks and so on until all tasks that
-     can be retried will be. If no tasks have been added to the workflow, this will immediately send
-     ‑workflowDidFinish: to the delegate.
+     can be retried will be.
  */
 - (void)retry;
 
@@ -296,5 +322,13 @@ extern NSString *const TSKWorkflowFailedTaskKey;
  @param error An error containing the reason the task failed. May be nil.
  */
 - (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error;
+
+/*!
+ @abstract Sent to the delegate when one of a workflow’s tasks is cancelled.
+ @discussion This is invoked after the task’s delegate receives ‑taskDidCancel:.
+ @param workflow The workflow that contains the task.
+ @param task The task that was cancelled.
+ */
+- (void)workflow:(TSKWorkflow *)workflow taskDidCancel:(TSKTask *)task;
 
 @end

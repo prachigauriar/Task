@@ -47,8 +47,8 @@
 
     TSKSelectorTask *task = [[TSKSelectorTask alloc] initWithTarget:self selector:@selector(method:)];
     XCTAssertNotNil(task, @"returns nil");
-    XCTAssertEqual(task.target, self, @"target not set propertly");
-    XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
+    XCTAssertEqual(task.target, self, @"target is set incorrectly");
+    XCTAssertEqual(task.selector, @selector(method:), @"method is set incorrectly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
@@ -56,9 +56,9 @@
 
     NSString *name = UMKRandomUnicodeString();
     task = [[TSKSelectorTask alloc] initWithName:name target:self selector:@selector(method:)];
-    XCTAssertEqual(task.target, self, @"target not set propertly");
-    XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
-    XCTAssertEqualObjects(task.name, name, @"name not set properly");
+    XCTAssertEqual(task.target, self, @"target is set incorrectly");
+    XCTAssertEqual(task.selector, @selector(method:), @"method is set incorrectly");
+    XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");

@@ -31,12 +31,14 @@
 
 #pragma mark Constants
 
-NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
 NSString *const TSKWorkflowDidFinishNotification = @"TSKWorkflowDidFinishNotification";
+NSString *const TSKWorkflowTaskDidCancelNotification = @"TSKWorkflowTaskDidCancelNotification";
+NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
+NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
+NSString *const TSKWorkflowWillResetNotification = @"TSKWorkflowWillResetNotification";
 NSString *const TSKWorkflowWillRetryNotification = @"TSKWorkflowWillRetryNotification";
 NSString *const TSKWorkflowWillStartNotification = @"TSKWorkflowWillStartNotification";
-NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
-NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
+NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 
 #pragma mark -
@@ -165,6 +167,12 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 }
 
 
++ (BOOL)automaticallyNotifiesObserversOfAllTasks
+{
+    return NO;
+}
+
+
 - (NSSet *)allTasks
 {
     return [self.tasks copy];
@@ -181,6 +189,9 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
     prerequisiteTasks = prerequisiteTasks ? [prerequisiteTasks copy] : [[NSSet alloc] init];
     NSAssert([prerequisiteTasks isSubsetOfSet:self.tasks], @"Prerequisite tasks have not been added to workflow");
 
+    NSSet *taskSet = [NSSet setWithObject:task];
+    [self willChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
+
     task.workflow = self;
     [self.tasks addObject:task];
     [self.prerequisiteTasks setObject:prerequisiteTasks forKey:task];
@@ -192,7 +203,7 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
         // We create an immutable set here, because -[TSKTask dependentTasks] just invokes
         // -[TSKWorkflow dependentTasksForTask:], which would need to return a copy of the set if
         // we stored mutable sets. Since -[TSKTask dependentTasks] is likely to be invoked many more
-        // times than this method, and creating copies of mutable sets is not cheap, we’re better of
+        // times than this method, and creating copies of mutable sets is not cheap, we’re better off
         // using immutable sets.
         [self.dependentTasks setObject:[dependentTasks setByAddingObject:task] forKey:prerequisiteTask];
     }
@@ -208,6 +219,8 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
     self.tasksWithNoDependentTasks = [self.tasks objectsPassingTest:^BOOL(TSKTask *task, BOOL *stop) {
         return task.dependentTasks.count == 0;
     }];
+
+    [self didChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
 }
 
 
@@ -266,27 +279,20 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 #pragma mark -
 
-- (BOOL)finishImmediatelyIfNoSubtasks
-{
-    if (self.tasks.count != 0) {
-        return NO;
-    }
-
-    if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
-        [self.delegate workflowDidFinish:self];
-    }
-
-    [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
-    return YES;
-}
-
-
 - (void)start
 {
     [self.notificationCenter postNotificationName:TSKWorkflowWillStartNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
+
+    if (self.tasks.count == 0) {
+        if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
+            [self.delegate workflowDidFinish:self];
+        }
+
+        [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
+        return;
     }
+
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
 }
 
 
@@ -297,12 +303,17 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 }
 
 
+- (void)reset
+{
+    [self.notificationCenter postNotificationName:TSKWorkflowWillResetNotification object:self];
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(reset)];
+}
+
+
 - (void)retry
 {
     [self.notificationCenter postNotificationName:TSKWorkflowWillRetryNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
-    }
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
 }
 
 
@@ -310,6 +321,8 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
 {
+    NSParameterAssert(task);
+
     __block BOOL allTasksFinished = NO;
     dispatch_barrier_sync(self.finishedTasksQueue, ^{
         [self.finishedTasks addObject:task];
@@ -328,16 +341,32 @@ NSString *const TSKWorkflowFailedTaskKey = @"TSKWorkflowFailedTaskKey";
 
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
 {
+    NSParameterAssert(task);
+
     if ([self.delegate respondsToSelector:@selector(workflow:task:didFailWithError:)]) {
         [self.delegate workflow:self task:task didFailWithError:error];
     }
 
-    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidFailNotification object:self userInfo:@{ TSKWorkflowFailedTaskKey : task }];
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidFailNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
+}
+
+
+- (void)subtaskDidCancel:(TSKTask *)task
+{
+    NSParameterAssert(task);
+
+    if ([self.delegate respondsToSelector:@selector(workflow:taskDidCancel:)]) {
+        [self.delegate workflow:self taskDidCancel:task];
+    }
+
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidCancelNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
 }
 
 
 - (void)subtaskDidReset:(TSKTask *)task
 {
+    NSParameterAssert(task);
+
     dispatch_barrier_async(self.finishedTasksQueue, ^{
         [self.finishedTasks removeObject:task];
     });

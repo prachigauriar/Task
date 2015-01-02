@@ -28,7 +28,7 @@
 
 
 /*!
- The TaskInterface category of TSKWorkflow declares a messages that must be exposed so that TSKTasks
+ The TaskInterface category of TSKWorkflow declares messages that must be exposed so that TSKTasks
  can notify their workflows of state changes.
  */
 @interface TSKWorkflow (TaskInterface)
@@ -46,6 +46,12 @@
  @param error The error that caused the task to fail.
  */
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
+
+/*!
+ @abstract Indicates to the receiver that the specified task was cancelled.
+ @param task The task that was cancelled. May not be nil.
+ */
+- (void)subtaskDidCancel:(TSKTask *)task;
 
 /*!
  @abstract Indicates to the receiver that the specified task was reset.

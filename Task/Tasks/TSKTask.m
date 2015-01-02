@@ -104,6 +104,13 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 - (BOOL)allPrerequisiteTasksFinished;
 
 /*!
+ @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from
+     pending to ready and executes the specified block.
+ @param block The block to execute after successfully transitioning to the ready state.
+ */
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block;
+
+/*!
  @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from 
      pending to ready and starts the task.
  */
@@ -257,7 +264,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     NSParameterAssert(validFromStates);
 
     // State transitions:
-    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-startIfReady)
+    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-transitionToReadyStateAndExecuteBlock:)
     //     Pending -> Cancelled: Task is cancelled (-cancel)
     //
     //     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
@@ -329,6 +336,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 {
     NSAssert(self.workflow, @"Tasks must be in a workflow before they can be started");
 
+    if (!self.isReady) {
+        return;
+    }
+
     // Because the operation queue is asynchronous, we need to be sure to do the state transition
     // after the operation starts executing. The alternative of adding the operation inside of the
     // state transition’s block could lead to a weird situation in which ‑main is invoked, but the
@@ -356,13 +367,19 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (void)startIfReady
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block
 {
     if ([self allPrerequisiteTasksFinished]) {
-        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:^{
-            [self start];
-        }];
+        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:block];
     }
+}
+
+
+- (void)startIfReady
+{
+    [self transitionToReadyStateAndExecuteBlock:^{
+        [self start];
+    }];
 }
 
 
@@ -375,7 +392,12 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:^{
+        if ([self.delegate respondsToSelector:@selector(taskDidCancel:)]) {
+            [self.delegate taskDidCancel:self];
+        }
+
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidCancelNotification object:self];
+        [self.workflow subtaskDidCancel:self];
     }];
     
     [self.dependentTasks makeObjectsPerformSelector:@selector(cancel)];
@@ -396,7 +418,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.error = nil;
         [self.workflow subtaskDidReset:self];
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
-        [self startIfReady];
+        [self transitionToReadyStateAndExecuteBlock:nil];
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
@@ -408,7 +430,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     static NSSet *fromStates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStatePending), @(TSKTaskStateReady), @(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
+        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
@@ -453,6 +475,32 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidFailNotification object:self];
         [self.workflow subtask:self didFailWithError:error];
     }];
+}
+
+
+#pragma mark - Prerequisite Results
+
+- (id)anyPrerequisiteResult
+{    
+    return [[self.prerequisiteTasks anyObject] result];
+}
+
+
+- (NSArray *)allPrerequisiteResults
+{
+    return [[self.prerequisiteTasks allObjects] valueForKey:@"result"];
+}
+
+
+- (NSMapTable *)prerequisiteResultsByTask
+{
+    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
+    for (TSKTask *task in self.prerequisiteTasks) {
+        id result = task.result ? task.result : [NSNull null];
+        [results setObject:result forKey:task];
+    }
+
+    return results;
 }
 
 @end
