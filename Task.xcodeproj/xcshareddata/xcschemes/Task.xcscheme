@@ -30,7 +30,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4C86D5B919F2E96800C898AF"
                BuildableName = "Task Tests.xctest"
-               BlueprintName = "Task Tests"
+               BlueprintName = "TaskTests"
                ReferencedContainer = "container:Task.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -48,7 +48,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4C86D5B919F2E96800C898AF"
                BuildableName = "Task Tests.xctest"
-               BlueprintName = "Task Tests"
+               BlueprintName = "TaskTests"
                ReferencedContainer = "container:Task.xcodeproj">
             </BuildableReference>
          </TestableReference>

@@ -423,9 +423,9 @@
 			productReference = 4C1EDFB419F48E1C0041A1D9 /* Task.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		4C1EDFBD19F48E1D0041A1D9 /* Task-iOS Tests */ = {
+		4C1EDFBD19F48E1D0041A1D9 /* Task-iOSTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS Tests" */;
+			buildConfigurationList = 4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOSTests" */;
 			buildPhases = (
 				B72F793AFB218F82973900C9 /* Check Pods Manifest.lock */,
 				4C1EDFBA19F48E1D0041A1D9 /* Sources */,
@@ -438,7 +438,7 @@
 			dependencies = (
 				4C1EDFC119F48E1D0041A1D9 /* PBXTargetDependency */,
 			);
-			name = "Task-iOS Tests";
+			name = "Task-iOSTests";
 			productName = "Task (iOS)Tests";
 			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -461,9 +461,9 @@
 			productReference = 4C86D5AF19F2E96800C898AF /* Task.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		4C86D5B919F2E96800C898AF /* Task Tests */ = {
+		4C86D5B919F2E96800C898AF /* TaskTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C86D5C819F2E96800C898AF /* Build configuration list for PBXNativeTarget "Task Tests" */;
+			buildConfigurationList = 4C86D5C819F2E96800C898AF /* Build configuration list for PBXNativeTarget "TaskTests" */;
 			buildPhases = (
 				C66D8BF9C82D1A1DC9186A22 /* Check Pods Manifest.lock */,
 				4C86D5B619F2E96800C898AF /* Sources */,
@@ -476,7 +476,7 @@
 			dependencies = (
 				4C86D5BD19F2E96800C898AF /* PBXTargetDependency */,
 			);
-			name = "Task Tests";
+			name = TaskTests;
 			productName = TaskKitTests;
 			productReference = 4C86D5BA19F2E96800C898AF /* Task Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -498,9 +498,9 @@
 			productReference = 4C86D60319F2ED6300C898AF /* libTask.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		4C86D60C19F2ED6300C898AF /* libTask Tests */ = {
+		4C86D60C19F2ED6300C898AF /* libTaskTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C86D61719F2ED6300C898AF /* Build configuration list for PBXNativeTarget "libTask Tests" */;
+			buildConfigurationList = 4C86D61719F2ED6300C898AF /* Build configuration list for PBXNativeTarget "libTaskTests" */;
 			buildPhases = (
 				C64022EEB5218F799C44651E /* Check Pods Manifest.lock */,
 				4C86D60919F2ED6300C898AF /* Sources */,
@@ -513,7 +513,7 @@
 			dependencies = (
 				4C86D61019F2ED6300C898AF /* PBXTargetDependency */,
 			);
-			name = "libTask Tests";
+			name = libTaskTests;
 			productName = libTaskKitTests;
 			productReference = 4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -562,11 +562,11 @@
 			projectRoot = "";
 			targets = (
 				4C86D5AE19F2E96800C898AF /* Task */,
-				4C86D5B919F2E96800C898AF /* Task Tests */,
+				4C86D5B919F2E96800C898AF /* TaskTests */,
 				4C1EDFB319F48E1C0041A1D9 /* Task-iOS */,
-				4C1EDFBD19F48E1D0041A1D9 /* Task-iOS Tests */,
+				4C1EDFBD19F48E1D0041A1D9 /* Task-iOSTests */,
 				4C86D60219F2ED6300C898AF /* libTask */,
-				4C86D60C19F2ED6300C898AF /* libTask Tests */,
+				4C86D60C19F2ED6300C898AF /* libTaskTests */,
 			);
 		};
 /* End PBXProject section */
@@ -929,7 +929,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -969,7 +970,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1123,7 +1125,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOS Tests" */ = {
+		4C1EDFCC19F48E1D0041A1D9 /* Build configuration list for PBXNativeTarget "Task-iOSTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C1EDFC919F48E1D0041A1D9 /* Debug */,
@@ -1150,7 +1152,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C86D5C819F2E96800C898AF /* Build configuration list for PBXNativeTarget "Task Tests" */ = {
+		4C86D5C819F2E96800C898AF /* Build configuration list for PBXNativeTarget "TaskTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C86D5C919F2E96800C898AF /* Debug */,
@@ -1168,7 +1170,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C86D61719F2ED6300C898AF /* Build configuration list for PBXNativeTarget "libTask Tests" */ = {
+		4C86D61719F2ED6300C898AF /* Build configuration list for PBXNativeTarget "libTaskTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C86D61819F2ED6300C898AF /* Debug */,
