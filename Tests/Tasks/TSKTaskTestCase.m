@@ -72,6 +72,7 @@
 - (void)testWorkflow;
 - (void)testStart;
 - (void)testOperationQueue;
+
 - (void)testFinish;
 - (void)testFail;
 - (void)testRetry;
@@ -82,6 +83,8 @@
 - (void)testTaskDelegateFinish;
 - (void)testTaskDelegateFail;
 - (void)testTaskDelegateCancel;
+
+- (void)testPrerequisiteResultMethods;
 
 @end
 
@@ -526,6 +529,54 @@
     task = [self taskExecutingWithDelegate:delegate];
 
     XCTAssertNoThrow([task cancel], @"delegate that does not implement messages is sent unexpected selector");
+}
+
+
+- (void)testPrerequisiteResultMethods
+{
+    NSUInteger elementCount = random() % 5 + 5;
+    NSArray *results = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
+        return UMKRandomUnicodeStringWithLength(64);
+    });
+
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    NSArray *prerequisiteTasks = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
+        TSKTask *task = [self finishingTaskWithLock:nil result:results[index]];
+        [workflow addTask:task prerequisites:nil];
+        return task;
+    });
+
+    // Task 1 is for testing non-nil results. Task 2 is for testing nil ones.
+    TSKTask *task1 = [self finishingTaskWithLock:nil];
+    TSKTask *task2 = [self finishingTaskWithLock:nil];
+    [workflow addTask:task1 prerequisiteTasks:workflow.allTasks];
+    [workflow addTask:task2 prerequisites:task1, nil];
+
+    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    // Task 1 tests
+    XCTAssertTrue([results containsObject:[task1 anyPrerequisiteResult]], @"anyPrerequisiteResult returns non-result object");
+
+    NSCountedSet *expectedResultsCountedSet = [[NSCountedSet alloc] initWithArray:results];
+    NSCountedSet *actualResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task1 allPrerequisiteResults]];
+    XCTAssertEqualObjects(expectedResultsCountedSet, actualResultsCountedSet, @"allPrerequisiteResults returns incorrect results");
+
+    NSMapTable *expectedResultsMapTable = [NSMapTable strongToStrongObjectsMapTable];
+    for (NSUInteger i = 0; i < elementCount; ++i) {
+        [expectedResultsMapTable setObject:results[i] forKey:prerequisiteTasks[i]];
+    }
+
+    XCTAssertEqualObjects([task1 prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
+
+    // Task 2 tests
+    XCTAssertNil([task2 anyPrerequisiteResult], @"anyPrerequisiteResult returns non-nil object");
+    XCTAssertEqualObjects([task2 allPrerequisiteResults], @[ [NSNull null] ], @"allPrerequisiteResults returns incorrect results");
+
+    [expectedResultsMapTable removeAllObjects];
+    [expectedResultsMapTable setObject:[NSNull null] forKey:task1];
+    XCTAssertEqualObjects([task2 prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
 }
 
 @end
