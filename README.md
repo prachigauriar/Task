@@ -23,6 +23,7 @@ that will break existing code. Thankfully, the changes are easy to accommodate.
 * Delegate messages for workflow and task cancellation. 
 * Workflows can now be reset by sending them the `‑reset` message.
 * The new `TSKTask` subclass `TSKSubworkflowTask` lets you run an entire workflow as a single task.
+* Convenience methods for accessing a task’s prerequisites results.
 * Unit tests! We now have unit tests for all major functionality in the framework.
 
 ### Changes
