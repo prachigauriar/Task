@@ -118,18 +118,18 @@
 
 /* Begin PBXFileReference section */
 		4C1EDFB419F48E1C0041A1D9 /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task-iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C1EDFBE19F48E1D0041A1D9 /* Task-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5AF19F2E96800C898AF /* Task.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Task.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5B319F2E96800C898AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4C86D5B419F2E96800C898AF /* Task.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
-		4C86D5BA19F2E96800C898AF /* Task Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Task Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C86D5BA19F2E96800C898AF /* TaskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D5C019F2E96800C898AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKWorkflow.h; sourceTree = "<group>"; };
 		4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKWorkflow.m; sourceTree = "<group>"; };
 		4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TaskErrors.h; sourceTree = "<group>"; };
 		4C86D5FC19F2EC0C00C898AF /* TaskErrors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TaskErrors.m; sourceTree = "<group>"; };
 		4C86D60319F2ED6300C898AF /* libTask.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTask.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "libTask Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C86D60D19F2ED6300C898AF /* libTaskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libTaskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C86D62E19F2F79900C898AF /* TSKBlockTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKBlockTask.h; sourceTree = "<group>"; };
 		4C86D62F19F2F79900C898AF /* TSKBlockTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBlockTask.m; sourceTree = "<group>"; };
 		4C86D63019F2F79900C898AF /* TSKExternalConditionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKExternalConditionTask.h; sourceTree = "<group>"; };
@@ -232,11 +232,11 @@
 			isa = PBXGroup;
 			children = (
 				4C86D5AF19F2E96800C898AF /* Task.framework */,
-				4C86D5BA19F2E96800C898AF /* Task Tests.xctest */,
+				4C86D5BA19F2E96800C898AF /* TaskTests.xctest */,
 				4C86D60319F2ED6300C898AF /* libTask.a */,
-				4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */,
+				4C86D60D19F2ED6300C898AF /* libTaskTests.xctest */,
 				4C1EDFB419F48E1C0041A1D9 /* Task.framework */,
-				4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */,
+				4C1EDFBE19F48E1D0041A1D9 /* Task-iOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -440,7 +440,7 @@
 			);
 			name = "Task-iOSTests";
 			productName = "Task (iOS)Tests";
-			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task-iOS Tests.xctest */;
+			productReference = 4C1EDFBE19F48E1D0041A1D9 /* Task-iOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4C86D5AE19F2E96800C898AF /* Task */ = {
@@ -478,7 +478,7 @@
 			);
 			name = TaskTests;
 			productName = TaskKitTests;
-			productReference = 4C86D5BA19F2E96800C898AF /* Task Tests.xctest */;
+			productReference = 4C86D5BA19F2E96800C898AF /* TaskTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4C86D60219F2ED6300C898AF /* libTask */ = {
@@ -515,7 +515,7 @@
 			);
 			name = libTaskTests;
 			productName = libTaskKitTests;
-			productReference = 4C86D60D19F2ED6300C898AF /* libTask Tests.xctest */;
+			productReference = 4C86D60D19F2ED6300C898AF /* libTaskTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -1030,7 +1030,7 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "Task Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
@@ -1045,7 +1045,7 @@
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "Task Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -1091,7 +1091,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "libTask Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1107,7 +1107,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "libTask Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
