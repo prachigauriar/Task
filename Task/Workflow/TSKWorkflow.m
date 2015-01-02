@@ -1,5 +1,5 @@
 //
-//  TSKGraph.m
+//  TSKWorkflow.m
 //  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
@@ -24,38 +24,40 @@
 //  THE SOFTWARE.
 //
 
-#import <Task/TSKGraph.h>
+#import <Task/TSKWorkflow.h>
 
-#import <Task/TSKTask+GraphInterface.h>
+#import <Task/TSKTask+WorkflowInterface.h>
 
 
 #pragma mark Constants
 
-NSString *const TSKGraphWillCancelNotification = @"TSKGraphWillCancelNotification";
-NSString *const TSKGraphDidFinishNotification = @"TSKGraphDidFinishNotification";
-NSString *const TSKGraphWillRetryNotification = @"TSKGraphWillRetryNotification";
-NSString *const TSKGraphWillStartNotification = @"TSKGraphWillStartNotification";
-NSString *const TSKGraphTaskDidFailNotification = @"TSKGraphTaskDidFailNotification";
-NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
+NSString *const TSKWorkflowDidFinishNotification = @"TSKWorkflowDidFinishNotification";
+NSString *const TSKWorkflowTaskDidCancelNotification = @"TSKWorkflowTaskDidCancelNotification";
+NSString *const TSKWorkflowTaskDidFailNotification = @"TSKWorkflowTaskDidFailNotification";
+NSString *const TSKWorkflowWillCancelNotification = @"TSKWorkflowWillCancelNotification";
+NSString *const TSKWorkflowWillResetNotification = @"TSKWorkflowWillResetNotification";
+NSString *const TSKWorkflowWillRetryNotification = @"TSKWorkflowWillRetryNotification";
+NSString *const TSKWorkflowWillStartNotification = @"TSKWorkflowWillStartNotification";
+NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 
 #pragma mark -
 
-@interface TSKGraph ()
+@interface TSKWorkflow ()
 
 /*!
- @abstract The set of tasks in the graph.
+ @abstract The set of tasks in the workflow.
  @discussion Access to this object is not thread-safe. This shouldn’t be a problem, as typically a
-     graph’s tasks are created and added to the graph and then the graph is started.
+     workflow’s tasks are created and added to the workflow and then the workflow is started.
  */
 @property (nonatomic, strong, readonly) NSMutableSet *tasks;
 
 @property (nonatomic, strong, readonly) dispatch_queue_t finishedTasksQueue;
 
 /*!
- @abstract The set of tasks in the graph that have finished successfully.
- @discussion Access to this object is not thread-safe. All accesses to the set should be synchronized
-     on the set itself to maintain data integrity.
+ @abstract The set of tasks in the workflow that have finished successfully.
+ @discussion Access to this object is not thread-safe. All accesses to the set should be
+     synchronized on the set itself to maintain data integrity.
  */
 @property (nonatomic, strong, readonly) NSMutableSet *finishedTasks;
 
@@ -68,7 +70,7 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 /*!
  @abstract A map table that maps a task to its dependent tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSSets. We
-     use immutable sets instead of mutable ones because tasks are added to a graph far less
+     use immutable sets instead of mutable ones because tasks are added to a workflow far less
      frequently than a task gets its set of dependent tasks. Repeatedly copying a mutable set
      is probably going to be more expensive than generated a new immutable set every time a
      task gains a new dependent.
@@ -86,7 +88,7 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
 #pragma mark -
 
-@implementation TSKGraph
+@implementation TSKWorkflow
 
 - (instancetype)init
 {
@@ -118,16 +120,16 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 {
     self = [super init];
     if (self) {
-        // If no name was provided, use the default. Initialize this here, because we use it to generate the operation
-        // queue’s name below
+        // If no name was provided, use the default. Initialize this here, because we use it to
+        // generate the operation queue’s name below
         if (!name) {
-            name = [[NSString alloc] initWithFormat:@"TSKGraph %p", self];
+            name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
         }
 
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
-            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKGraph.%@", name];
+            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKWorkflow.%@", name];
         }
 
         _name = [name copy];
@@ -137,7 +139,7 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
         _tasks = [[NSMutableSet alloc] init];
         _finishedTasks = [[NSMutableSet alloc] init];
 
-        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKGraph.%@.finishedTasks", _name];
+        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKWorkflow.%@.finishedTasks", _name];
         _finishedTasksQueue = dispatch_queue_create([finishedTasksQueueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
@@ -165,6 +167,12 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 }
 
 
++ (BOOL)automaticallyNotifiesObserversOfAllTasks
+{
+    return NO;
+}
+
+
 - (NSSet *)allTasks
 {
     return [self.tasks copy];
@@ -176,12 +184,15 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 - (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks
 {
     NSParameterAssert(task);
-    NSAssert(!task.graph, @"Task (%@) has been previously added to a graph (%@)", task, task.graph);
+    NSAssert(!task.workflow, @"Task (%@) has been previously added to a workflow (%@)", task, task.workflow);
 
     prerequisiteTasks = prerequisiteTasks ? [prerequisiteTasks copy] : [[NSSet alloc] init];
-    NSAssert([prerequisiteTasks isSubsetOfSet:self.tasks], @"Prerequisite tasks have not been added to graph");
+    NSAssert([prerequisiteTasks isSubsetOfSet:self.tasks], @"Prerequisite tasks have not been added to workflow");
 
-    task.graph = self;
+    NSSet *taskSet = [NSSet setWithObject:task];
+    [self willChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
+
+    task.workflow = self;
     [self.tasks addObject:task];
     [self.prerequisiteTasks setObject:prerequisiteTasks forKey:task];
     [self.dependentTasks setObject:[[NSSet alloc] init] forKey:task];
@@ -190,9 +201,9 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
         NSSet *dependentTasks = [self dependentTasksForTask:prerequisiteTask];
 
         // We create an immutable set here, because -[TSKTask dependentTasks] just invokes
-        // -[TSKGraph dependentTasksForTask:], which would need to return a copy of the set if
+        // -[TSKWorkflow dependentTasksForTask:], which would need to return a copy of the set if
         // we stored mutable sets. Since -[TSKTask dependentTasks] is likely to be invoked many more
-        // times than this method, and creating copies of mutable sets is not cheap, we’re better of
+        // times than this method, and creating copies of mutable sets is not cheap, we’re better off
         // using immutable sets.
         [self.dependentTasks setObject:[dependentTasks setByAddingObject:task] forKey:prerequisiteTask];
     }
@@ -208,6 +219,8 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
     self.tasksWithNoDependentTasks = [self.tasks objectsPassingTest:^BOOL(TSKTask *task, BOOL *stop) {
         return task.dependentTasks.count == 0;
     }];
+
+    [self didChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
 }
 
 
@@ -266,43 +279,41 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
 #pragma mark -
 
-- (BOOL)finishImmediatelyIfNoSubtasks
-{
-    if (self.tasks.count != 0) {
-        return NO;
-    }
-
-    if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
-        [self.delegate graphDidFinish:self];
-    }
-
-    [self.notificationCenter postNotificationName:TSKGraphDidFinishNotification object:self];
-    return YES;
-}
-
-
 - (void)start
 {
-    [self.notificationCenter postNotificationName:TSKGraphWillStartNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
+    [self.notificationCenter postNotificationName:TSKWorkflowWillStartNotification object:self];
+
+    if (self.tasks.count == 0) {
+        if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
+            [self.delegate workflowDidFinish:self];
+        }
+
+        [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
+        return;
     }
+
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
 }
 
 
 - (void)cancel
 {
-    [self.notificationCenter postNotificationName:TSKGraphWillCancelNotification object:self];
+    [self.notificationCenter postNotificationName:TSKWorkflowWillCancelNotification object:self];
     [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(cancel)];
+}
+
+
+- (void)reset
+{
+    [self.notificationCenter postNotificationName:TSKWorkflowWillResetNotification object:self];
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(reset)];
 }
 
 
 - (void)retry
 {
-    [self.notificationCenter postNotificationName:TSKGraphWillRetryNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
-    }
+    [self.notificationCenter postNotificationName:TSKWorkflowWillRetryNotification object:self];
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
 }
 
 
@@ -310,6 +321,8 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
 
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result
 {
+    NSParameterAssert(task);
+
     __block BOOL allTasksFinished = NO;
     dispatch_barrier_sync(self.finishedTasksQueue, ^{
         [self.finishedTasks addObject:task];
@@ -317,27 +330,43 @@ NSString *const TSKGraphFailedTaskKey = @"TSKGraphFailedTaskKey";
     });
 
     if (allTasksFinished) {
-        if ([self.delegate respondsToSelector:@selector(graphDidFinish:)]) {
-            [self.delegate graphDidFinish:self];
+        if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
+            [self.delegate workflowDidFinish:self];
         }
 
-        [self.notificationCenter postNotificationName:TSKGraphDidFinishNotification object:self];
+        [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
     }
 }
 
 
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error
 {
-    if ([self.delegate respondsToSelector:@selector(graph:task:didFailWithError:)]) {
-        [self.delegate graph:self task:task didFailWithError:error];
+    NSParameterAssert(task);
+
+    if ([self.delegate respondsToSelector:@selector(workflow:task:didFailWithError:)]) {
+        [self.delegate workflow:self task:task didFailWithError:error];
     }
 
-    [self.notificationCenter postNotificationName:TSKGraphTaskDidFailNotification object:self userInfo:@{ TSKGraphFailedTaskKey : task }];
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidFailNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
+}
+
+
+- (void)subtaskDidCancel:(TSKTask *)task
+{
+    NSParameterAssert(task);
+
+    if ([self.delegate respondsToSelector:@selector(workflow:taskDidCancel:)]) {
+        [self.delegate workflow:self taskDidCancel:task];
+    }
+
+    [self.notificationCenter postNotificationName:TSKWorkflowTaskDidCancelNotification object:self userInfo:@{ TSKWorkflowTaskKey : task }];
 }
 
 
 - (void)subtaskDidReset:(TSKTask *)task
 {
+    NSParameterAssert(task);
+
     dispatch_barrier_async(self.finishedTasksQueue, ^{
         [self.finishedTasks removeObject:task];
     });

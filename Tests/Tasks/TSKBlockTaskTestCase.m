@@ -1,5 +1,5 @@
 //
-//  TSKSelectorTaskTestCase.m
+//  TSKBlockTaskTestCase.m
 //  Task
 //
 //  Created by Jill Cohen on 11/5/14.
@@ -27,10 +27,7 @@
 #import "TSKRandomizedTestCase.h"
 
 
-@interface TSKSelectorTaskTestCase : TSKRandomizedTestCase
-
-@property (nonatomic, assign) BOOL methodInvoked;
-@property (nonatomic, strong) TSKTask *task;
+@interface TSKBlockTaskTestCase : TSKRandomizedTestCase
 
 - (void)testInit;
 - (void)testMain;
@@ -38,51 +35,51 @@
 @end
 
 
-@implementation TSKSelectorTaskTestCase
+@implementation TSKBlockTaskTestCase
 
 - (void)testInit
 {
-    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:self selector:NULL]), @"NULL selector does not throw exception");
-    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:nil selector:@selector(description)]), @"nil target does not throw exception");
+    XCTAssertThrows(([[TSKBlockTask alloc] initWithBlock:nil]), @"nil block does not throw exception");
 
-    TSKSelectorTask *task = [[TSKSelectorTask alloc] initWithTarget:self selector:@selector(method:)];
+    void (^block)(TSKTask *) = ^void(TSKTask *task) { };
+
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:block];
     XCTAssertNotNil(task, @"returns nil");
-    XCTAssertEqual(task.target, self, @"target not set propertly");
-    XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
+    XCTAssertEqualObjects(task.block, block, @"block is set incorrectly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
 
     NSString *name = UMKRandomUnicodeString();
-    task = [[TSKSelectorTask alloc] initWithName:name target:self selector:@selector(method:)];
-    XCTAssertEqual(task.target, self, @"target not set propertly");
-    XCTAssertEqual(task.selector, @selector(method:), @"method not set propertly");
-    XCTAssertEqualObjects(task.name, name, @"name not set properly");
-    XCTAssertNil(task.graph, @"graph is non-nil");
+    task = [[TSKBlockTask alloc] initWithName:name block:block];
+    XCTAssertNotNil(task, @"returns nil");
+    XCTAssertEqualObjects(task.block, block, @"block is set incorrectly");
+    XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
+
+    XCTAssertThrows(([[TSKBlockTask alloc] initWithName:name block:nil]), @"nil block does not throw exception");
 }
 
 
 - (void)testMain
 {
-    self.methodInvoked = NO;
+    __block BOOL blockInvoked = NO;
+    __block TSKTask *taskParameter = nil;
+    void (^block)(TSKTask *) = ^void(TSKTask *task) {
+        blockInvoked = YES;
+        taskParameter = task;
+    };
 
-    TSKSelectorTask *task = [[TSKSelectorTask alloc] initWithTarget:self selector:@selector(method:)];
+    TSKBlockTask *task = [[TSKBlockTask alloc] initWithBlock:block];
 
-    XCTAssertFalse(self.methodInvoked, @"selector called early");
+    XCTAssertFalse(blockInvoked, @"block invoked early");
     [task main];
-    XCTAssertTrue(self.methodInvoked, @"selector not called");
-    XCTAssertEqual(self.task, task, @"incorrect task parameter");
-}
-
-
-- (void)method:(TSKTask *)task
-{
-    self.methodInvoked = YES;
-    self.task = task;
+    XCTAssertTrue(blockInvoked, @"block not invoked");
+    XCTAssertEqual(taskParameter, task, @"incorrect task parameter");
 }
 
 @end

@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4C1EDFB319F48E1C0041A1D9"
                BuildableName = "Task.framework"
-               BlueprintName = "Task (iOS)"
+               BlueprintName = "Task-iOS"
                ReferencedContainer = "container:Task.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,8 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4C1EDFBD19F48E1D0041A1D9"
-               BuildableName = "Task (iOS) Tests.xctest"
-               BlueprintName = "Task (iOS) Tests"
+               BuildableName = "Task-iOSTests.xctest"
+               BlueprintName = "Task-iOSTests"
                ReferencedContainer = "container:Task.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,8 +47,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4C1EDFBD19F48E1D0041A1D9"
-               BuildableName = "Task (iOS) Tests.xctest"
-               BlueprintName = "Task (iOS) Tests"
+               BuildableName = "Task-iOSTests.xctest"
+               BlueprintName = "Task-iOSTests"
                ReferencedContainer = "container:Task.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -58,7 +58,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4C1EDFB319F48E1C0041A1D9"
             BuildableName = "Task.framework"
-            BlueprintName = "Task (iOS)"
+            BlueprintName = "Task-iOS"
             ReferencedContainer = "container:Task.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -77,7 +77,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4C1EDFB319F48E1C0041A1D9"
             BuildableName = "Task.framework"
-            BlueprintName = "Task (iOS)"
+            BlueprintName = "Task-iOS"
             ReferencedContainer = "container:Task.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -95,7 +95,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4C1EDFB319F48E1C0041A1D9"
             BuildableName = "Task.framework"
-            BlueprintName = "Task (iOS)"
+            BlueprintName = "Task-iOS"
             ReferencedContainer = "container:Task.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

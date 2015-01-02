@@ -26,9 +26,9 @@
 
 #import <Task/TSKTask.h>
 
-#import <Task/TSKGraph.h>
-#import <Task/TSKGraph+TaskInterface.h>
-#import <Task/TSKTask+GraphInterface.h>
+#import <Task/TSKWorkflow.h>
+#import <Task/TSKWorkflow+TaskInterface.h>
+#import <Task/TSKTask+WorkflowInterface.h>
 
 
 #pragma mark Constants and Functions
@@ -66,7 +66,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 @interface TSKTask ()
 
-@property (nonatomic, weak, readwrite) TSKGraph *graph;
+@property (nonatomic, weak, readwrite) TSKWorkflow *workflow;
 
 @property (nonatomic, strong, readwrite) NSDate *finishDate;
 @property (nonatomic, strong, readwrite) NSError *error;
@@ -102,6 +102,13 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
  @result Whether all the receiver’s prerequisite tasks have finished successfully.
  */
 - (BOOL)allPrerequisiteTasksFinished;
+
+/*!
+ @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from
+     pending to ready and executes the specified block.
+ @param block The block to execute after successfully transitioning to the ready state.
+ */
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block;
 
 /*!
  @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from 
@@ -179,19 +186,19 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (NSSet *)prerequisiteTasks
 {
-    return [self.graph prerequisiteTasksForTask:self];
+    return [self.workflow prerequisiteTasksForTask:self];
 }
 
 
 - (NSSet *)dependentTasks
 {
-    return [self.graph dependentTasksForTask:self];
+    return [self.workflow dependentTasksForTask:self];
 }
 
 
 - (NSOperationQueue *)operationQueue
 {
-    return _operationQueue ? _operationQueue : self.graph.operationQueue;
+    return _operationQueue ? _operationQueue : self.workflow.operationQueue;
 }
 
 
@@ -257,10 +264,10 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     NSParameterAssert(validFromStates);
 
     // State transitions:
-    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-startIfReady)
+    //     Pending -> Ready: All of task’s prerequisite tasks are finished (-transitionToReadyStateAndExecuteBlock:)
     //     Pending -> Cancelled: Task is cancelled (-cancel)
     //
-    //     Ready -> Pending: Task is added to a graph with at least one prerequisite task (-didAddPrerequisiteTask)
+    //     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
     //     Ready -> Executing: Task starts (-start)
     //     Ready -> Cancelled: Task is cancelled (-cancel)
     //
@@ -327,7 +334,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (void)start
 {
-    NSAssert(self.graph, @"Tasks must be in a graph before they can be started");
+    NSAssert(self.workflow, @"Tasks must be in a workflow before they can be started");
+
+    if (!self.isReady) {
+        return;
+    }
 
     // Because the operation queue is asynchronous, we need to be sure to do the state transition
     // after the operation starts executing. The alternative of adding the operation inside of the
@@ -337,7 +348,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     // possible. Doing the check inside the operation’s block before invoking ‑main avoids that.
     [self.operationQueue addOperationWithBlock:^{
         [self transitionFromState:TSKTaskStateReady toState:TSKTaskStateExecuting andExecuteBlock:^{
-            [self.graph.notificationCenter postNotificationName:TSKTaskDidStartNotification object:self];
+            [self.workflow.notificationCenter postNotificationName:TSKTaskDidStartNotification object:self];
             [self main];
         }];
     }];
@@ -356,13 +367,19 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (void)startIfReady
+- (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block
 {
     if ([self allPrerequisiteTasksFinished]) {
-        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:^{
-            [self start];
-        }];
+        [self transitionFromState:TSKTaskStatePending toState:TSKTaskStateReady andExecuteBlock:block];
     }
+}
+
+
+- (void)startIfReady
+{
+    [self transitionToReadyStateAndExecuteBlock:^{
+        [self start];
+    }];
 }
 
 
@@ -375,7 +392,12 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:^{
-        [self.graph.notificationCenter postNotificationName:TSKTaskDidCancelNotification object:self];
+        if ([self.delegate respondsToSelector:@selector(taskDidCancel:)]) {
+            [self.delegate taskDidCancel:self];
+        }
+
+        [self.workflow.notificationCenter postNotificationName:TSKTaskDidCancelNotification object:self];
+        [self.workflow subtaskDidCancel:self];
     }];
     
     [self.dependentTasks makeObjectsPerformSelector:@selector(cancel)];
@@ -394,9 +416,9 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
-        [self.graph subtaskDidReset:self];
-        [self.graph.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
-        [self startIfReady];
+        [self.workflow subtaskDidReset:self];
+        [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
+        [self transitionToReadyStateAndExecuteBlock:nil];
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
@@ -408,14 +430,14 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     static NSSet *fromStates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStatePending), @(TSKTaskStateReady), @(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
+        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateCancelled), @(TSKTaskStateFailed), nil];
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
-        [self.graph.notificationCenter postNotificationName:TSKTaskDidRetryNotification object:self];
+        [self.workflow.notificationCenter postNotificationName:TSKTaskDidRetryNotification object:self];
         [self startIfReady];
     }];
 
@@ -433,8 +455,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFinishWithResult:result];
         }
 
-        [self.graph.notificationCenter postNotificationName:TSKTaskDidFinishNotification object:self];
-        [self.graph subtask:self didFinishWithResult:result];
+        [self.workflow.notificationCenter postNotificationName:TSKTaskDidFinishNotification object:self];
+        [self.workflow subtask:self didFinishWithResult:result];
         [self.dependentTasks makeObjectsPerformSelector:@selector(startIfReady)];
     }];
 }
@@ -450,9 +472,35 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
             [self.delegate task:self didFailWithError:error];
         }
 
-        [self.graph.notificationCenter postNotificationName:TSKTaskDidFailNotification object:self];
-        [self.graph subtask:self didFailWithError:error];
+        [self.workflow.notificationCenter postNotificationName:TSKTaskDidFailNotification object:self];
+        [self.workflow subtask:self didFailWithError:error];
     }];
+}
+
+
+#pragma mark - Prerequisite Results
+
+- (id)anyPrerequisiteResult
+{    
+    return [[self.prerequisiteTasks anyObject] result];
+}
+
+
+- (NSArray *)allPrerequisiteResults
+{
+    return [[self.prerequisiteTasks allObjects] valueForKey:@"result"];
+}
+
+
+- (NSMapTable *)prerequisiteResultsByTask
+{
+    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
+    for (TSKTask *task in self.prerequisiteTasks) {
+        id result = task.result ? task.result : [NSNull null];
+        [results setObject:result forKey:task];
+    }
+
+    return results;
 }
 
 @end

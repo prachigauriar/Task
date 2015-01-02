@@ -80,7 +80,12 @@
     });
 
     if (didFulfill) {
-        [self retry];
+        TSKTaskState state = self.state;
+        if (state == TSKTaskStateCancelled || state == TSKTaskStateFailed) {
+            [self retry];
+        } else if (state == TSKTaskStateReady) {
+            [self start];
+        }
     }
 }
 
