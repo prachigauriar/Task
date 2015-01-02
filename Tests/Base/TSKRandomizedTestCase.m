@@ -112,12 +112,13 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
             isFulfilled = YES;
         }
 
+        [weak_notificationCenter removeObserver:observer name:notificationName object:object];
+
         if (block) {
             block(note);
         }
 
         [expectation fulfill];
-        [weak_notificationCenter removeObserver:observer name:notificationName object:object];
     }];
 }
 

@@ -106,6 +106,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 /*!
  @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from
      pending to ready and executes the specified block.
+ @param block The block to execute after successfully transitioning to the ready state.
  */
 - (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block;
 

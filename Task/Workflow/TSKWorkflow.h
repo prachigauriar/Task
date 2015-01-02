@@ -276,8 +276,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @abstract Sends ‑retry to every prerequisite-less task in the receiver. 
  @discussion This serves to retry all the tasks in the receiver that have failed. The initial set of 
      tasks will propagate the retry to their dependent tasks and so on until all tasks that
-     can be retried will be. If no tasks have been added to the workflow, this will immediately send
-     ‑workflowDidFinish: to the delegate.
+     can be retried will be.
  */
 - (void)retry;
 

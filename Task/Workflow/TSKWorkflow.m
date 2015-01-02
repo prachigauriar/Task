@@ -279,27 +279,20 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 #pragma mark -
 
-- (BOOL)finishImmediatelyIfNoSubtasks
-{
-    if (self.tasks.count != 0) {
-        return NO;
-    }
-
-    if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
-        [self.delegate workflowDidFinish:self];
-    }
-
-    [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
-    return YES;
-}
-
-
 - (void)start
 {
     [self.notificationCenter postNotificationName:TSKWorkflowWillStartNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
+
+    if (self.tasks.count == 0) {
+        if ([self.delegate respondsToSelector:@selector(workflowDidFinish:)]) {
+            [self.delegate workflowDidFinish:self];
+        }
+
+        [self.notificationCenter postNotificationName:TSKWorkflowDidFinishNotification object:self];
+        return;
     }
+
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(start)];
 }
 
 
@@ -320,9 +313,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 - (void)retry
 {
     [self.notificationCenter postNotificationName:TSKWorkflowWillRetryNotification object:self];
-    if (![self finishImmediatelyIfNoSubtasks]) {
-        [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
-    }
+    [self.tasksWithNoPrerequisiteTasks makeObjectsPerformSelector:@selector(retry)];
 }
 
 
