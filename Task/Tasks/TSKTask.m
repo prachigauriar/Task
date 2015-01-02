@@ -477,4 +477,30 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     }];
 }
 
+
+#pragma mark - Prerequisite Results
+
+- (id)anyPrerequisiteResult
+{    
+    return [[self.prerequisiteTasks anyObject] result];
+}
+
+
+- (NSArray *)allPrerequisiteResults
+{
+    return [[self.prerequisiteTasks allObjects] valueForKey:@"result"];
+}
+
+
+- (NSMapTable *)prerequisiteResultsByTask
+{
+    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
+    for (TSKTask *task in self.prerequisiteTasks) {
+        id result = task.result ? task.result : [NSNull null];
+        [results setObject:result forKey:task];
+    }
+
+    return results;
+}
+
 @end
