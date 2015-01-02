@@ -272,7 +272,7 @@ TSKTask *mappingTask = [[TSKSelectorTask alloc] initWithName:@"Map API Result"
 
 - (void)mapRequestResultWithTask:(TSKTask *)task
 {
-    NSDictionary *JSONResponse = [[task.prerequisiteTasks anyObject] result];
+    NSDictionary *JSONResponse = [task anyPrerequisiteResult];
     NSManagedObject *mappedObject = [self mapJSONResponse:JSONResponse
                                               intoContext:self.managedObjectContext];
 
