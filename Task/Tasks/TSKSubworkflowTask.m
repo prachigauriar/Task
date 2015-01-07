@@ -123,17 +123,15 @@
 }
 
 
-- (void)reset
+- (void)didReset
 {
     [self.subworkflow reset];
-    [super reset];
 }
 
 
-- (void)retry
+- (void)didRetry
 {
     [self.subworkflow retry];
-    [super retry];
 }
 
 

@@ -278,7 +278,7 @@ extern NSString *const TSKTaskDidStartNotification;
      
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)cancel;
+- (void)cancel __attribute__((objc_requires_super));
 
 /*!
  @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled.
@@ -288,7 +288,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)reset;
+- (void)reset __attribute__((objc_requires_super));
 
 /*!
  @abstract Sets the task’s state to pending if it is cancelled or failed, and starts the task if its
@@ -298,7 +298,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)retry;
+- (void)retry __attribute__((objc_requires_super));
 
 /*!
  @abstract Sets the task’s state to finished and updates its result and finishDate properties.
@@ -309,7 +309,7 @@ extern NSString *const TSKTaskDidStartNotification;
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)finishWithResult:(id)result;
+- (void)finishWithResult:(id)result __attribute__((objc_requires_super));
 
 /*!
  @abstract Sets the task’s state to failed and updates its error and finishDate properties.
@@ -321,7 +321,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
  */
-- (void)failWithError:(NSError *)error;
+- (void)failWithError:(NSError *)error __attribute__((objc_requires_super));
 
 /*!
  @abstract Returns the result of one of the receiver’s prerequisite tasks.
