@@ -457,7 +457,6 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidRetryNotification object:self];
         [self startIfReady];
-
     }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(retry)];
