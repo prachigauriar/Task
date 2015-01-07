@@ -352,6 +352,60 @@ extern NSString *const TSKTaskDidStartNotification;
 @end
 
 
+/*!
+ The SubclassInterface contains methods for use by TSKTask subclasses. These methods should never be
+ invoked directly.
+ */
+@interface TSKTask (SubclassInterface)
+
+/*!
+ @abstract Performs actions once the receiver has been cancelled.
+ @discussion This method is invoked after the receiver has been put in the cancelled state but
+     before it has informed its delegate or posted any relevant notifications. The default
+     implementation does nothing. Subclasses can override this method to perform any special actions
+     upon cancellation. This method should not be invoked directly.
+ */
+- (void)didCancel;
+
+/*!
+ @abstract Performs actions once the receiver has been reset.
+ @discussion This method is invoked after the receiver has been put in the pending state but before
+     it has informed its delegate or posted any relevant notifications. The default implementation
+     does nothing. Subclasses can override this method to perform any special actions upon being
+     reset. This method should not be invoked directly.
+ */
+- (void)didReset;
+
+/*!
+ @abstract Performs actions once the receiver has been retried.
+ @discussion This method is invoked after the receiver has been put in the pending state but before
+     it has informed its delegate or posted any relevant notifications. The default implementation
+     does nothing. Subclasses can override this method to perform any special actions upon being
+     retried. This method should not be invoked directly.
+ */
+- (void)didRetry;
+
+/*!
+ @abstract Performs actions once the receiver finishes.
+ @discussion This method is invoked after the receiver has been put in the finished state but before
+     it has informed its delegate or posted any relevant notifications. The default implementation
+     does nothing. Subclasses can override this method to perform any special actions upon finishing.
+     This method should not be invoked directly.
+ */
+- (void)didFinishWithResult:(id)result;
+
+/*!
+ @abstract Performs actions once the receiver has failed.
+ @discussion This method is invoked after the receiver has been put in the failed state but before
+     it has informed its delegate or posted any relevant notifications. The default implementation
+     does nothing. Subclasses can override this method to perform any special actions upon failing.
+     This method should not be invoked directly.
+ */
+- (void)didFailWithError:(NSError *)error;
+
+@end
+
+
 #pragma mark - Task Delegate Protocol
 
 /*!
