@@ -392,6 +392,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStateCancelled andExecuteBlock:^{
+        [self didCancel];
+
         if ([self.delegate respondsToSelector:@selector(taskDidCancel:)]) {
             [self.delegate taskDidCancel:self];
         }
@@ -401,6 +403,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     }];
     
     [self.dependentTasks makeObjectsPerformSelector:@selector(cancel)];
+}
+
+
+- (void)didCancel
+{
 }
 
 
@@ -416,12 +423,20 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
-        [self.workflow subtaskDidReset:self];
+
+        [self didReset];
+
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
+        [self.workflow subtaskDidReset:self];
         [self transitionToReadyStateAndExecuteBlock:nil];
-    }];
+}];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
+}
+
+
+- (void)didReset
+{
 }
 
 
@@ -437,6 +452,9 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         self.finishDate = nil;
         self.result = nil;
         self.error = nil;
+
+        [self didRetry];
+
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidRetryNotification object:self];
         [self startIfReady];
     }];
@@ -445,11 +463,18 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
+- (void)didRetry
+{
+}
+
+
 - (void)finishWithResult:(id)result
 {
     [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFinished andExecuteBlock:^{
         self.finishDate = [NSDate date];
         self.result = result;
+
+        [self didFinishWithResult:result];
 
         if ([self.delegate respondsToSelector:@selector(task:didFinishWithResult:)]) {
             [self.delegate task:self didFinishWithResult:result];
@@ -462,11 +487,18 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
+- (void)didFinishWithResult:(id)result
+{
+}
+
+
 - (void)failWithError:(NSError *)error
 {
     [self transitionFromState:TSKTaskStateExecuting toState:TSKTaskStateFailed andExecuteBlock:^{
         self.finishDate = [NSDate date];
         self.error = error;
+
+        [self didFailWithError:error];
 
         if ([self.delegate respondsToSelector:@selector(task:didFailWithError:)]) {
             [self.delegate task:self didFailWithError:error];
@@ -475,6 +507,11 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidFailNotification object:self];
         [self.workflow subtask:self didFailWithError:error];
     }];
+}
+
+
+- (void)didFailWithError:(NSError *)error
+{
 }
 
 
