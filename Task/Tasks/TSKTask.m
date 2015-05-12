@@ -139,7 +139,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
         _name = [name copy];
         _state = TSKTaskStateReady;
-        NSString *stateQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKTask.%@.state", name];
+        NSString *stateQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKTask.%@.state", name];
         _stateQueue = dispatch_queue_create([stateQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 

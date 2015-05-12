@@ -129,7 +129,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @abstract The task workflow’s operation queue.
  @discussion If no operation queue is provided upon initialization, a queue will be created for the
      task workflow with the default quality of service and maximum concurrent operations count. Its
-     name will be of the form “com.twotoasters.TSKWorkflow.«name»”, where «name» is the name of the
+     name will be of the form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the
      task workflow.
  */
 @property (nonatomic, strong, readonly) NSOperationQueue *operationQueue;
@@ -154,7 +154,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @abstract Initializes a newly created TSKWorkflow instance with the specified name.
  @discussion A new operation queue will be created for the task workflow with the default quality of
      service and maximum concurrent operations count. The queue’s name will be of the form
-     “com.twotoasters.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
+     “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @param name The name of the task workflow. If nil, the instance’s name will be set to 
      “TSKWorkflow «id»”, where «id» is the memory address of the task.
  @result A newly initialized TSKWorkflow instance with the specified name.
@@ -168,7 +168,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param operationQueue The operation queue the workflow’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task workflow with the default
      quality of service and maximum concurrent operations count. The queue’s name will be of the
-     form “com.twotoasters.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
+     form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @result A newly initialized TSKWorkflow instance with the specified operation queue.
  */
 - (instancetype)initWithOperationQueue:(NSOperationQueue *)operationQueue;
@@ -181,7 +181,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param operationQueue The operation queue the workflow’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task workflow with the default
      quality of service and maximum concurrent operations count. The queue’s name will be of the
-     form “com.twotoasters.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
+     form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @result A newly initialized TSKWorkflow instance with the specified name and operation queue.
  */
 - (instancetype)initWithName:(NSString *)name operationQueue:(NSOperationQueue *)operationQueue;
@@ -195,7 +195,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param operationQueue The operation queue the workflow’s tasks will use to execute their ‑main
      methods. If nil, a new operation queue will be created for the task workflow with the default
      quality of service and maximum concurrent operations count. The queue’s name will be of the
-     form “com.twotoasters.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
+     form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @param notificationCenter The notification center the workflow and its tasks will use to post 
      notifications. If nil, the default notification center will be used.
  @result A newly initialized TSKWorkflow instance with the specified name, operation queue,

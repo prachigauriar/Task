@@ -46,7 +46,7 @@
 {
     self = [super initWithName:name];
     if (self) {
-        NSString *fulfillmentQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKExternalConditionTask.%@.fulfillment", self.name];
+        NSString *fulfillmentQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKExternalConditionTask.%@.fulfillment", self.name];
         _fulfillmentQueue = dispatch_queue_create([fulfillmentQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 

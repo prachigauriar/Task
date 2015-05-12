@@ -98,7 +98,7 @@
     XCTAssertEqualObjects(workflow.allTasks, [NSSet set]);
     XCTAssertEqualObjects(workflow.name, ([NSString stringWithFormat:@"TSKWorkflow %p", workflow]), @"name not set to default");
     XCTAssertNotNil(workflow.operationQueue, @"operation queue not set to default");
-    XCTAssertEqualObjects(workflow.operationQueue.name, ([NSString stringWithFormat:@"com.twotoasters.TSKWorkflow.TSKWorkflow %p", workflow]),
+    XCTAssertEqualObjects(workflow.operationQueue.name, ([NSString stringWithFormat:@"com.ticketmaster.TSKWorkflow.TSKWorkflow %p", workflow]),
                           @"name not set to default");
     XCTAssertEqualObjects(workflow.notificationCenter, [NSNotificationCenter defaultCenter], @"notificationCenter not set to default");
 

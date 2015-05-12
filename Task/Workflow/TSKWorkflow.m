@@ -129,7 +129,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
-            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKWorkflow.%@", name];
+            operationQueue.name = [[NSString alloc] initWithFormat:@"com.ticketmaster.TSKWorkflow.%@", name];
         }
 
         _name = [name copy];
@@ -139,7 +139,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
         _tasks = [[NSMutableSet alloc] init];
         _finishedTasks = [[NSMutableSet alloc] init];
 
-        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKWorkflow.%@.finishedTasks", _name];
+        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKWorkflow.%@.finishedTasks", _name];
         _finishedTasksQueue = dispatch_queue_create([finishedTasksQueueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
