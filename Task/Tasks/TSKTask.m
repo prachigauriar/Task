@@ -184,7 +184,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (NSSet *)namesOfRequiredPrerequisites
+- (NSSet *)requiredPrerequisiteKeys
 {
     return [NSSet set];
 }
@@ -196,15 +196,15 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (NSSet *)unnamedPrerequisiteTasks
+- (NSSet *)unkeyedPrerequisiteTasks
 {
-    return [self.workflow unnamedPrerequisiteTasksForTask:self];
+    return [self.workflow unkeyedPrerequisiteTasksForTask:self];
 }
 
 
-- (NSDictionary *)namedPrerequisiteTasks
+- (NSDictionary *)keyedPrerequisiteTasks
 {
-    return [self.workflow namedPrerequisiteTasksForTask:self];
+    return [self.workflow keyedPrerequisiteTasksForTask:self];
 }
 
 
@@ -547,28 +547,28 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
-- (NSArray *)allUnnamedPrerequisiteResults
+- (NSArray *)allUnkeyedPrerequisiteResults
 {
-    return [[self.unnamedPrerequisiteTasks allObjects] valueForKey:@"result"];
+    return [[self.unkeyedPrerequisiteTasks allObjects] valueForKey:@"result"];
 }
 
 
-- (NSDictionary *)namedPrerequisiteResults
+- (NSDictionary *)keyedPrerequisiteResults
 {
-    NSDictionary *namedPrerequisiteTasks = self.namedPrerequisiteTasks;
-    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:namedPrerequisiteTasks.count];
+    NSDictionary *keyedPrerequisiteTasks = self.keyedPrerequisiteTasks;
+    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:keyedPrerequisiteTasks.count];
 
-    [namedPrerequisiteTasks enumerateKeysAndObjectsUsingBlock:^(NSString *name, TSKTask *task, BOOL *stop) {
+    [keyedPrerequisiteTasks enumerateKeysAndObjectsUsingBlock:^(NSString *name, TSKTask *task, BOOL *stop) {
         results[name] = task.result ? task.result : [NSNull null];
     }];
 
-    return namedPrerequisiteTasks;
+    return results;
 }
 
 
-- (id)resultForPrerequisiteNamed:(NSString *)prerequisiteName
+- (id)prerequisiteResultForKey:(id<NSCopying>)prerequisiteName
 {
-    return [self.namedPrerequisiteTasks[prerequisiteName] result];
+    return [self.keyedPrerequisiteTasks[prerequisiteName] result];
 }
 
 

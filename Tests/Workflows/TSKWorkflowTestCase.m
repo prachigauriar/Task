@@ -137,11 +137,11 @@
     XCTAssertEqualObjects([workflow dependentTasksForTask:task2], [NSSet set], @"dependents not set");
 
     TSKTask *dependent = [[TSKTask alloc] init];
-    [workflow addTask:dependent prerequisiteTasks:[NSSet setWithObject:task1] namedPrerequisiteTasks:@{ @"a" : task2}];
+    [workflow addTask:dependent prerequisiteTasks:[NSSet setWithObject:task1] keyedPrerequisiteTasks:@{ @"a" : task2}];
 
     XCTAssertEqualObjects([workflow prerequisiteTasksForTask:dependent], ([NSSet setWithObjects:task1, task2, nil]), @"prerequisites not set property");
-    XCTAssertEqualObjects([workflow unnamedPrerequisiteTasksForTask:dependent], [NSSet setWithObject:task1], @"unnamed prerequisites not set property");
-    XCTAssertEqualObjects([workflow namedPrerequisiteTasksForTask:dependent], @{ @"a" : task2 }, @"named prerequisites not set property");
+    XCTAssertEqualObjects([workflow unkeyedPrerequisiteTasksForTask:dependent], [NSSet setWithObject:task1], @"unkeyed prerequisites not set property");
+    XCTAssertEqualObjects([workflow keyedPrerequisiteTasksForTask:dependent], @{ @"a" : task2 }, @"keyed prerequisites not set property");
 
     XCTAssertEqualObjects([workflow dependentTasksForTask:task1], [NSSet setWithObject:dependent], @"dependents not set property");
     XCTAssertEqualObjects([workflow dependentTasksForTask:task2], [NSSet setWithObject:dependent], @"dependents not set property");
@@ -167,6 +167,14 @@
 
     XCTAssertThrows(([workflow addTask:dependentTask prerequisites:prerequisiteTask, nil]),
                     @"workflow allows a task to be added before its prerequisite is added");
+
+    TSKTestTask *requiredKeysTask = [self finishingTaskWithLock:nil];
+    requiredKeysTask.requiredPrerequisiteKeys = UMKGeneratedSetWithElementCount(random() % 5 + 2, ^id{
+        return UMKRandomUnsignedNumber();
+    });
+
+    XCTAssertThrows([workflow addTask:requiredKeysTask keyedPrerequisiteTasks:@{ [requiredKeysTask.requiredPrerequisiteKeys anyObject] : task }],
+                    @"workflow allows a task to be added without all its required keys");
 }
 
 
@@ -286,6 +294,48 @@
 }
 
 
+- (void)testStartOneKeyedPrerequisite
+{
+    NSLock *willFinishLock = [[NSLock alloc] init];
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKTestTask *task = [self finishingTaskWithLock:willFinishLock];
+    TSKTestTask *dependentTask = [self finishingTaskWithLock:willFinishLock];
+    [workflow addTask:task prerequisites:nil];
+
+    NSString *prerequisiteKey = UMKRandomIdentifierString();
+    [workflow addTask:dependentTask keyedPrerequisiteTasks:@{ prerequisiteKey : task }];
+
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state is not ready");
+    XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
+
+    [self expectationForNotification:TSKWorkflowWillStartNotification workflow:workflow block:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:task handler:nil];
+    [willFinishLock lock];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil]; // wait until task starts
+    XCTAssertEqual(task.state, TSKTaskStateExecuting, @"state is not executing");
+    XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependent state is not pending");
+
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:task handler:nil];
+    [self expectationForNotification:TSKTestTaskDidStartNotification object:dependentTask handler:nil];
+    [willFinishLock unlock];
+    // First task is waiting for lock and finishes
+    [willFinishLock lock];
+    [self waitForExpectationsWithTimeout:1 handler:nil]; // wait until dependentTask starts
+    XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
+    XCTAssertEqual(dependentTask.state, TSKTaskStateExecuting, @"state is not executing");
+    XCTAssertTrue(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is not true");
+
+    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
+    [self expectationForNotification:TSKTestTaskDidFinishNotification object:dependentTask handler:nil];
+    [willFinishLock unlock];
+    // Dependent task is waiting for lock and finishes
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertEqual(dependentTask.state, TSKTaskStateFinished, "state is not finished");
+    XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
+}
+
+
 - (void)testStartMultiplePrerequisites
 {
     NSLock *willFinishLock = [[NSLock alloc] init];
@@ -295,7 +345,7 @@
     TSKTestTask *dependentTask = [self finishingTaskWithLock:willFinishLock];
     [workflow addTask:task1 prerequisites:nil];
     [workflow addTask:task2 prerequisites:nil];
-    [workflow addTask:dependentTask prerequisites:task1, task2, nil];
+    [workflow addTask:dependentTask prerequisiteTasks:[NSSet setWithObject:task1] keyedPrerequisiteTasks:@{ UMKRandomIdentifierString() : task2 }];
 
     XCTAssertEqual(task1.state, TSKTaskStateReady, @"state is not ready");
     XCTAssertEqual(task2.state, TSKTaskStateReady, @"state is not ready");

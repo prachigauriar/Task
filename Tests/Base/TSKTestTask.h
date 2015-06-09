@@ -46,6 +46,7 @@ extern NSString *const TSKTestTaskDidCancelNotification;
 @interface TSKTestTask : TSKTask
 
 @property (nonatomic, copy, readonly) void (^block)(TSKTask *task);
+@property (nonatomic, copy) NSSet *requiredPrerequisiteKeys;
 
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block;
 - (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block NS_DESIGNATED_INITIALIZER;
