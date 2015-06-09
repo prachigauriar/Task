@@ -133,6 +133,14 @@ extern NSString *const TSKTaskDidStartNotification;
  ‑finishWithResult: or ‑failWithError: when complete. If you want to avoid subclassing, you can also
  use TSKBlockTask and TSKSelectorTask. See their respective class documentation for more information.
 
+ Tasks have two types of prerequisites, keyed and unkeyed, which have a simple distinction: a keyed
+ prerequisite has a unique key that can be used to retrieve its result, while an unkeyed prerequisite
+ does not. Keyed prerequisites are primarily useful when a task has many prerequisites with different
+ kinds of results. If your task ignores its prerequisites’ results, has only one prerequisite, or has
+ many prerequisites whose results are treated uniformly, unkeyed prerequisites may be more convenient
+ to use. Keyed and unkeyed prerequisites may also be used in combination, though this is rare. Task
+ subclasses can declare which prerequisite keys are required by overriding ‑requiredPrerequisiteKeys.
+
  Every TSKTask has an optional delegate that can be informed when a task succeeds or fails. See the
  documentation for TSKTaskDelegate for more information.
  */
@@ -160,15 +168,6 @@ extern NSString *const TSKTaskDidStartNotification;
      to a workflow, it may not be added (or moved) to another workflow.
  */
 @property (nonatomic, weak, readonly) TSKWorkflow *workflow;
-
-/*! 
- @abstract The required prerequisite keys that must be fulfilled for the task to run.
- @discussion Returns an empty set by default. Subclasses can override this method to return a set of
-     keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
-     workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
-     is nil, no prerequisite keys are required.
- */
-@property (nonatomic, copy, readonly) NSSet *requiredPrerequisiteKeys;
 
 /*!
  @abstract The task’s prerequisite tasks.
@@ -274,6 +273,16 @@ extern NSString *const TSKTaskDidStartNotification;
  @result A newly initialized TSKTask instance with the specified name.
  */
 - (instancetype)initWithName:(NSString *)name NS_DESIGNATED_INITIALIZER;
+
+/*!
+ @abstract Returns the prerequisite keys that the receiver requires to run.
+ @discussion Returns an empty set by default. Subclasses can override this method to return a set of
+     keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
+     workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
+     is nil, no prerequisite keys are required.
+ @result The set of prerequisite keys that the receiver requires to run.
+ */
+- (NSSet *)requiredPrerequisiteKeys;
 
 /*!
  @abstract Performs the task’s work.
@@ -386,7 +395,7 @@ extern NSString *const TSKTaskDidStartNotification;
 - (NSArray *)allUnkeyedPrerequisiteResults;
 
 /*!
- @abstract Returns the results of all receiver’s keyed prerequisite tasks in a dictionary.
+ @abstract Returns the results of all the receiver’s keyed prerequisite tasks in a dictionary.
  @discussion The returned dictionary maps the prerequisite’s key to its result and will contain
      NSNull elements for each task that returns nil.
  @result A dictionary containing the results of all the receiver’s keyed prerequisite tasks.
@@ -394,7 +403,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (NSDictionary *)keyedPrerequisiteResults;
 
 /*!
- @abstract Returns the result of the receiver’s prerequisite that has the specified key.
+ @abstract Returns the result of the prerequisite in the receiver’s keyed prerequisites that has
+     the specified key.
  @result The result for the receiver’s prerequisite task with the specified key. Returns nil if
      the receiver has no such prerequisite task or the task has a nil result.
  */

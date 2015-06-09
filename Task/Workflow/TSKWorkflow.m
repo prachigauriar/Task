@@ -71,7 +71,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 /*!
  @abstract A map table that maps a task to its keyed prerequisite tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSDictionaries
-     whose keys are strings and whose values are TSKTask instances.
+     whose keys are objects that conform to NSCopying and whose values are TSKTask instances.
  */
 @property (nonatomic, strong, readonly) NSMapTable *keyedPrerequisiteTasks;
 

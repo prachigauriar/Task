@@ -50,6 +50,7 @@
     XCTAssertEqual(task.target, self, @"target is set incorrectly");
     XCTAssertEqual(task.selector, @selector(method:), @"method is set incorrectly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, [NSSet set], @"requiredPrerequisiteKeys is not the empty set");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
@@ -59,6 +60,21 @@
     XCTAssertEqual(task.target, self, @"target is set incorrectly");
     XCTAssertEqual(task.selector, @selector(method:), @"method is set incorrectly");
     XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, [NSSet set], @"requiredPrerequisiteKeys is not the empty set");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
+    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
+
+    NSSet *requiredPrerequisiteKeys = UMKGeneratedSetWithElementCount(random() % 5 + 5, ^id{
+        return UMKRandomIdentifierString();
+    });
+
+    task = [[TSKSelectorTask alloc] initWithName:name target:self selector:@selector(method:) requiredPrerequisiteKeys:requiredPrerequisiteKeys];
+    XCTAssertEqual(task.target, self, @"target is set incorrectly");
+    XCTAssertEqual(task.selector, @selector(method:), @"method is set incorrectly");
+    XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, requiredPrerequisiteKeys, @"requiredPrerequisiteKeys is set incorrectly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");

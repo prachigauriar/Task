@@ -251,7 +251,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no unkeyed
      prerequisite tasks. Otherwise, each task in the set must have already been added to the receiver.
- @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their
+ @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite keys to their
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
      in the dictionary must have already been added to the receiver.
  */

@@ -27,21 +27,34 @@
 #import <Task/TSKSelectorTask.h>
 
 
+@interface TSKSelectorTask ()
+
+@property (nonatomic, copy, readonly) NSSet *requiredPrerequisiteKeys;
+
+@end
+
+
 @implementation TSKSelectorTask
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name target:nil selector:NULL];
+    return [self initWithName:name target:nil selector:NULL requiredPrerequisiteKeys:[NSSet set]];
 }
 
 
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector
 {
-    return [self initWithName:nil target:target selector:selector];
+    return [self initWithName:nil target:target selector:selector requiredPrerequisiteKeys:[NSSet set]];
 }
 
 
 - (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector
+{
+    return [self initWithName:name target:target selector:selector requiredPrerequisiteKeys:[NSSet set]];
+}
+
+
+- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys
 {
     NSParameterAssert(target);
     NSParameterAssert(selector);
@@ -50,6 +63,7 @@
     if (self) {
         _target = target;
         _selector = selector;
+        _requiredPrerequisiteKeys = [requiredPrerequisiteKeys copy];
     }
 
     return self;
