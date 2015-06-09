@@ -219,6 +219,39 @@ extern NSString *const TSKWorkflowTaskKey;
 - (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks;
 
 /*!
+ @abstract Adds the specified task to the task workflow with the specified dictionary of named 
+     prerequisite tasks.
+ @discussion The task’s workflow property is set to the receiver, and its named prerequisite tasks are
+     set to the ones specified. Furthermore, the task is added to each of the named prerequisite tasks’ 
+     sets of dependent tasks. If the task has any prerequisites, its state is set to pending.
+
+     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @param task The task to add. May not be nil. May not be a member of any other task workflow.
+ @param namedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their 
+     corresponding task. If nil, the task will have no named prerequisite tasks. Otherwise, each task
+     in the dictionary must have already been added to the receiver.
+ */
+- (void)addTask:(TSKTask *)task namedPrerequisiteTasks:(NSDictionary *)namedPrerequisiteTasks;
+
+/*!
+ @abstract Adds the specified task to the task workflow with the specified prerequisite and named
+     prerequisite tasks.
+ @discussion The task’s workflow property is set to the receiver, and its prerequisite and named 
+     prerequisite tasks are set to the ones specified. Furthermore, for each prerequisite task —
+     named or otherwise — the task is added to the prerequisite’s set of dependent tasks. If the 
+     task has any prerequisites, its state is set to pending.
+
+     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @param task The task to add. May not be nil. May not be a member of any other task workflow.
+ @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no unnamed
+     prerequisite tasks. Otherwise, each task in the set must have already been added to the receiver.
+ @param namedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their
+     corresponding task. If nil, the task will have no named prerequisite tasks. Otherwise, each task
+     in the dictionary must have already been added to the receiver.
+ */
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks namedPrerequisiteTasks:(NSDictionary *)namedPrerequisiteTasks;
+
+/*!
  @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
  @discussion The task’s workflow property is set to the receiver, and its prerequisite tasks are set 
      to the ones specified. Furthermore, the task is added to each of the prerequisite tasks’ sets
@@ -233,11 +266,28 @@ extern NSString *const TSKWorkflowTaskKey;
 
 /*!
  @abstract Returns the set of prerequisite tasks for the specified task.
+ @discussion This is the union of the task’s named and unnamed prerequisite tasks.
  @param task The task.
  @result The set of prerequisite tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
 - (NSSet *)prerequisiteTasksForTask:(TSKTask *)task;
+
+/*! 
+ @abstract Returns the set of unnamed prerequisite tasks for the specified task.
+ @param task The task.
+ @result The set of unnamed prerequisite tasks for the specified task. Returns nil if the task is not
+     in the receiver.
+ */
+- (NSSet *)unnamedPrerequisiteTasksForTask:(TSKTask *)task;
+
+/*!
+ @abstract Returns the named prerequisite tasks for the specified task.
+ @param task The task.
+ @result A dictionary that maps the names of the specified task’s named prerequisites to their 
+     corresponding tasks. Returns nil if the task is not in the receiver.
+ */
+- (NSDictionary *)namedPrerequisiteTasksForTask:(TSKTask *)task;
 
 /*!
  @abstract Returns the set of dependent tasks for the specified task.

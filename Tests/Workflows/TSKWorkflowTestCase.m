@@ -126,19 +126,29 @@
 - (void)testAddTasks
 {
     TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
-    TSKTask *task = [[TSKTask alloc] init];
-    [workflow addTask:task prerequisites:nil];
-    XCTAssertEqualObjects([workflow prerequisiteTasksForTask:task], [NSSet set], @"prereqs not set");
-    XCTAssertEqualObjects([workflow dependentTasksForTask:task], [NSSet set], @"prereqs not set");
+    TSKTask *task1 = [[TSKTask alloc] init];
+    [workflow addTask:task1 prerequisites:nil];
+    XCTAssertEqualObjects([workflow prerequisiteTasksForTask:task1], [NSSet set], @"prerequisites not set");
+    XCTAssertEqualObjects([workflow dependentTasksForTask:task1], [NSSet set], @"dependents not set");
+
+    TSKTask *task2 = [[TSKTask alloc] init];
+    [workflow addTask:task2 prerequisites:nil];
+    XCTAssertEqualObjects([workflow prerequisiteTasksForTask:task2], [NSSet set], @"prerequisites not set");
+    XCTAssertEqualObjects([workflow dependentTasksForTask:task2], [NSSet set], @"dependents not set");
 
     TSKTask *dependent = [[TSKTask alloc] init];
-    [workflow addTask:dependent prerequisites:task, nil];
+    [workflow addTask:dependent prerequisiteTasks:[NSSet setWithObject:task1] namedPrerequisiteTasks:@{ @"a" : task2}];
 
-    XCTAssertEqualObjects([workflow prerequisiteTasksForTask:dependent], [NSSet setWithObject:task], @"prereqs not set property");
-    XCTAssertEqualObjects([workflow dependentTasksForTask:task], [NSSet setWithObject:dependent], @"prereqs not set property");
-    XCTAssertEqualObjects([workflow allTasks], ([NSSet setWithObjects:task, dependent, nil]), @"all tasks not set property");
-    XCTAssertEqualObjects([workflow tasksWithNoPrerequisiteTasks], ([NSSet setWithObject:task]), @"tasksWithNoPrerequisiteTasks not set correctly");
-    XCTAssertEqualObjects([workflow tasksWithNoDependentTasks], ([NSSet setWithObject:dependent]), @"tasksWithNoDependentTasks not set correctly");
+    XCTAssertEqualObjects([workflow prerequisiteTasksForTask:dependent], ([NSSet setWithObjects:task1, task2, nil]), @"prerequisites not set property");
+    XCTAssertEqualObjects([workflow unnamedPrerequisiteTasksForTask:dependent], [NSSet setWithObject:task1], @"unnamed prerequisites not set property");
+    XCTAssertEqualObjects([workflow namedPrerequisiteTasksForTask:dependent], @{ @"a" : task2 }, @"named prerequisites not set property");
+
+    XCTAssertEqualObjects([workflow dependentTasksForTask:task1], [NSSet setWithObject:dependent], @"dependents not set property");
+    XCTAssertEqualObjects([workflow dependentTasksForTask:task2], [NSSet setWithObject:dependent], @"dependents not set property");
+    XCTAssertEqualObjects([workflow allTasks], ([NSSet setWithObjects:task1, task2, dependent, nil]), @"all tasks not set property");
+    XCTAssertEqualObjects([workflow tasksWithNoPrerequisiteTasks], ([NSSet setWithObjects:task1, task2, nil]),
+                          @"tasksWithNoPrerequisiteTasks not set correctly");
+    XCTAssertEqualObjects([workflow tasksWithNoDependentTasks], [NSSet setWithObject:dependent], @"tasksWithNoDependentTasks not set correctly");
 }
 
 
