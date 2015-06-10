@@ -338,7 +338,7 @@ result of a given keyed prerequisite can be retrieved by sending a task
 For example, suppose a task were added to a workflow as follows:
 
 ```objc
-    [workflow addTask:task keyedPrerequisiteTasks:@{ @"userTask" : task1, @"addressTask" : task2 }];
+[workflow addTask:task keyedPrerequisiteTasks:@{ @"userTask" : task1, @"addressTask" : task2 }];
 ```
 
 The task can easily refer to the results of `task1` and `task2`, e.g., in its `‑main` method like so:
