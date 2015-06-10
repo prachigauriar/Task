@@ -421,7 +421,7 @@ extern NSString *const TSKTaskDidStartNotification;
 @end
 
 
-#pragma mark
+#pragma mark -
 
 /*!
  The SubclassInterface contains methods for use by TSKTask subclasses. These methods should never be
