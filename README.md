@@ -4,21 +4,61 @@ Task is a simple Cocoa framework for expressing and executing your application�
 Task, you need only express each step in your workflow — called tasks — and what their prerequisite
 tasks are. After that, the framework handles the mechanics of executing the steps in the correct
 order with the appropriate level of concurrency, letting you know when tasks finish or fail. It also
-makes it easy to cancel tasks, retry failed tasks, and re-run previously completed tasks and 
+makes it easy to cancel tasks, retry failed tasks, and re-run previously completed tasks and
 workflows.
 
 
 ## What’s New in 1.1
 
-Task 1.1 adds keyed prerequisites so that a task can retrieve its prerequisite’s results using 
-unique identifiers. This simplifies cases where a task has multiple prerequisites that it needs
-to treat specially. Keyed prerequisites can be specified when adding a task to a workflow using
-`‑[TSKWorkflow addTask:keyedPrerequisiteTasks:]` or 
-`‑[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisiteTasks:]`. Results from keyed prerequisites
-can be easily retrieved using `‑[TSKTask prerequisiteResultForKey:]`.
+Task 1.1 is a significant update that makes it easier for Task subclasses to get prerequisite
+results and respond to state changes.
 
-Task 1.1 also adds new methods to `TSKTask` so that subclasses can more easily respond to changes in
-a task’s state. See the `SubclassInterface` category of `TSKTask` for more information.
+### Keyed Prerequisites
+
+When adding a task to a workflow, prerequisites can be given unique keys that can be used to
+retrieve their results. For example,
+
+```objc
+TSKWorkflow *workflow = …;
+TSKTask *taskA = …;
+TSKTask *taskB = …;
+TSKTask *taskC = …;
+
+…
+
+[workflow addTask:taskC keyedPrerequisiteTasks:@{ @"userTask" : taskA, @"projectTask" : taskB }];
+```
+
+Later, `taskC` can access the results of `taskA` and `taskB`, e.g., in its `‑main` method, using
+`‑[TSKTask prerequisiteResultForKey:]`:
+
+```objc
+- (void)main
+{
+    User *user = [self prerequisiteResultForKey:@"userTask"];
+    Project *project = [self prerequisiteResultForKey:@"projectTask"];
+    …
+}
+```
+
+Tasks can even specify which keys they require to run by overriding `‑requiredPrerequisiteKeys`. If
+this requirement is not fulfilled when a task is added to a workflow, an assertion is raised.
+
+
+### Task Subclass Interface
+
+We’ve also added numerous methods to `TSKTask` so that subclasses can respond to changes in task 
+state:
+ 
+* `didCancel`
+* `didReset`
+* `didRetry`
+* `didFinishWithResult:`
+* `didFailWithError:`
+
+While the default implementations of these methods do nothing, subclasses can override them to
+perform necessary actions upon state changes. This should obviate the need for `TSKTask` subclasses
+to observe notifications posted by their superclass.
 
 
 ## Features

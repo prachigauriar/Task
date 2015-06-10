@@ -34,7 +34,6 @@
 @end
 
 
-
 @implementation TSKBlockTask
 
 - (instancetype)initWithName:(NSString *)name

@@ -280,6 +280,17 @@ extern NSString *const TSKTaskDidStartNotification;
      keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
      workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
      is nil, no prerequisite keys are required.
+ 
+     Subclasses that override this method should take care to include their superclass’s required keys
+     in the set they return. For example, an appropriate implementation may look like:
+ 
+         - (NSSet *)requiredPrerequisiteKeys
+         {
+             return [[super requiredPrerequisiteKeys] setByAddingObjectsFromArray:@[ @"a", @"b" ]];
+         }
+
+     Since the base implementation fo this class returns the empty set, direct subclasses of TSKTask
+     need not do this.
  @result The set of prerequisite keys that the receiver requires to run.
  */
 - (NSSet *)requiredPrerequisiteKeys;
@@ -405,6 +416,7 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract Returns the result of the prerequisite in the receiver’s keyed prerequisites that has
      the specified key.
+ @param prerequisiteKey The key of the prerequisite task whose result is being retrieved.
  @result The result for the receiver’s prerequisite task with the specified key. Returns nil if
      the receiver has no such prerequisite task or the task has a nil result.
  */

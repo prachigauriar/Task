@@ -213,11 +213,8 @@ extern NSString *const TSKWorkflowTaskKey;
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified set of prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its prerequisite tasks are set 
-     to the ones specified. Furthermore, the task is added to each of the prerequisite tasks’ sets
-     of dependent tasks. If the task has any prerequisites, its state is set to pending.
- 
-     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @discussion This is equivalent to invoking ‑addTask:prerequisiteTasks:keyedPrerequisiteTasks: with
+     a nil keyedPrerequisiteTasks parameter.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no prerequisite
      tasks. Otherwise, each task in the set must have already been added to the receiver.
@@ -227,11 +224,8 @@ extern NSString *const TSKWorkflowTaskKey;
 /*!
  @abstract Adds the specified task to the task workflow with the specified dictionary of keyed 
      prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its keyed prerequisite tasks are
-     set to the ones specified. Furthermore, the task is added to each of the keyed prerequisite tasks’ 
-     sets of dependent tasks. If the task has any prerequisites, its state is set to pending.
-
-     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @discussion This is equivalent to invoking ‑addTask:prerequisiteTasks:keyedPrerequisiteTasks: with
+     a nil prerequisiteTasks parameter.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their 
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
@@ -259,11 +253,10 @@ extern NSString *const TSKWorkflowTaskKey;
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its prerequisite tasks are set 
-     to the ones specified. Furthermore, the task is added to each of the prerequisite tasks’ sets
-     of dependent tasks. If the task has any prerequisites, its state is set to pending.
-
-     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @discussion This method is a convenient shorthand for invoking ‑addTask:prerequisiteTasks:. It is 
+     equivalent to the following:
+ 
+         [workflow addTask:task prerequisiteTasks:[NSSet setWithObjects:prerequisiteTask1, ...]];
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTask1 ... The task’s prerequisite tasks as a nil-terminated list. Each task in
      the set must have already been added to the receiver.
