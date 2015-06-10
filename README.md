@@ -8,41 +8,17 @@ makes it easy to cancel tasks, retry failed tasks, and re-run previously complet
 workflows.
 
 
-## What’s New in 1.0
+## What’s New in 1.1
 
-Task 1.0 adds numerous new features, but also makes a few significant API changes from Task 0.3 
-that will break existing code. Thankfully, the changes are easy to accommodate.
+Task 1.1 adds keyed prerequisites so that a task can retrieve its prerequisite’s results using 
+unique identifiers. This simplifies cases where a task has multiple prerequisites that it needs
+to treat specially. Keyed prerequisites can be specified when adding a task to a workflow using
+`‑[TSKWorkflow addTask:keyedPrerequisiteTasks:]` or 
+`‑[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisiteTasks:]`. Results from keyed prerequisites
+can be easily retrieved using `‑[TSKTask prerequisiteResultForKey:]`.
 
-### New Features
-
-* Notifications for important task- and workflow-related events. Every workflow has a reference to a
-  notification center — by default, the default notification center — that it and its tasks use to 
-  post notifications. Tasks post notifications when they start, finish, fail, cancel, retry, and
-  reset. Notifications are also posted when workflows start, retry, and reset, as well as when all
-  their tasks finish, or a single task fails or is cancelled.
-* Delegate messages for workflow and task cancellation. 
-* Workflows can now be reset by sending them the `‑reset` message.
-* The new `TSKTask` subclass `TSKSubworkflowTask` lets you run an entire workflow as a single task.
-* Convenience methods for accessing a task’s prerequisites results.
-* Unit tests! We now have unit tests for all major functionality in the framework.
-
-### Changes
-
-* `TSKGraph` has been renamed to `TSKWorkflow` to more clearly express its purpose. All references
-  to “graphs” have been replaced with references to “workflows.” To adapt to this change, we
-  recommend you find & replace `graph` with `workflow` and `Graph` with `Workflow` for all your
-  task-related code. This is what we did to make the change.
-* Tasks no longer automatically start themselves after resetting. If you need to start a task after
-  resetting it, send it the `‑start` message immediately after sending it `‑reset`.
-* Retrying tasks that are in the pending or ready states no longer has any effect on the task itself,
-  though the dependent tasks still receive the `‑retry` message. If you wish to run a task that is
-  in the ready state, send it the `‑start` message. Tasks in the pending state cannot be run, but
-  will automatically be started when their prerequisites finish successfully.
-* Workflows that contain no tasks will finish immediately upon receiving `‑start`.
-* As a minor optimization, sending `‑start` to a task only enqueues an operation on its operation 
-  queue if the task is in the ready state. The operation itself still ensures that the task is in
-  the ready state before invoking the task’s `‑main` method, but this should lead to better
-  performance when a task’s operation queue has limited concurrency.
+Task 1.1 also adds new methods to `TSKTask` so that subclasses can more easily respond to changes in
+a task’s state. See the `SubclassInterface` category of `TSKTask` for more information.
 
 
 ## Features
@@ -68,7 +44,7 @@ that will break existing code. Thankfully, the changes are easy to accommodate.
 The easiest way to start using Task is to install it with CocoaPods.
 
 ```ruby
-pod 'Task', '~> 1.0'
+pod 'Task', '~> 1.1'
 ```
 
 You can also build it and include the built products in your project. For OS X and iOS 8, just add
@@ -205,7 +181,8 @@ take a look at that next.
 Every task is an instance of `TSKTask`, with its work being executed by the instance’s `‑main`
 method. Unfortunately, `TSKTask` is an abstract class, so its `‑main` method doesn’t actually do
 anything. To make a task that does real work, you either need to subclass `TSKTask` and override its
-`‑main` method, or use one of its two built-in subclasses, `TSKBlockTask` and `TSKSelectorTask`. 
+`‑main` method, or use `TSKBlockTask` and `TSKSelectorTask`, which allow you to wrap a block or method
+invocation in a task, respectively.
 
 Subclassing makes sense if you need to repeatedly run tasks that perform the same type of work. For
 example, if your app repeatedly breaks an image into multiple tiles and then processes those tiles
@@ -325,6 +302,75 @@ TSKTask *uploadImageTask = [[UploadDataTask alloc] init];
 [imageWorkflow addTask:filterTask prerequisites:imageAvailableTask, nil];
 [imageWorkflow addTask:uploadImageTask prerequisites:filterTask, nil];
 ```
+
+
+### Getting Results from Prerequisite Tasks
+
+When tasks finish successfully, they can finish with a result — an object that represents the final
+result of their work. Quite commonly, tasks use the results of their prerequisite tasks to perform
+additional work. For example, a workflow for executing a RESTful API call might include a task that 
+sends an HTTP request and converts the response bytes into JSON, followed by a task that maps the 
+first task’s resulting JSON object into a model object. Task.framework provides numerous methods for
+accessing a task’s prerequisite results.
+
+In the simplest case, a task doesn’t use its prerequisites’ results at all; the task simply runs its
+`‑main` method with no dependency on its prerequisites’ output. A very slightly more complex case
+occurs when a task has only one prerequisite and depends on its result. In this case, the task can
+simply invoke `‑anyPrerequisiteResult` on itself to get the result of one of its prerequisites.
+Since the task has only one prerequisite, this is equivalent to getting the result of that single
+prerequisite.
+
+A task may also aggregate the results of its prerequisites uniformly. For example, a workflow might
+break some data set into chunks, process each of those chunks in separate tasks, and then combine
+the results of those tasks in a final task. In cases like these, a task can invoke
+`‑allPrerequisiteResults` on itself to get an array of all its prerequisite results and process them
+uniformly.
+
+Sometimes, tasks need to use the results of multiple prerequisite in varied ways. For this purpose,
+Task.framework has the concept of *keyed* prerequisites. Keyed prerequisites allow a task to assign
+unique keys to its prerequisites with which they can be referred later. Tasks can define their keyed
+prerequisites using `‑[TSKWorkflow addTask:keyedPrerequisiteTasks:]` or 
+`‑[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisiteTasks:]`. In both cases, the
+`keyedPrerequisiteTasks` parameter is a dictionary that maps a key to its associated task. The
+result of a given keyed prerequisite can be retrieved by sending a task
+`‑prerequisiteResultForKey:`. 
+
+For example, suppose a task were added to a workflow as follows:
+
+```objc
+    [workflow addTask:task keyedPrerequisiteTasks:@{ @"userTask" : task1, @"addressTask" : task2 }];
+```
+
+The task can easily refer to the results of `task1` and `task2`, e.g., in its `‑main` method like so:
+
+```objc
+- (void)main
+{
+    User *user = [self prerequisiteResultForKey:@"userTask"];
+    Address *address = [self prerequisiteResultForKey:@"addressTask"];
+
+    user.address = address;
+    
+    …
+}
+```
+
+Furthermore, if a task cannot function without certain keyed prerequisites, it can specify that to
+Task.framework by overriding `‑requiredPrerequisiteKeys`. The `TSKTask` subclass in our example
+above might override that method as follows:
+
+```objc
+- (NSSet *)requiredPrerequisiteKeys
+{
+    return [NSSet setWithObjects:@"userTask", @"addressTask", nil];
+}
+```
+
+If subclasses override this method and return a non-empty set, `TSKWorkflow` will ensure that the
+required prerequisite keys have corresponding tasks when the task is added to a workflow. For
+convenience, `TSKBlockTask` and `TSKSelectorTask` can have their required prerequisite keys set
+during initialization. 
+
 
 ### Changing the Execution State of Tasks
 
