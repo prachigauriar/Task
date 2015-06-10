@@ -47,6 +47,7 @@
 /*!
  @abstract Initializes a newly created TSKBlockTask instance with the specified block.
  @discussion A default name will be given to the task as specified by TSKTask’s ‑initWithName:.
+     Furthermore, The task’s set of required prerequisite keys is the empty set.
  @param block The block that performs the task’s work. May not be nil.
  @result A newly initialized TSKBlockTask instance with the specified block.
  */
@@ -54,12 +55,27 @@
 
 /*!
  @abstract Initializes a newly created TSKBlockTask instance with the specified name and block.
- @discussion This is the class’s designated initializer.
+ @discussion The task’s set of required prerequisite keys is the empty set.
  @param name The name of the task. If nil, a default name will be given to the task as specified by
      TSKTask’s ‑initWithName:.
  @param block The block that performs the task’s work. May not be nil.
  @result A newly initialized TSKBlockTask instance with the specified name and block.
  */
-- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block;
+
+/*!
+ @abstract Initializes a newly created TSKBlockTask instance with the specified name, required 
+     prerequisite keys, and block.
+ @discussion This is the class’s designated initializer.
+ @param name The name of the task. If nil, a default name will be given to the task as specified by
+     TSKTask’s ‑initWithName:.
+ @param requiredPrerequisiteKeys The prerequisite keys that the task requires to run. If nil, no 
+     prerequisite keys are required.
+ @param block The block that performs the task’s work. May not be nil.
+ @result A newly initialized TSKBlockTask instance with the specified name and block.
+ */
+- (instancetype)initWithName:(NSString *)name
+    requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys
+                       block:(void (^)(TSKTask *task))block NS_DESIGNATED_INITIALIZER;
 
 @end

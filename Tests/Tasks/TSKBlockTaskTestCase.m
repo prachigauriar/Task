@@ -47,6 +47,7 @@
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.block, block, @"block is set incorrectly");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, [NSSet set], @"requiredPrerequisiteKeys is not the empty set");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
@@ -56,12 +57,27 @@
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.block, block, @"block is set incorrectly");
     XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, [NSSet set], @"requiredPrerequisiteKeys is not the empty set");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
-    XCTAssertThrows(([[TSKBlockTask alloc] initWithName:name block:nil]), @"nil block does not throw exception");
+    NSSet *requiredPrerequisiteKeys = UMKGeneratedSetWithElementCount(random() % 5 + 5, ^id{
+        return UMKRandomIdentifierString();
+    });
+
+    task = [[TSKBlockTask alloc] initWithName:name requiredPrerequisiteKeys:requiredPrerequisiteKeys block:block];
+    XCTAssertNotNil(task, @"returns nil");
+    XCTAssertEqualObjects(task.block, block, @"block is set incorrectly");
+    XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
+    XCTAssertEqualObjects(task.requiredPrerequisiteKeys, requiredPrerequisiteKeys, @"requiredPrerequisiteKeys is set incorrectly");
+    XCTAssertNil(task.workflow, @"workflow is non-nil");
+    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
+
+    XCTAssertThrows(([[TSKBlockTask alloc] initWithName:name requiredPrerequisiteKeys:nil block:nil]), @"nil block does not throw exception");
 }
 
 

@@ -84,7 +84,8 @@
 - (void)testTaskDelegateFail;
 - (void)testTaskDelegateCancel;
 
-- (void)testPrerequisiteResultMethods;
+- (void)testPrerequisiteResultMethodsNil;
+- (void)testPrerequisiteResultMethodsNonNil;
 
 @end
 
@@ -102,6 +103,8 @@
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
+    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
@@ -112,6 +115,8 @@
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
+    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
@@ -120,6 +125,8 @@
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
     XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
+    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
+    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
 }
 
@@ -127,18 +134,37 @@
 - (void)testWorkflow
 {
     TSKWorkflow *workflow = [self workflowForNotificationTesting];
-    TSKTask *task = [[TSKTask alloc] init];
-    [workflow addTask:task prerequisites:nil];
+    TSKTask *task1 = [[TSKTask alloc] init];
+    TSKTask *task2 = [[TSKTask alloc] init];
 
-    XCTAssertEqual(workflow, task.workflow, @"workflow is set incorrectly");
-    XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prereqs not empty");
-    XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependents not empty");
+    [workflow addTask:task1 prerequisites:nil];
+    [workflow addTask:task2 prerequisites:nil];
+
+    XCTAssertEqual(workflow, task1.workflow, @"workflow is set incorrectly");
+    XCTAssertEqualObjects(task1.prerequisiteTasks, [NSSet set], @"prerequisites not empty");
+    XCTAssertEqualObjects(task1.keyedPrerequisiteTasks, [NSDictionary dictionary], @"keyedPrerequisiteTasks not empty");
+    XCTAssertEqualObjects(task1.unkeyedPrerequisiteTasks, [NSSet set], @"unkeyedPrerequisiteTasks not empty");
+    XCTAssertEqualObjects(task1.keyedPrerequisiteTasks, @{ }, @"unkeyedPrerequisiteTasks is not empty");
+    XCTAssertEqualObjects(task1.dependentTasks, [NSSet set], @"dependents not empty");
+
+    XCTAssertEqual(workflow, task2.workflow, @"workflow is set incorrectly");
+    XCTAssertEqualObjects(task2.prerequisiteTasks, [NSSet set], @"prerequisites not empty");
+    XCTAssertEqualObjects(task2.keyedPrerequisiteTasks, [NSDictionary dictionary], @"keyedPrerequisiteTasks not empty");
+    XCTAssertEqualObjects(task2.unkeyedPrerequisiteTasks, [NSSet set], @"unkeyedPrerequisiteTasks not empty");
+    XCTAssertEqualObjects(task2.keyedPrerequisiteTasks, @{ }, @"unkeyedPrerequisiteTasks is not empty");
+    XCTAssertEqualObjects(task2.dependentTasks, [NSSet set], @"dependents not empty");
 
     TSKTask *dependent = [[TSKTask alloc] init];
-    [workflow addTask:dependent prerequisites:task, nil];
+    [workflow addTask:dependent prerequisiteTasks:[NSSet setWithObject:task1] keyedPrerequisiteTasks:@{ @"a" : task2 }];
 
-    XCTAssertEqualObjects(task.dependentTasks, [NSSet setWithObject:dependent], @"dependents is set incorrectly");
-    XCTAssertEqualObjects(dependent.prerequisiteTasks, [NSSet setWithObject:task], @"prereqs not set property");
+    XCTAssertEqual(workflow, dependent.workflow, @"workflow is set incorrectly");
+    XCTAssertEqualObjects(dependent.prerequisiteTasks, ([NSSet setWithObjects:task1, task2, nil]), @"prerequisites is set incorrectly");
+    XCTAssertEqualObjects(dependent.unkeyedPrerequisiteTasks, [NSSet setWithObject:task1], @"unkeyedPrerequisiteTasks is set incorrectly");
+    XCTAssertEqualObjects(dependent.keyedPrerequisiteTasks, @{ @"a" : task2 }, @"unkeyedPrerequisiteTasks is set incorrectly");
+    XCTAssertEqualObjects(dependent.dependentTasks, [NSSet set], @"dependents is set incorrectly");
+
+    XCTAssertEqualObjects(task1.dependentTasks, [NSSet setWithObject:dependent], @"dependents is set incorrectly");
+    XCTAssertEqualObjects(task2.dependentTasks, [NSSet setWithObject:dependent], @"dependents is set incorrectly");
 
     XCTAssertEqual(dependent.state, TSKTaskStatePending, @"dependent state not set to pending");
 }
@@ -532,51 +558,156 @@
 }
 
 
-- (void)testPrerequisiteResultMethods
+- (void)testPrerequisiteResultMethodsNil
 {
     NSUInteger elementCount = random() % 5 + 5;
-    NSArray *results = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
-        return UMKRandomUnicodeStringWithLength(64);
+
+    // Unkeyed prerequisite tasks
+    NSSet *unkeyedPrerequisiteTasks = UMKGeneratedSetWithElementCount(elementCount, ^id{
+        return [self finishingTaskWithLock:nil];
     });
 
+    // Keyed prerequisite tasks
+    NSDictionary *keyedPrerequisiteTasks = UMKGeneratedDictionaryWithElementCount(elementCount, ^id{
+        return UMKRandomIdentifierStringWithLength(10);
+    }, ^id(id key) {
+        return [self finishingTaskWithLock:nil];
+    });
+
+    // Set up our workflow
     TSKWorkflow *workflow = [self workflowForNotificationTesting];
-    NSArray *prerequisiteTasks = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
-        TSKTask *task = [self finishingTaskWithLock:nil result:results[index]];
-        [workflow addTask:task prerequisites:nil];
-        return task;
-    });
+    TSKTask *task = [self finishingTaskWithLock:nil];
 
-    // Task 1 is for testing non-nil results. Task 2 is for testing nil ones.
-    TSKTask *task1 = [self finishingTaskWithLock:nil];
-    TSKTask *task2 = [self finishingTaskWithLock:nil];
-    [workflow addTask:task1 prerequisiteTasks:workflow.allTasks];
-    [workflow addTask:task2 prerequisites:task1, nil];
+    for (TSKTask *prerequisiteTask in unkeyedPrerequisiteTasks) {
+        [workflow addTask:prerequisiteTask prerequisiteTasks:nil];
+    }
+
+    for (TSKTask *prerequisiteTask in [keyedPrerequisiteTasks allValues]) {
+        [workflow addTask:prerequisiteTask prerequisiteTasks:nil];
+    }
+
+    [workflow addTask:task prerequisiteTasks:unkeyedPrerequisiteTasks keyedPrerequisiteTasks:keyedPrerequisiteTasks];
 
     [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
     [workflow start];
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 
-    // Task 1 tests
-    XCTAssertTrue([results containsObject:[task1 anyPrerequisiteResult]], @"anyPrerequisiteResult returns non-result object");
+    // -anyPrerequisiteResult
+    XCTAssertNil([task anyPrerequisiteResult], @"anyPrerequisiteResult returns non-nil object");
 
-    NSCountedSet *expectedResultsCountedSet = [[NSCountedSet alloc] initWithArray:results];
-    NSCountedSet *actualResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task1 allPrerequisiteResults]];
-    XCTAssertEqualObjects(expectedResultsCountedSet, actualResultsCountedSet, @"allPrerequisiteResults returns incorrect results");
+    // -allPrerequisiteResults
+    NSCountedSet *actualResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task allPrerequisiteResults]];
+    XCTAssertEqualObjects(actualResultsCountedSet.allObjects, @[ [NSNull null] ], @"allPrerequisiteResults returns incorrect results");
+    XCTAssertEqual([actualResultsCountedSet countForObject:[NSNull null]], elementCount * 2, @"allPrerequisiteResults returns incorrect results");
 
+    // -allUnkeyedPrerequisiteResults
+    NSCountedSet *actualUnkeyedResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task allUnkeyedPrerequisiteResults]];
+    XCTAssertEqualObjects(actualUnkeyedResultsCountedSet.allObjects, @[ [NSNull null] ], @"allUnkeyedPrerequisiteResults returns incorrect results");
+    XCTAssertEqual([actualResultsCountedSet countForObject:[NSNull null]], elementCount * 2, @"allUnkeyedPrerequisiteResults returns incorrect results");
+
+    // -prerequisiteResultsByTask
     NSMapTable *expectedResultsMapTable = [NSMapTable strongToStrongObjectsMapTable];
-    for (NSUInteger i = 0; i < elementCount; ++i) {
-        [expectedResultsMapTable setObject:results[i] forKey:prerequisiteTasks[i]];
+    for (TSKTestTask *task in unkeyedPrerequisiteTasks) {
+        [expectedResultsMapTable setObject:[NSNull null] forKey:task];
     }
 
-    XCTAssertEqualObjects([task1 prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
+    [keyedPrerequisiteTasks enumerateKeysAndObjectsUsingBlock:^(id key, TSKTestTask *task, BOOL *stop) {
+        [expectedResultsMapTable setObject:[NSNull null] forKey:task];
+    }];
 
-    // Task 2 tests
-    XCTAssertNil([task2 anyPrerequisiteResult], @"anyPrerequisiteResult returns non-nil object");
-    XCTAssertEqualObjects([task2 allPrerequisiteResults], @[ [NSNull null] ], @"allPrerequisiteResults returns incorrect results");
+    XCTAssertEqualObjects([task prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
 
-    [expectedResultsMapTable removeAllObjects];
-    [expectedResultsMapTable setObject:[NSNull null] forKey:task1];
-    XCTAssertEqualObjects([task2 prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
+    // -keyedPrerequisiteResults
+    NSMutableDictionary *keyedPrerequisiteResults = [[NSMutableDictionary alloc] initWithCapacity:keyedPrerequisiteTasks.count];
+    for (id key in keyedPrerequisiteTasks) {
+        keyedPrerequisiteResults[key] = [NSNull null];
+    }
+
+    XCTAssertEqualObjects([task keyedPrerequisiteResults], keyedPrerequisiteResults, @"keyedPrerequisiteResults returns incorrect results");
+
+    // -prerequisiteResultForKey:
+    for (id key in keyedPrerequisiteTasks) {
+        XCTAssertNil([task prerequisiteResultForKey:key], @"prerequisiteResultForKey: returns non-nil object");
+    }
+}
+
+
+- (void)testPrerequisiteResultMethodsNonNil
+{
+    NSUInteger elementCount = random() % 5 + 5;
+
+    // Unkeyed prerequisite tasks and results
+    NSArray *unkeyedPrerequisiteResults = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
+        return UMKRandomAlphanumericString();
+    });
+
+    NSArray *unkeyedPrerequisiteTasks = UMKGeneratedArrayWithElementCount(elementCount, ^id(NSUInteger index) {
+        return [self finishingTaskWithLock:nil result:unkeyedPrerequisiteResults[index]];
+    });
+
+    // Keyed prerequisite tasks and results
+    NSDictionary *keyedPrerequisiteResults = UMKGeneratedDictionaryWithElementCount(elementCount, ^id{
+        return UMKRandomIdentifierStringWithLength(10);
+    }, ^id(id key) {
+        return UMKRandomUnicodeStringWithLength(10);
+    });
+
+    NSMutableDictionary *keyedPrerequisiteTasks = [[NSMutableDictionary alloc] initWithCapacity:elementCount];
+    [keyedPrerequisiteResults enumerateKeysAndObjectsUsingBlock:^(id key, id result, BOOL *stop) {
+        keyedPrerequisiteTasks[key] = [self finishingTaskWithLock:nil result:result];
+    }];
+
+    // Set up our workflow
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKTask *task = [self finishingTaskWithLock:nil];
+
+    for (TSKTask *prerequisiteTask in unkeyedPrerequisiteTasks) {
+        [workflow addTask:prerequisiteTask prerequisiteTasks:nil];
+    }
+
+    for (TSKTask *prerequisiteTask in [keyedPrerequisiteTasks allValues]) {
+        [workflow addTask:prerequisiteTask prerequisiteTasks:nil];
+    }
+
+    [workflow addTask:task prerequisiteTasks:[NSSet setWithArray:unkeyedPrerequisiteTasks] keyedPrerequisiteTasks:keyedPrerequisiteTasks];
+
+    [self expectationForNotification:TSKWorkflowDidFinishNotification workflow:workflow block:nil];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+
+    // -anyPrerequisiteResult
+    NSArray *allResults = [unkeyedPrerequisiteResults arrayByAddingObjectsFromArray:[keyedPrerequisiteResults allValues]];
+    XCTAssertTrue([allResults containsObject:[task anyPrerequisiteResult]], @"anyPrerequisiteResult returns non-result object");
+
+    // -allPrerequisiteResults
+    NSCountedSet *expectedResultsCountedSet = [[NSCountedSet alloc] initWithArray:allResults];
+    NSCountedSet *actualResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task allPrerequisiteResults]];
+    XCTAssertEqualObjects(expectedResultsCountedSet, actualResultsCountedSet, @"allPrerequisiteResults returns incorrect results");
+
+    // -allUnkeyedPrerequisiteResults
+    NSCountedSet *expectedUnkeyedResultsCountedSet = [[NSCountedSet alloc] initWithArray:unkeyedPrerequisiteResults];
+    NSCountedSet *actualUnkeyedResultsCountedSet = [[NSCountedSet alloc] initWithArray:[task allUnkeyedPrerequisiteResults]];
+    XCTAssertEqualObjects(expectedUnkeyedResultsCountedSet, actualUnkeyedResultsCountedSet, @"allUnkeyedPrerequisiteResults returns incorrect results");
+
+    // -prerequisiteResultsByTask
+    NSMapTable *expectedResultsMapTable = [NSMapTable strongToStrongObjectsMapTable];
+    [unkeyedPrerequisiteTasks enumerateObjectsUsingBlock:^(TSKTestTask *task, NSUInteger i, BOOL *stop) {
+        [expectedResultsMapTable setObject:unkeyedPrerequisiteResults[i] forKey:task];
+    }];
+
+    [keyedPrerequisiteTasks enumerateKeysAndObjectsUsingBlock:^(id key, TSKTestTask *task, BOOL *stop) {
+        [expectedResultsMapTable setObject:keyedPrerequisiteResults[key] forKey:task];
+    }];
+
+    XCTAssertEqualObjects([task prerequisiteResultsByTask], expectedResultsMapTable, @"prerequisiteResultsByTask returns incorrect results");
+
+    // -keyedPrerequisiteResults
+    XCTAssertEqualObjects([task keyedPrerequisiteResults], keyedPrerequisiteResults, @"keyedPrerequisiteResults returns incorrect results");
+
+    // -prerequisiteResultForKey:
+    for (id key in keyedPrerequisiteTasks) {
+        XCTAssertEqual([task prerequisiteResultForKey:key], keyedPrerequisiteResults[key], @"prerequisiteResultForKey: returns incorrect result");
+    }
 }
 
 @end

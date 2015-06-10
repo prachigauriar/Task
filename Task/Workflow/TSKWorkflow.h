@@ -150,6 +150,9 @@ extern NSString *const TSKWorkflowTaskKey;
 /*! The set of tasks currently in the receiver that have no dependent tasks. */
 @property (nonatomic, copy, readonly) NSSet *tasksWithNoDependentTasks;
 
+
+#pragma mark - Initializers
+
 /*!
  @abstract Initializes a newly created TSKWorkflow instance with the specified name.
  @discussion A new operation queue will be created for the task workflow with the default quality of
@@ -205,13 +208,13 @@ extern NSString *const TSKWorkflowTaskKey;
               operationQueue:(NSOperationQueue *)operationQueue
           notificationCenter:(NSNotificationCenter *)notificationCenter NS_DESIGNATED_INITIALIZER;
 
+
+#pragma mark - Adding Tasks
+
 /*!
  @abstract Adds the specified task to the task workflow with the specified set of prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its prerequisite tasks are set 
-     to the ones specified. Furthermore, the task is added to each of the prerequisite tasks’ sets
-     of dependent tasks. If the task has any prerequisites, its state is set to pending.
- 
-     This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @discussion This is equivalent to invoking ‑addTask:prerequisiteTasks:keyedPrerequisiteTasks: with
+     a nil keyedPrerequisiteTasks parameter.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no prerequisite
      tasks. Otherwise, each task in the set must have already been added to the receiver.
@@ -219,25 +222,74 @@ extern NSString *const TSKWorkflowTaskKey;
 - (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks;
 
 /*!
- @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its prerequisite tasks are set 
-     to the ones specified. Furthermore, the task is added to each of the prerequisite tasks’ sets
-     of dependent tasks. If the task has any prerequisites, its state is set to pending.
+ @abstract Adds the specified task to the task workflow with the specified dictionary of keyed 
+     prerequisite tasks.
+ @discussion This is equivalent to invoking ‑addTask:prerequisiteTasks:keyedPrerequisiteTasks: with
+     a nil prerequisiteTasks parameter.
+ @param task The task to add. May not be nil. May not be a member of any other task workflow.
+ @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their 
+     corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
+     in the dictionary must have already been added to the receiver.
+ */
+- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks;
+
+/*!
+ @abstract Adds the specified task to the task workflow with the specified prerequisite and keyed
+     prerequisite tasks.
+ @discussion The task’s workflow property is set to the receiver, and its prerequisite and keyed 
+     prerequisite tasks are set to the ones specified. Furthermore, for each prerequisite task —
+     keyed or otherwise — the task is added to the prerequisite’s set of dependent tasks. If the 
+     task has any prerequisites, its state is set to pending.
 
      This is not a thread-safe operation. This method should only execute on one thread at a time.
+ @param task The task to add. May not be nil. May not be a member of any other task workflow.
+ @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no unkeyed
+     prerequisite tasks. Otherwise, each task in the set must have already been added to the receiver.
+ @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite keys to their
+     corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
+     in the dictionary must have already been added to the receiver.
+ */
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks;
+
+/*!
+ @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
+ @discussion This method is a convenient shorthand for invoking ‑addTask:prerequisiteTasks:. It is 
+     equivalent to the following:
+ 
+         [workflow addTask:task prerequisiteTasks:[NSSet setWithObjects:prerequisiteTask1, ...]];
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTask1 ... The task’s prerequisite tasks as a nil-terminated list. Each task in
      the set must have already been added to the receiver.
  */
 - (void)addTask:(TSKTask *)task prerequisites:(TSKTask *)prerequisiteTask1, ... NS_REQUIRES_NIL_TERMINATION;
 
+
+#pragma mark - Getting Related Tasks
+
 /*!
  @abstract Returns the set of prerequisite tasks for the specified task.
+ @discussion This is the union of the task’s keyed and unkeyed prerequisite tasks.
  @param task The task.
  @result The set of prerequisite tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
 - (NSSet *)prerequisiteTasksForTask:(TSKTask *)task;
+
+/*! 
+ @abstract Returns the set of unkeyed prerequisite tasks for the specified task.
+ @param task The task.
+ @result The set of unkeyed prerequisite tasks for the specified task. Returns nil if the task is not
+     in the receiver.
+ */
+- (NSSet *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task;
+
+/*!
+ @abstract Returns the keyed prerequisite tasks for the specified task.
+ @param task The task.
+ @result A dictionary that maps the names of the specified task’s keyed prerequisites to their 
+     corresponding tasks. Returns nil if the task is not in the receiver.
+ */
+- (NSDictionary *)keyedPrerequisiteTasksForTask:(TSKTask *)task;
 
 /*!
  @abstract Returns the set of dependent tasks for the specified task.
@@ -246,6 +298,9 @@ extern NSString *const TSKWorkflowTaskKey;
      receiver.
  */
 - (NSSet *)dependentTasksForTask:(TSKTask *)task;
+
+
+#pragma mark - Workflow State
 
 /*!
  @abstract Sends ‑start to every prerequisite-less task in the receiver.

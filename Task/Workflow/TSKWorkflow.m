@@ -63,9 +63,17 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 /*!
  @abstract A map table that maps a task to its prerequisite tasks.
- @discussion The keys for this map table are TSKTask instances and their values are NSSets.
+ @discussion The keys for this map table are TSKTask instances and their values are NSSets of 
+     TSKTask instances.
  */
 @property (nonatomic, strong, readonly) NSMapTable *prerequisiteTasks;
+
+/*!
+ @abstract A map table that maps a task to its keyed prerequisite tasks.
+ @discussion The keys for this map table are TSKTask instances and their values are NSDictionaries
+     whose keys are objects that conform to NSCopying and whose values are TSKTask instances.
+ */
+@property (nonatomic, strong, readonly) NSMapTable *keyedPrerequisiteTasks;
 
 /*!
  @abstract A map table that maps a task to its dependent tasks.
@@ -143,6 +151,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
         _finishedTasksQueue = dispatch_queue_create([finishedTasksQueueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
+        _keyedPrerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];
         _dependentTasks = [NSMapTable strongToStrongObjectsMapTable];
     }
 
@@ -183,11 +192,37 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
 - (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks
 {
+    [self addTask:task prerequisiteTasks:prerequisiteTasks keyedPrerequisiteTasks:nil];
+}
+
+
+- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks
+{
+    [self addTask:task prerequisiteTasks:nil keyedPrerequisiteTasks:keyedPrerequisiteTasks];
+}
+
+
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks
+{
     NSParameterAssert(task);
     NSAssert(!task.workflow, @"Task (%@) has been previously added to a workflow (%@)", task, task.workflow);
 
-    prerequisiteTasks = prerequisiteTasks ? [prerequisiteTasks copy] : [[NSSet alloc] init];
+    if (!prerequisiteTasks) {
+        prerequisiteTasks = [[NSSet alloc] init];
+    }
+
+    keyedPrerequisiteTasks = keyedPrerequisiteTasks ? [keyedPrerequisiteTasks copy] : [[NSDictionary alloc] init];
+
+    prerequisiteTasks = [prerequisiteTasks setByAddingObjectsFromArray:[keyedPrerequisiteTasks allValues]];
     NSAssert([prerequisiteTasks isSubsetOfSet:self.tasks], @"Prerequisite tasks have not been added to workflow");
+
+    NSSet *requiredPrerequisiteKeys = task.requiredPrerequisiteKeys;
+    if (!requiredPrerequisiteKeys) {
+        requiredPrerequisiteKeys = [NSSet set];
+    }
+
+    NSAssert([requiredPrerequisiteKeys isSubsetOfSet:[NSSet setWithArray:[keyedPrerequisiteTasks allKeys]]],
+             @"Task has required keyed prerequisites that are unfulfilled");
 
     NSSet *taskSet = [NSSet setWithObject:task];
     [self willChangeValueForKey:@"allTasks" withSetMutation:NSKeyValueUnionSetMutation usingObjects:taskSet];
@@ -195,6 +230,8 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
     task.workflow = self;
     [self.tasks addObject:task];
     [self.prerequisiteTasks setObject:prerequisiteTasks forKey:task];
+    [self.keyedPrerequisiteTasks setObject:keyedPrerequisiteTasks forKey:task];
+
     [self.dependentTasks setObject:[[NSSet alloc] init] forKey:task];
 
     for (TSKTask *prerequisiteTask in prerequisiteTasks) {
@@ -245,6 +282,20 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 - (NSSet *)prerequisiteTasksForTask:(TSKTask *)task
 {
     return [self.prerequisiteTasks objectForKey:task];
+}
+
+
+- (NSSet *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task
+{
+    NSMutableSet *prerequisites = [[self prerequisiteTasksForTask:task] mutableCopy];
+    [prerequisites minusSet:[NSSet setWithArray:[[self keyedPrerequisiteTasksForTask:task] allValues]]];
+    return prerequisites;
+}
+
+
+- (NSDictionary *)keyedPrerequisiteTasksForTask:(TSKTask *)task
+{
+    return [self.keyedPrerequisiteTasks objectForKey:task];
 }
 
 

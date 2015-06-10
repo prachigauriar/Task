@@ -37,6 +37,8 @@ NSString *const TSKTestTaskDidCancelNotification = @"Task did cancel";
 
 @implementation TSKTestTask
 
+@synthesize requiredPrerequisiteKeys = _requiredPrerequisiteKeys;
+
 - (instancetype)initWithName:(NSString *)name
 {
     return [self initWithName:name block:nil];

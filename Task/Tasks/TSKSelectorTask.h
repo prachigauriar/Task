@@ -58,6 +58,7 @@
  @abstract Initializes a newly created TSKSelectorTask instance with the specified target and
      selector.
  @discussion A default name will be given to the task as specified by TSKTask’s ‑initWithName:.
+     Furthermore, the task’s set of required prerequisite keys is the empty set.
  @param target The receiver of the task’s message-send. May not be nil.
  @param selector The selector that the task’s target performs in order to do the task’s work. 
      May not be NULL.
@@ -68,7 +69,7 @@
 /*!
  @abstract Initializes a newly created TSKSelectorTask instance with the specified name, target, and
      selector.
- @discussion This is the class’s designated initializer.
+ @discussion The task’s set of required prerequisite keys is the empty set.
  @param name The name of the task. If nil, a default name will be given to the task as specified by
      TSKTask’s ‑initWithName:.
  @param target The receiver of the task’s message-send. May not be nil.
@@ -76,6 +77,25 @@
      May not be NULL.
  @result A newly initialized TSKSelectorTask instance with the specified name, target, and action.
  */
-- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector;
+
+
+/*!
+ @abstract Initializes a newly created TSKSelectorTask instance with the specified name, target,
+     selector, and required prerequisite keys.
+ @discussion This is the class’s designated initializer.
+ @param name The name of the task. If nil, a default name will be given to the task as specified by
+     TSKTask’s ‑initWithName:.
+ @param target The receiver of the task’s message-send. May not be nil.
+ @param selector The selector that the task’s target performs in order to do the task’s work.
+     May not be NULL.
+ @param requiredPrerequisiteKeys The prerequisite keys that the task requires to run. If nil, no
+     prerequisite keys are required.
+ @result A newly initialized TSKSelectorTask instance with the specified name, target, and action.
+ */
+- (instancetype)initWithName:(NSString *)name
+                      target:(id)target
+                    selector:(SEL)selector
+    requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys NS_DESIGNATED_INITIALIZER;
 
 @end

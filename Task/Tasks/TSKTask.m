@@ -184,9 +184,27 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 }
 
 
+- (NSSet *)requiredPrerequisiteKeys
+{
+    return [NSSet set];
+}
+
+
 - (NSSet *)prerequisiteTasks
 {
     return [self.workflow prerequisiteTasksForTask:self];
+}
+
+
+- (NSSet *)unkeyedPrerequisiteTasks
+{
+    return [self.workflow unkeyedPrerequisiteTasksForTask:self];
+}
+
+
+- (NSDictionary *)keyedPrerequisiteTasks
+{
+    return [self.workflow keyedPrerequisiteTasksForTask:self];
 }
 
 
@@ -526,6 +544,31 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 - (NSArray *)allPrerequisiteResults
 {
     return [[self.prerequisiteTasks allObjects] valueForKey:@"result"];
+}
+
+
+- (NSArray *)allUnkeyedPrerequisiteResults
+{
+    return [[self.unkeyedPrerequisiteTasks allObjects] valueForKey:@"result"];
+}
+
+
+- (NSDictionary *)keyedPrerequisiteResults
+{
+    NSDictionary *keyedPrerequisiteTasks = self.keyedPrerequisiteTasks;
+    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:keyedPrerequisiteTasks.count];
+
+    [keyedPrerequisiteTasks enumerateKeysAndObjectsUsingBlock:^(NSString *name, TSKTask *task, BOOL *stop) {
+        results[name] = task.result ? task.result : [NSNull null];
+    }];
+
+    return results;
+}
+
+
+- (id)prerequisiteResultForKey:(id<NSCopying>)prerequisiteName
+{
+    return [self.keyedPrerequisiteTasks[prerequisiteName] result];
 }
 
 

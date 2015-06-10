@@ -27,27 +27,41 @@
 #import <Task/TSKBlockTask.h>
 
 
+@interface TSKBlockTask ()
+
+@property (nonatomic, copy, readonly) NSSet *requiredPrerequisiteKeys;
+
+@end
+
+
 @implementation TSKBlockTask
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name block:nil];
+    return [self initWithName:name requiredPrerequisiteKeys:[NSSet set] block:nil];
 }
 
 
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block
 {
-    return [self initWithName:nil block:block];
+    return [self initWithName:nil requiredPrerequisiteKeys:[NSSet set] block:block];
 }
 
 
 - (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block
+{
+    return [self initWithName:name requiredPrerequisiteKeys:[NSSet set] block:block];
+}
+
+
+- (instancetype)initWithName:(NSString *)name requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys block:(void (^)(TSKTask *task))block
 {
     NSParameterAssert(block);
 
     self = [super initWithName:name];
     if (self) {
         _block = [block copy];
+        _requiredPrerequisiteKeys = [requiredPrerequisiteKeys copy];
     }
 
     return self;
