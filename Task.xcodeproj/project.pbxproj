@@ -536,7 +536,7 @@
 			attributes = {
 				CLASSPREFIX = TSK;
 				LastUpgradeCheck = 0610;
-				ORGANIZATIONNAME = "Two Toasters, LLC";
+				ORGANIZATIONNAME = "Ticketmaster Entertainment, Inc.";
 				TargetAttributes = {
 					4C1EDFB319F48E1C0041A1D9 = {
 						CreatedOnToolsVersion = 6.1;
