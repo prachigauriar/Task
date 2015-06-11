@@ -3,7 +3,7 @@
 //  Task
 //
 //  Created by Jill Cohen on 11/4/14.
-//  Copyright (c) 2014 Two Toasters, LLC.
+//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -98,7 +98,7 @@
     XCTAssertEqualObjects(workflow.allTasks, [NSSet set]);
     XCTAssertEqualObjects(workflow.name, ([NSString stringWithFormat:@"TSKWorkflow %p", workflow]), @"name not set to default");
     XCTAssertNotNil(workflow.operationQueue, @"operation queue not set to default");
-    XCTAssertEqualObjects(workflow.operationQueue.name, ([NSString stringWithFormat:@"com.twotoasters.TSKWorkflow.TSKWorkflow %p", workflow]),
+    XCTAssertEqualObjects(workflow.operationQueue.name, ([NSString stringWithFormat:@"com.ticketmaster.TSKWorkflow.TSKWorkflow %p", workflow]),
                           @"name not set to default");
     XCTAssertEqualObjects(workflow.notificationCenter, [NSNotificationCenter defaultCenter], @"notificationCenter not set to default");
 

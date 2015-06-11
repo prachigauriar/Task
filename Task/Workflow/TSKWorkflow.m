@@ -3,7 +3,7 @@
 //  Task
 //
 //  Created by Prachi Gauriar on 10/14/2014.
-//  Copyright (c) 2014 Two Toasters, LLC.
+//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -137,7 +137,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
-            operationQueue.name = [[NSString alloc] initWithFormat:@"com.twotoasters.TSKWorkflow.%@", name];
+            operationQueue.name = [[NSString alloc] initWithFormat:@"com.ticketmaster.TSKWorkflow.%@", name];
         }
 
         _name = [name copy];
@@ -147,7 +147,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
         _tasks = [[NSMutableSet alloc] init];
         _finishedTasks = [[NSMutableSet alloc] init];
 
-        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKWorkflow.%@.finishedTasks", _name];
+        NSString *finishedTasksQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKWorkflow.%@.finishedTasks", _name];
         _finishedTasksQueue = dispatch_queue_create([finishedTasksQueueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _prerequisiteTasks = [NSMapTable strongToStrongObjectsMapTable];

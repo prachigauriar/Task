@@ -3,7 +3,7 @@
 //  Task
 //
 //  Created by Prachi Gauriar on 10/11/2014.
-//  Copyright (c) 2014 Two Toasters, LLC.
+//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -139,7 +139,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
         _name = [name copy];
         _state = TSKTaskStateReady;
-        NSString *stateQueueName = [NSString stringWithFormat:@"com.twotoasters.TSKTask.%@.state", name];
+        NSString *stateQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKTask.%@.state", name];
         _stateQueue = dispatch_queue_create([stateQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
