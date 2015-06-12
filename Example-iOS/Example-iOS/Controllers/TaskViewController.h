@@ -3,7 +3,7 @@
 //  Example-iOS
 //
 //  Created by Prachi Gauriar on 10/19/2014.
-//  Copyright (c) 2014 Two Toasters, LLC. All rights reserved.
+//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 
 @import UIKit;
