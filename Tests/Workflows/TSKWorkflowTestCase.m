@@ -447,15 +447,51 @@
     XCTAssertEqual(task.state, TSKTaskStateFinished, @"state is not finished");
     XCTAssertFalse(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is true");
 
-    // Test that workflow sends retry to its task
+    // Test that workflow sends reset to its task
     [self expectationForNotification:TSKWorkflowWillResetNotification workflow:workflow block:nil];
     [self expectationForNotification:TSKTestTaskDidResetNotification object:task handler:nil];
     [willFinishLock lock];
     [workflow reset];
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    XCTAssert((task.state == TSKTaskStatePending || task.state == TSKTaskStateReady), @"state is not ready or executing");
+    XCTAssert((task.state == TSKTaskStatePending || task.state == TSKTaskStateReady), @"state is not pending or ready");
     XCTAssertTrue(workflow.hasUnfinishedTasks, @"workflow.hasUnfinishedTasks is not true");
     [willFinishLock unlock];
+}
+
+
+- (void)testResetWithReadyDependent
+{
+    TSKWorkflow *workflow = [self workflowForNotificationTesting];
+    TSKTestTask *task = [self finishingTaskWithLock:nil];
+    TSKTestTask *dependentTask = [self failingTaskWithLock:nil];
+
+    [workflow addTask:task prerequisites:nil];
+    [workflow addTask:dependentTask prerequisites:task, nil];
+
+    // Run workflow so that task finishes and dependentTask fails
+    [self expectationForNotification:TSKWorkflowWillStartNotification workflow:workflow block:nil];
+    [self expectationForNotification:TSKTaskDidFailNotification task:dependentTask];
+    [workflow start];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    XCTAssertEqual(task.state, TSKTaskStateFinished, @"task state is not finished");
+    XCTAssertEqual(dependentTask.state, TSKTaskStateFailed, @"dependent task state is not failed");
+
+    // Reset dependentTask. Should be in ready state
+    [self expectationForNotification:TSKTaskDidResetNotification task:dependentTask];
+    [dependentTask reset];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    XCTAssertEqual(dependentTask.state, TSKTaskStateReady, @"dependent task state is not ready after reset");
+
+    // Reset task. Should be in ready state. dependentTask should also be reset and be in pending state.
+    [self expectationForNotification:TSKTaskDidResetNotification task:task];
+    [self expectationForNotification:TSKTaskDidResetNotification task:dependentTask];
+    [task reset];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"task state is not ready after reset");
+    XCTAssertEqual(dependentTask.state, TSKTaskStatePending, @"dependentTask state is not pending after reset");
 }
 
 

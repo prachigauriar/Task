@@ -334,7 +334,7 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)cancel __attribute__((objc_requires_super));
 
 /*!
- @abstract Sets the task’s state to pending if it is executing, finished, failed, or cancelled.
+ @abstract Sets the task’s state to pending if it is ready, executing, finished, failed, or cancelled.
  @discussion If, after being reset, the receiver’s prerequisite tasks have all finished successfully,
      the receiver is automatically put into the ready state. Regardless of the receiver’s state,
      sends the ‑reset message to all of the receiver’s dependent tasks.

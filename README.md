@@ -11,7 +11,9 @@ workflows.
 ## What’s New in 1.1
 
 Task 1.1 is a significant update that makes it easier for Task subclasses to get prerequisite
-results and respond to state changes.
+results and respond to state changes. It also contains a very important fix related to task
+resetting. Users are strongly encouraged to upgrade to Task 1.1.
+
 
 ### Keyed Prerequisites
 
@@ -60,6 +62,19 @@ While the default implementations of these methods do nothing, subclasses can ov
 perform necessary actions upon state changes. This should obviate the need for `TSKTask` subclasses
 to observe notifications posted by their superclass.
 
+
+### Fix to Reset
+
+Task 1.0 contains a serious bug in which a reset task may be able to run even if its prerequisites
+have not all completed. This bug can be reproduced as follows:
+
+1. Set up a workflow with two tasks, A and B, with A listed as a prerequisite of B.
+2. Run the workflow to completion.
+3. Reset B. A is now in the Finished state. B should be Ready.
+4. Reset A. A is now in the Ready state. As such, B should be in the Pending state.
+
+In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
+ 
 
 ## Features
 

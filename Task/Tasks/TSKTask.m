@@ -285,7 +285,9 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     //     Pending -> Ready: All of task’s prerequisite tasks are finished (-transitionToReadyStateAndExecuteBlock:)
     //     Pending -> Cancelled: Task is cancelled (-cancel)
     //
-    //     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask)
+    //     Ready -> Pending: Task is added to a workflow with at least one prerequisite task (-didAddPrerequisiteTask),
+    //                       or Task is reset (-reset) and has an unfinished prerequisite (because the prerequisite
+    //                       also received -reset)
     //     Ready -> Executing: Task starts (-start)
     //     Ready -> Cancelled: Task is cancelled (-cancel)
     //
@@ -434,7 +436,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     static NSSet *fromStates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateFinished), @(TSKTaskStateFailed), @(TSKTaskStateCancelled), nil];
+        fromStates = [[NSSet alloc] initWithArray:@[ @(TSKTaskStateReady), @(TSKTaskStateExecuting), @(TSKTaskStateFinished),
+                                                     @(TSKTaskStateFailed), @(TSKTaskStateCancelled) ]];
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
