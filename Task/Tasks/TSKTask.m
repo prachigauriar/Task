@@ -434,7 +434,8 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
     static NSSet *fromStates = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fromStates = [[NSSet alloc] initWithObjects:@(TSKTaskStateExecuting), @(TSKTaskStateFinished), @(TSKTaskStateFailed), @(TSKTaskStateCancelled), nil];
+        fromStates = [[NSSet alloc] initWithArray:@[ @(TSKTaskStateReady), @(TSKTaskStateExecuting), @(TSKTaskStateFinished),
+                                                     @(TSKTaskStateFailed), @(TSKTaskStateCancelled) ]];
     });
 
     [self transitionFromStateInSet:fromStates toState:TSKTaskStatePending andExecuteBlock:^{
