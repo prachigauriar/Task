@@ -8,6 +8,24 @@ makes it easy to cancel tasks, retry failed tasks, and re-run previously complet
 workflows.
 
 
+## Features
+
+* Simple, well-documented Objective-C API
+* Flexible system for expressing your app’s workflows in a clear, concise manner
+* Powerful execution system that allows you to easily manage your workflow’s execution
+    * Tasks are started as soon as all their prerequisites have finished successfully
+    * Tasks that have no cross-dependencies are executed concurrently
+    * Tasks and their dependents can be easily cancelled or retried
+    * Tasks that previously finished successfully can be reset and re-run
+* Strong task state reporting so that you know when a task succeeds, fails, or is cancelled
+* Block and selector tasks for creating tasks that execute a block or method
+* External condition tasks for representing prerequisite user interaction or other external
+  conditions that must be fulfilled before work can continue
+* Subworkflow tasks for executing whole workflows as a single step in a workflow
+* Easy-to-extend API for creating your own reusable tasks
+* Works with both iOS and OS X
+
+
 ## What’s New in 1.1
 
 Task 1.1 is a significant update that makes it easier for Task subclasses to get prerequisite
@@ -63,7 +81,7 @@ perform necessary actions upon state changes. This should obviate the need for `
 to observe notifications posted by their superclass.
 
 
-### Fix to Reset
+### Reset Bug Fix
 
 Task 1.0 contains a serious bug in which a reset task may be able to run even if its prerequisites
 have not all completed. This bug can be reproduced as follows:
@@ -74,24 +92,6 @@ have not all completed. This bug can be reproduced as follows:
 4. Reset A. A is now in the Ready state. As such, B should be in the Pending state.
 
 In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
- 
-
-## Features
-
-* Simple, well-documented Objective-C API
-* Flexible system for expressing your app’s workflows in a clear, concise manner
-* Powerful execution system that allows you to easily manage your workflow’s execution
-    * Tasks are started as soon as all their prerequisites have finished successfully
-    * Tasks that have no cross-dependencies are executed concurrently
-    * Tasks and their dependents can be easily cancelled or retried
-    * Tasks that previously finished successfully can be reset and re-run
-* Strong task state reporting so that you know when a task succeeds, fails, or is cancelled
-* Block and selector tasks for creating tasks that execute a block or method
-* External condition tasks for representing prerequisite user interaction or other external
-  conditions that must be fulfilled before work can continue
-* Subworkflow tasks for executing whole workflows as a single step in a workflow
-* Easy-to-extend API for creating your own reusable tasks
-* Works with both iOS and OS X
 
 
 ## Installation
