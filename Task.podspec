@@ -15,15 +15,15 @@ Pod::Spec.new do |s|
                    tasks and workflows.
                    DESC
 
-  s.author       = { "Two Toasters" => "general@twotoasters.com" }
-  s.homepage     = "https://github.com/twotoasters/Task"
+  s.author       = { "Ticketmaster" => "general@twotoasters.com" }
+  s.homepage     = "https://github.com/Ticketmaster/Task"
   s.license      = { :type => "MIT", :file => "LICENSE" }
 
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.8'
   s.requires_arc = true
 
-  s.source       = { :git => "https://github.com/twotoasters/Task.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/Ticketmaster/Task.git", :tag => s.version.to_s }
 
   s.source_files = 'Task/**/*.{h,m}'
 end
