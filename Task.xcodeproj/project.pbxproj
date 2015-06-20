@@ -27,6 +27,16 @@
 		4C1EDFDA19F48E7F0041A1D9 /* TSKWorkflow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C86D5E519F2EA8B00C898AF /* TSKWorkflow.m */; };
 		4C2C27871A55C5700023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
 		4C2C27881A55C5710023CCCB /* TSKExternalConditionTaskTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C9B8BE91A4F506D0035B91A /* TSKExternalConditionTaskTestCase.m */; };
+		4C5A3AA21B351BD300ECD689 /* Task.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5B419F2E96800C898AF /* Task.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA31B351BD300ECD689 /* TaskErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5FB19F2EC0C00C898AF /* TaskErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA41B351BD300ECD689 /* TSKTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63519F2F79900C898AF /* TSKTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA51B351BD300ECD689 /* TSKTask+WorkflowInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63419F2F79900C898AF /* TSKTask+WorkflowInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		4C5A3AA61B351BD300ECD689 /* TSKBlockTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D62E19F2F79900C898AF /* TSKBlockTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA71B351BD300ECD689 /* TSKExternalConditionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63019F2F79900C898AF /* TSKExternalConditionTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA81B351BD300ECD689 /* TSKSelectorTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D63219F2F79900C898AF /* TSKSelectorTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AA91B351BD300ECD689 /* TSKSubworkflowTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C9B8BC21A4F3A310035B91A /* TSKSubworkflowTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AAA1B351BD300ECD689 /* TSKWorkflow.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4C5A3AAB1B351BD300ECD689 /* TSKWorkflow+TaskInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4CB6CAE01A197B1000E68A6C /* TSKWorkflow+TaskInterface.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		4C86D5B519F2E96800C898AF /* Task.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5B419F2E96800C898AF /* Task.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4C86D5BB19F2E96800C898AF /* Task.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C86D5AF19F2E96800C898AF /* Task.framework */; };
 		4C86D5F019F2EA8B00C898AF /* TSKWorkflow.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C86D5E419F2EA8B00C898AF /* TSKWorkflow.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -395,6 +405,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4C5A3AA11B351BAE00ECD689 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C5A3AA21B351BD300ECD689 /* Task.h in Headers */,
+				4C5A3AA31B351BD300ECD689 /* TaskErrors.h in Headers */,
+				4C5A3AA41B351BD300ECD689 /* TSKTask.h in Headers */,
+				4C5A3AA61B351BD300ECD689 /* TSKBlockTask.h in Headers */,
+				4C5A3AA71B351BD300ECD689 /* TSKExternalConditionTask.h in Headers */,
+				4C5A3AA81B351BD300ECD689 /* TSKSelectorTask.h in Headers */,
+				4C5A3AA91B351BD300ECD689 /* TSKSubworkflowTask.h in Headers */,
+				4C5A3AAA1B351BD300ECD689 /* TSKWorkflow.h in Headers */,
+				4C5A3AA51B351BD300ECD689 /* TSKTask+WorkflowInterface.h in Headers */,
+				4C5A3AAB1B351BD300ECD689 /* TSKWorkflow+TaskInterface.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4C86D5AC19F2E96800C898AF /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -498,6 +525,7 @@
 				4C86D5FF19F2ED6300C898AF /* Sources */,
 				4C86D60019F2ED6300C898AF /* Frameworks */,
 				4C86D60119F2ED6300C898AF /* CopyFiles */,
+				4C5A3AA11B351BAE00ECD689 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -1066,7 +1094,9 @@
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
+				PRIVATE_HEADERS_FOLDER_PATH = PrivateHeaders;
 				PRODUCT_NAME = Task;
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 			};
@@ -1077,7 +1107,9 @@
 			buildSettings = {
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				OTHER_LDFLAGS = "-ObjC";
+				PRIVATE_HEADERS_FOLDER_PATH = PrivateHeaders;
 				PRODUCT_NAME = Task;
+				PUBLIC_HEADERS_FOLDER_PATH = Headers;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				VALIDATE_PRODUCT = YES;
