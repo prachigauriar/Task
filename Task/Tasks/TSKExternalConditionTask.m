@@ -31,8 +31,8 @@
 
 @interface TSKExternalConditionTask ()
 
-@property (nonatomic, strong, readonly) dispatch_queue_t fulfillmentQueue;
-@property (nonatomic, strong) id fulfillmentResult;
+@property (nonatomic, strong, readonly, nonnull) dispatch_queue_t fulfillmentQueue;
+@property (nonatomic, strong, nullable) id fulfillmentResult;
 @property (nonatomic, readwrite, assign, getter = isFulfilled) BOOL fulfilled;
 
 @end

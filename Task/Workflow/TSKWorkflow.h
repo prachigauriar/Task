@@ -24,8 +24,10 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
+
+NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Constants
 
@@ -120,10 +122,10 @@ extern NSString *const TSKWorkflowTaskKey;
  @discussion The default value of this property is “TSKWorkflow «id»”, where «id» is the memory
      address of the task workflow.
  */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy, null_resettable) NSString *name;
 
 /*! The task workflow’s delegate. */
-@property (nonatomic, weak) id<TSKWorkflowDelegate> delegate;
+@property (nonatomic, weak, nullable) id<TSKWorkflowDelegate> delegate;
 
 /*!
  @abstract The task workflow’s operation queue.
@@ -142,13 +144,13 @@ extern NSString *const TSKWorkflowTaskKey;
 @property (nonatomic, strong, readonly) NSNotificationCenter *notificationCenter;
 
 /*! The task workflow’s current set of tasks. */
-@property (nonatomic, copy, readonly) NSSet *allTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *allTasks;
 
 /*! The set of tasks currently in the receiver that have no prerequisite tasks. */
-@property (nonatomic, copy, readonly) NSSet *tasksWithNoPrerequisiteTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *tasksWithNoPrerequisiteTasks;
 
 /*! The set of tasks currently in the receiver that have no dependent tasks. */
-@property (nonatomic, copy, readonly) NSSet *tasksWithNoDependentTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *tasksWithNoDependentTasks;
 
 
 #pragma mark - Initializers
@@ -162,7 +164,7 @@ extern NSString *const TSKWorkflowTaskKey;
      “TSKWorkflow «id»”, where «id» is the memory address of the task.
  @result A newly initialized TSKWorkflow instance with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (instancetype)initWithName:(nullable NSString *)name;
 
 /*!
  @abstract Initializes a newly created TSKWorkflow instance with the specified operation queue.
@@ -174,7 +176,7 @@ extern NSString *const TSKWorkflowTaskKey;
      form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @result A newly initialized TSKWorkflow instance with the specified operation queue.
  */
-- (instancetype)initWithOperationQueue:(NSOperationQueue *)operationQueue;
+- (instancetype)initWithOperationQueue:(nullable NSOperationQueue *)operationQueue;
 
 /*!
  @abstract Initializes a newly created TSKWorkflow instance with the specified name and operation
@@ -187,7 +189,7 @@ extern NSString *const TSKWorkflowTaskKey;
      form “com.ticketmaster.TSKWorkflow.«name»”, where «name» is the name of the task workflow.
  @result A newly initialized TSKWorkflow instance with the specified name and operation queue.
  */
-- (instancetype)initWithName:(NSString *)name operationQueue:(NSOperationQueue *)operationQueue;
+- (instancetype)initWithName:(nullable NSString *)name operationQueue:(nullable NSOperationQueue *)operationQueue;
 
 /*!
  @abstract Initializes a newly created TSKWorkflow instance with the specified name, operation
@@ -204,9 +206,9 @@ extern NSString *const TSKWorkflowTaskKey;
  @result A newly initialized TSKWorkflow instance with the specified name, operation queue,
      and notification center.
  */
-- (instancetype)initWithName:(NSString *)name
-              operationQueue:(NSOperationQueue *)operationQueue
-          notificationCenter:(NSNotificationCenter *)notificationCenter NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nullable NSString *)name
+              operationQueue:(nullable NSOperationQueue *)operationQueue
+          notificationCenter:(nullable NSNotificationCenter *)notificationCenter NS_DESIGNATED_INITIALIZER;
 
 
 #pragma mark - Adding Tasks
@@ -219,7 +221,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no prerequisite
      tasks. Otherwise, each task in the set must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks;
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks;
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified dictionary of keyed 
@@ -227,11 +229,11 @@ extern NSString *const TSKWorkflowTaskKey;
  @discussion This is equivalent to invoking ‑addTask:prerequisiteTasks:keyedPrerequisiteTasks: with
      a nil prerequisiteTasks parameter.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
- @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite names to their 
+ @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite keys to their 
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
      in the dictionary must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks;
+- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified prerequisite and keyed
@@ -249,7 +251,9 @@ extern NSString *const TSKWorkflowTaskKey;
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
      in the dictionary must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks keyedPrerequisiteTasks:(NSDictionary *)keyedPrerequisiteTasks;
+-        (void)addTask:(TSKTask *)task
+     prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks
+keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
@@ -261,7 +265,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param prerequisiteTask1 ... The task’s prerequisite tasks as a nil-terminated list. Each task in
      the set must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task prerequisites:(TSKTask *)prerequisiteTask1, ... NS_REQUIRES_NIL_TERMINATION;
+- (void)addTask:(TSKTask *)task prerequisites:(nullable TSKTask *)prerequisiteTask1, ... NS_REQUIRES_NIL_TERMINATION;
 
 
 #pragma mark - Getting Related Tasks
@@ -273,7 +277,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @result The set of prerequisite tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
-- (NSSet *)prerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)prerequisiteTasksForTask:(TSKTask *)task;
 
 /*! 
  @abstract Returns the set of unkeyed prerequisite tasks for the specified task.
@@ -281,15 +285,15 @@ extern NSString *const TSKWorkflowTaskKey;
  @result The set of unkeyed prerequisite tasks for the specified task. Returns nil if the task is not
      in the receiver.
  */
-- (NSSet *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task;
 
 /*!
  @abstract Returns the keyed prerequisite tasks for the specified task.
  @param task The task.
- @result A dictionary that maps the names of the specified task’s keyed prerequisites to their 
+ @result A dictionary that maps the keys of the specified task’s keyed prerequisites to their 
      corresponding tasks. Returns nil if the task is not in the receiver.
  */
-- (NSDictionary *)keyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasksForTask:(TSKTask *)task;
 
 /*!
  @abstract Returns the set of dependent tasks for the specified task.
@@ -297,7 +301,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @result The set of dependent tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
-- (NSSet *)dependentTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)dependentTasksForTask:(TSKTask *)task;
 
 
 #pragma mark - Workflow State
@@ -376,7 +380,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.
  */
-- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(NSError *)error;
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
 
 /*!
  @abstract Sent to the delegate when one of a workflow’s tasks is cancelled.
@@ -387,3 +391,5 @@ extern NSString *const TSKWorkflowTaskKey;
 - (void)workflow:(TSKWorkflow *)workflow taskDidCancel:(TSKTask *)task;
 
 @end
+
+NS_ASSUME_NONNULL_END

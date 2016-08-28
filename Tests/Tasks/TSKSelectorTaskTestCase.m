@@ -42,8 +42,10 @@
 
 - (void)testInit
 {
-    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:self selector:NULL]), @"NULL selector does not throw exception");
-    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:nil selector:@selector(description)]), @"nil target does not throw exception");
+    id nilObject = nil;
+    SEL nullSelector = NULL;
+    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:self selector:nullSelector]), @"NULL selector does not throw exception");
+    XCTAssertThrows(([[TSKSelectorTask alloc] initWithTarget:nilObject selector:@selector(description)]), @"nil target does not throw exception");
 
     TSKSelectorTask *task = [[TSKSelectorTask alloc] initWithTarget:self selector:@selector(method:)];
     XCTAssertNotNil(task, @"returns nil");

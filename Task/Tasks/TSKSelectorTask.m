@@ -29,18 +29,12 @@
 
 @interface TSKSelectorTask ()
 
-@property (nonatomic, copy, readonly) NSSet *requiredPrerequisiteKeys;
+@property (nonatomic, copy, readonly) NSSet<id<NSCopying>> *requiredPrerequisiteKeys;
 
 @end
 
 
 @implementation TSKSelectorTask
-
-- (instancetype)initWithName:(NSString *)name
-{
-    return [self initWithName:name target:nil selector:NULL requiredPrerequisiteKeys:[NSSet set]];
-}
-
 
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector
 {
@@ -63,7 +57,7 @@
     if (self) {
         _target = target;
         _selector = selector;
-        _requiredPrerequisiteKeys = [requiredPrerequisiteKeys copy];
+        _requiredPrerequisiteKeys = requiredPrerequisiteKeys ? [requiredPrerequisiteKeys copy] : [NSSet set];
     }
 
     return self;

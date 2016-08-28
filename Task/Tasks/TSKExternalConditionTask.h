@@ -27,6 +27,8 @@
 #import <Task/TSKTask.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  TSKExternalConditionTask is special type of task that performs no actual work. Instead, it
  represents an external condition that is either fulfilled or not. When run, the task will either
@@ -46,6 +48,8 @@
  @discussion If the task is in the cancelled or failed state, it will automatically retry itself.
      Otherwise it will start itself if ready.
  */
-- (void)fulfillWithResult:(id)result;
+- (void)fulfillWithResult:(nullable id)result;
 
 @end
+
+NS_ASSUME_NONNULL_END

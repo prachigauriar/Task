@@ -27,6 +27,8 @@
 #import <Task/TSKTask.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  A TSKSubworkflowTask is a task that executes a whole workflow, called a subworkflow, as its unit 
  of work. This is primarily intended for when you have an existing mechanism for creating a workflow
@@ -72,6 +74,21 @@
 /*! The receiver’s subworkflow. May not be nil. */
 @property (nonatomic, strong, readonly) TSKWorkflow *subworkflow;
 
+
+/*!
+ @abstract -init is unavailable, as there is no reasonable default value for the instance’s subworkflow.
+ @discussion Use -initWithSubworkflow: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/*!
+ @abstract -initWithName: is unavailable, as there is no reasonable default value for the instance’s
+     subworkflow.
+ @discussion Use -initWithName:subworkflow: instead.
+ */
+- (instancetype)initWithName:(nullable NSString *)name NS_UNAVAILABLE;
+
+
 /*!
  @abstract Initializes a newly created TSKSubworkflowTask instance with the specified subworkflow.
  @discussion A default name will be given to the task as specified by TSKTask’s ‑initWithName:.
@@ -89,6 +106,8 @@
  @param subworkflow The subworkflow that the task starts in its ‑main method. May not be nil.
  @result A newly initialized TSKSubworkflowTask instance with the specified name and subworkflow.
  */
-- (instancetype)initWithName:(NSString *)name subworkflow:(TSKWorkflow *)subworkflow NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nullable NSString *)name subworkflow:(TSKWorkflow *)subworkflow NS_DESIGNATED_INITIALIZER;
 
 @end
+
+NS_ASSUME_NONNULL_END

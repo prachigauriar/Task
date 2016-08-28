@@ -39,7 +39,8 @@
 
 - (void)testInit
 {
-    XCTAssertThrows(([[TSKBlockTask alloc] initWithBlock:nil]), @"nil block does not throw exception");
+    id nilObject = nil;
+    XCTAssertThrows(([[TSKBlockTask alloc] initWithBlock:nilObject]), @"nil block does not throw exception");
 
     void (^block)(TSKTask *) = ^void(TSKTask *task) { };
 
@@ -77,7 +78,7 @@
     XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
-    XCTAssertThrows(([[TSKBlockTask alloc] initWithName:name requiredPrerequisiteKeys:nil block:nil]), @"nil block does not throw exception");
+    XCTAssertThrows(([[TSKBlockTask alloc] initWithName:name requiredPrerequisiteKeys:nil block:nilObject]), @"nil block does not throw exception");
 }
 
 

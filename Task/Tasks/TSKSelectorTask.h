@@ -27,6 +27,8 @@
 #import <Task/TSKTask.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  TSKSelectorTasks perform a task’s work by sending a message to an object. Together with
  TSKBlockTask and TSKExternalConditionTask, this obviates the need to subclass TSKTask in most 
@@ -38,7 +40,7 @@
  @abstract The receiver of the task’s message-send. 
  @discussion May not be nil.
  */
-@property (nonatomic, weak, readonly) id target;
+@property (nonatomic, weak, readonly, nullable) id target;
 
 /*!
  @abstract The selector that the task’s target performs in order to do the task’s work. 
@@ -53,6 +55,20 @@
      so, stop executing at the earliest possible moment.
  */
 @property (nonatomic, assign, readonly) SEL selector;
+
+/*!
+ @abstract -init is unavailable, as there is no reasonable default value for the instance’s target
+     and selector.
+ @discussion Use -initWithTarget:selector: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/*!
+ @abstract -initWithName: is unavailable, as there is no reasonable default value for the instance’s
+     target and selector.
+ @discussion Use -initWithName:target:selector: instead.
+ */
+- (instancetype)initWithName:(nullable NSString *)name NS_UNAVAILABLE;
 
 /*!
  @abstract Initializes a newly created TSKSelectorTask instance with the specified target and
@@ -77,7 +93,7 @@
      May not be NULL.
  @result A newly initialized TSKSelectorTask instance with the specified name, target, and action.
  */
-- (instancetype)initWithName:(NSString *)name target:(id)target selector:(SEL)selector;
+- (instancetype)initWithName:(nullable NSString *)name target:(id)target selector:(SEL)selector;
 
 
 /*!
@@ -93,9 +109,11 @@
      prerequisite keys are required.
  @result A newly initialized TSKSelectorTask instance with the specified name, target, and action.
  */
-- (instancetype)initWithName:(NSString *)name
+- (instancetype)initWithName:(nullable NSString *)name
                       target:(id)target
                     selector:(SEL)selector
-    requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys NS_DESIGNATED_INITIALIZER;
+    requiredPrerequisiteKeys:(nullable NSSet<id<NSCopying>> *)requiredPrerequisiteKeys NS_DESIGNATED_INITIALIZER;
 
 @end
+
+NS_ASSUME_NONNULL_END

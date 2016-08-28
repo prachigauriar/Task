@@ -50,46 +50,46 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
  @discussion Access to this object is not thread-safe. This shouldn’t be a problem, as typically a
      workflow’s tasks are created and added to the workflow and then the workflow is started.
  */
-@property (nonatomic, strong, readonly) NSMutableSet *tasks;
+@property (nonatomic, strong, readonly, nonnull) NSMutableSet<TSKTask *> *tasks;
 
-@property (nonatomic, strong, readonly) dispatch_queue_t finishedTasksQueue;
+@property (nonatomic, strong, readonly, nonnull) dispatch_queue_t finishedTasksQueue;
 
 /*!
  @abstract The set of tasks in the workflow that have finished successfully.
  @discussion Access to this object is not thread-safe. All accesses to the set should be
      synchronized on the set itself to maintain data integrity.
  */
-@property (nonatomic, strong, readonly) NSMutableSet *finishedTasks;
+@property (nonatomic, strong, readonly, nonnull) NSMutableSet<TSKTask *> *finishedTasks;
 
 /*!
  @abstract A map table that maps a task to its prerequisite tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSSets of 
      TSKTask instances.
  */
-@property (nonatomic, strong, readonly) NSMapTable *prerequisiteTasks;
+@property (nonatomic, strong, readonly, nonnull) NSMapTable<TSKTask *, NSSet<TSKTask *> *> *prerequisiteTasks;
 
 /*!
  @abstract A map table that maps a task to its keyed prerequisite tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSDictionaries
      whose keys are objects that conform to NSCopying and whose values are TSKTask instances.
  */
-@property (nonatomic, strong, readonly) NSMapTable *keyedPrerequisiteTasks;
+@property (nonatomic, strong, readonly, nonnull) NSMapTable<TSKTask *, NSDictionary<id<NSCopying>, TSKTask *> *> *keyedPrerequisiteTasks;
 
 /*!
  @abstract A map table that maps a task to its dependent tasks.
  @discussion The keys for this map table are TSKTask instances and their values are NSSets. We
      use immutable sets instead of mutable ones because tasks are added to a workflow far less
      frequently than a task gets its set of dependent tasks. Repeatedly copying a mutable set
-     is probably going to be more expensive than generated a new immutable set every time a
+     is probably going to be more expensive than generating a new immutable set every time a
      task gains a new dependent.
  */
-@property (nonatomic, strong, readonly) NSMapTable *dependentTasks;
+@property (nonatomic, strong, readonly, nonnull) NSMapTable<TSKTask *, NSSet<TSKTask *> *> *dependentTasks;
 
 /*! The set of tasks currently in the receiver that have no prerequisite tasks. */
-@property (nonatomic, copy, readwrite) NSSet *tasksWithNoPrerequisiteTasks;
+@property (nonatomic, copy, readwrite) NSSet<TSKTask *> *tasksWithNoPrerequisiteTasks;
 
 /*! The set of tasks currently in the receiver that have no dependent tasks. */
-@property (nonatomic, copy, readwrite) NSSet *tasksWithNoDependentTasks;
+@property (nonatomic, copy, readwrite) NSSet<TSKTask *> *tasksWithNoDependentTasks;
 
 @end
 
@@ -128,19 +128,17 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 {
     self = [super init];
     if (self) {
-        // If no name was provided, use the default. Initialize this here, because we use it to
-        // generate the operation queue’s name below
-        if (!name) {
-            name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
-        }
+        // Initialize the name here, because we use it to generate the operation queue’s name
+        // below. We use the setter instead of setting the instance variable directly so that
+        // we get consistent default name behavior without duplicating code.
+        self.name = name;
 
         // If no operation queue was provided, create one
         if (!operationQueue) {
             operationQueue = [[NSOperationQueue alloc] init];
-            operationQueue.name = [[NSString alloc] initWithFormat:@"com.ticketmaster.TSKWorkflow.%@", name];
+            operationQueue.name = [[NSString alloc] initWithFormat:@"com.ticketmaster.TSKWorkflow.%@", _name];
         }
 
-        _name = [name copy];
         _operationQueue = operationQueue;
         _notificationCenter = notificationCenter ? notificationCenter : [NSNotificationCenter defaultCenter];
 
@@ -188,6 +186,16 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 }
 
 
+- (void)setName:(NSString *)name
+{
+    if (!name) {
+        name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
+    }
+
+    _name = [name copy];
+}
+
+
 #pragma mark -
 
 - (void)addTask:(TSKTask *)task prerequisiteTasks:(NSSet *)prerequisiteTasks
@@ -218,7 +226,7 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 
     NSSet *requiredPrerequisiteKeys = task.requiredPrerequisiteKeys;
     if (!requiredPrerequisiteKeys) {
-        requiredPrerequisiteKeys = [NSSet set];
+        requiredPrerequisiteKeys = [[NSSet alloc] init];
     }
 
     NSAssert([requiredPrerequisiteKeys isSubsetOfSet:[NSSet setWithArray:[keyedPrerequisiteTasks allKeys]]],
