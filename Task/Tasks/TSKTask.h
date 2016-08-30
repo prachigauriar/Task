@@ -24,8 +24,10 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
+
+NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark Constants and Functions
 
@@ -58,7 +60,7 @@ typedef NS_ENUM(NSUInteger, TSKTaskState) {
  @param state The task state.
  @result A string describing the specified task state. If the task state is unknown, returns nil.
  */
-extern NSString *const TSKTaskStateDescription(TSKTaskState state);
+extern NSString *const _Nullable TSKTaskStateDescription(TSKTaskState state);
 
 
 /*!
@@ -154,20 +156,20 @@ extern NSString *const TSKTaskDidStartNotification;
 @property (nonatomic, copy) NSString *name;
 
 /*! The task’s delegate. */
-@property (nonatomic, weak) id<TSKTaskDelegate> delegate;
+@property (nonatomic, weak, nullable) id<TSKTaskDelegate> delegate;
 
 /*!
  @abstract The task’s operation queue.
  @discussion If not explicitly set, the task’s queue will be the same as its workflow’s.
  */
-@property (nonatomic, strong) NSOperationQueue *operationQueue;
+@property (nonatomic, strong, nullable) NSOperationQueue *operationQueue;
 
 /*! 
  @abstract The task’s workflow. 
  @discussion This property is set when the task is added to a workflow. Once a task has been added
      to a workflow, it may not be added (or moved) to another workflow.
  */
-@property (nonatomic, weak, readonly) TSKWorkflow *workflow;
+@property (nonatomic, weak, readonly, nullable) TSKWorkflow *workflow;
 
 /*!
  @abstract The task’s prerequisite tasks.
@@ -178,7 +180,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      This property is not key-value observable.
  */
-@property (nonatomic, copy, readonly) NSSet *prerequisiteTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *prerequisiteTasks;
 
 /*!
  @abstract The task’s keyed prerequisite tasks.
@@ -188,7 +190,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      This property is not key-value observable.
  */
-@property (nonatomic, copy, readonly) NSDictionary *keyedPrerequisiteTasks;
+@property (nonatomic, copy, readonly) NSDictionary<id<NSCopying>, TSKTask *> *keyedPrerequisiteTasks;
 
 /*!
  @abstract The task’s unkeyed prerequisite tasks.
@@ -198,7 +200,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      This property is not key-value observable.
  */
-@property (nonatomic, copy, readonly) NSSet *unkeyedPrerequisiteTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *unkeyedPrerequisiteTasks;
 
 /*!
  @abstract The task’s dependent tasks.
@@ -208,7 +210,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      This property is not key-value observable.
  */
-@property (nonatomic, copy, readonly) NSSet *dependentTasks;
+@property (nonatomic, copy, readonly) NSSet<TSKTask *> *dependentTasks;
 
 /*!
  @abstract The task’s state.
@@ -243,21 +245,21 @@ extern NSString *const TSKTaskDidStartNotification;
  @abstract The date at which the task either finished successfully or failed. 
  @discussion This is nil until the task receives either ‑finishWithResult: or ‑failWithError:.
  */
-@property (nonatomic, strong, readonly) NSDate *finishDate;
+@property (nonatomic, strong, readonly, nullable) NSDate *finishDate;
 
 /*!
  @abstract The result of the task finishing successfully. 
  @discussion This is nil until the task receives ‑finishWithResult:, after which it is the value
      of that message’s result parameter.
  */
-@property (nonatomic, strong, readonly) id result;
+@property (nonatomic, strong, readonly, nullable) id result;
 
 /*!
  @abstract The error that caused the task to fail. 
  @discussion This is nil until the task receives ‑failWithError:, after which it is the value of
      that message’s error parameter.
  */
-@property (nonatomic, strong, readonly) NSError *error;
+@property (nonatomic, strong, readonly, nullable) NSError *error;
 
 
 #pragma mark -
@@ -272,7 +274,7 @@ extern NSString *const TSKTaskDidStartNotification;
      «id» is the memory address of the task.
  @result A newly initialized TSKTask instance with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nullable NSString *)name NS_DESIGNATED_INITIALIZER;
 
 /*!
  @abstract Returns the prerequisite keys that the receiver requires to run.
@@ -289,11 +291,11 @@ extern NSString *const TSKTaskDidStartNotification;
              return [[super requiredPrerequisiteKeys] setByAddingObjectsFromArray:@[ @"a", @"b" ]];
          }
 
-     Since the base implementation fo this class returns the empty set, direct subclasses of TSKTask
+     Since the base implementation of this class returns the empty set, direct subclasses of TSKTask
      need not do this.
  @result The set of prerequisite keys that the receiver requires to run.
  */
-- (NSSet *)requiredPrerequisiteKeys;
+- (NSSet<id<NSCopying>> *)requiredPrerequisiteKeys;
 
 /*!
  @abstract Performs the task’s work.
@@ -331,7 +333,7 @@ extern NSString *const TSKTaskDidStartNotification;
      
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)cancel __attribute__((objc_requires_super));
+- (void)cancel NS_REQUIRES_SUPER;
 
 /*!
  @abstract Sets the task’s state to pending if it is ready, executing, finished, failed, or cancelled.
@@ -341,7 +343,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)reset __attribute__((objc_requires_super));
+- (void)reset NS_REQUIRES_SUPER;
 
 /*!
  @abstract Sets the task’s state to pending if it is cancelled or failed, and starts the task if its
@@ -351,7 +353,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      Subclasses should invoke the superclass implementation of this method.
  */
-- (void)retry __attribute__((objc_requires_super));
+- (void)retry NS_REQUIRES_SUPER;
 
 /*!
  @abstract Sets the task’s state to finished and updates its result and finishDate properties.
@@ -362,7 +364,7 @@ extern NSString *const TSKTaskDidStartNotification;
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)finishWithResult:(id)result __attribute__((objc_requires_super));
+- (void)finishWithResult:(nullable id)result NS_REQUIRES_SUPER;
 
 /*!
  @abstract Sets the task’s state to failed and updates its error and finishDate properties.
@@ -374,7 +376,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
  */
-- (void)failWithError:(NSError *)error __attribute__((objc_requires_super));
+- (void)failWithError:(nullable NSError *)error NS_REQUIRES_SUPER;
 
 
 #pragma mark - Prerequisite Results
@@ -386,7 +388,7 @@ extern NSString *const TSKTaskDidStartNotification;
      that this method will return the same task’s result on repeated invocations.
  @result The result of one of the receiver’s prerequisite tasks.
  */
-- (id)anyPrerequisiteResult;
+- (nullable id)anyPrerequisiteResult;
 
 /*!
  @abstract Returns the results of all the receiver’s prerequisite tasks in an array.
@@ -420,7 +422,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @result The result for the receiver’s prerequisite task with the specified key. Returns nil if
      the receiver has no such prerequisite task or the task has a nil result.
  */
-- (id)prerequisiteResultForKey:(id<NSCopying>)prerequisiteKey;
+- (nullable id)prerequisiteResultForKey:(id<NSCopying>)prerequisiteKey;
 
 /*!
  @abstract Returns the results of all the receiver’s prerequisite tasks in a map table.
@@ -428,7 +430,7 @@ extern NSString *const TSKTaskDidStartNotification;
      corresponding results. The map table will contain NSNull values for each nil result.
  @result A map table containing the results of all the receiver’s prerequisite tasks.
  */
-- (NSMapTable *)prerequisiteResultsByTask;
+- (NSMapTable<TSKTask *, id> *)prerequisiteResultsByTask;
 
 @end
 
@@ -475,7 +477,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon finishing.
      This method should not be invoked directly.
  */
-- (void)didFinishWithResult:(id)result;
+- (void)didFinishWithResult:(nullable id)result;
 
 /*!
  @abstract Performs actions once the receiver has failed.
@@ -484,7 +486,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon failing.
      This method should not be invoked directly.
  */
-- (void)didFailWithError:(NSError *)error;
+- (void)didFailWithError:(nullable NSError *)error;
 
 @end
 
@@ -504,14 +506,14 @@ extern NSString *const TSKTaskDidStartNotification;
  @param task The task that finished.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)task:(TSKTask *)task didFinishWithResult:(id)result;
+- (void)task:(TSKTask *)task didFinishWithResult:(nullable id)result;
 
 /*!
  @abstract Sent to the delegate when the specified task fails.
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil. 
  */
-- (void)task:(TSKTask *)task didFailWithError:(NSError *)error;
+- (void)task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
 
 /*!
  @abstract Sent to the delegate when the specified task is cancelled.
@@ -520,3 +522,5 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)taskDidCancel:(TSKTask *)task;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -1,9 +1,9 @@
 //
-//  TaskTableViewCell.h
+//  Random.swift
 //  Example-iOS
 //
-//  Created by Prachi Gauriar on 10/19/2014.
-//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
+//  Created by Prachi Gauriar on 8/28/2016.
+//  Copyright © 2016 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,10 @@
 //  THE SOFTWARE.
 //
 
-#import <UIKit/UIKit.h>
+import Foundation
 
-@interface TaskTableViewCell : UITableViewCell
 
-@property (nonatomic, weak, readonly) IBOutlet UILabel *nameLabel;
-@property (nonatomic, weak, readonly) IBOutlet UILabel *stateLabel;
-@property (nonatomic, weak, readonly) IBOutlet UILabel *prerequisitesLabel;
-@property (nonatomic, weak, readonly) IBOutlet UIButton *actionButton;
-@property (nonatomic, weak, readonly) IBOutlet UIProgressView *progressView;
-
-+ (UINib *)nib;
-
-@end
+/// Returns a random non-negative Double value strictly less than 1.0.
+func randomDouble() -> Double {
+    return Double(arc4random_uniform(UInt32.max)) / Double(UInt32.max)
+}

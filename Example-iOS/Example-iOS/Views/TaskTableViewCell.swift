@@ -1,9 +1,9 @@
 //
-//  AppDelegate.h
+//  TaskTableViewCell.swift
 //  Example-iOS
 //
-//  Created by Prachi Gauriar on 10/18/2014.
-//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
+//  Created by Prachi Gauriar on 8/28/2016.
+//  Copyright © 2016 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,24 @@
 //  THE SOFTWARE.
 //
 
-@import UIKit;
+import UIKit
 
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+class TaskTableViewCell : UITableViewCell {
+    @IBOutlet private(set) weak var nameLabel: UILabel!
+    @IBOutlet private(set) weak var stateLabel: UILabel!
+    @IBOutlet private(set) weak var prerequisitesLabel: UILabel!
+    @IBOutlet private(set) weak var actionButton: UIButton!
+    @IBOutlet private(set) weak var progressView: UIProgressView!
 
-@property (strong, nonatomic) UIWindow *window;
+    static var nib: UINib {
+        return UINib(nibName: "TaskTableViewCell", bundle: nil)
+    }
 
-@end
+    override func prepareForReuse() {
+        super.prepareForReuse()
 
+        progressView.progress = 0.0
+        actionButton.removeTarget(nil, action: nil, for: .allTouchEvents)
+    }
+}

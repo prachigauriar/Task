@@ -29,18 +29,12 @@
 
 @interface TSKBlockTask ()
 
-@property (nonatomic, copy, readonly) NSSet *requiredPrerequisiteKeys;
+@property (nonatomic, copy, readonly) NSSet<id<NSCopying>> *requiredPrerequisiteKeys;
 
 @end
 
 
 @implementation TSKBlockTask
-
-- (instancetype)initWithName:(NSString *)name
-{
-    return [self initWithName:name requiredPrerequisiteKeys:[NSSet set] block:nil];
-}
-
 
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block
 {
@@ -54,14 +48,16 @@
 }
 
 
-- (instancetype)initWithName:(NSString *)name requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys block:(void (^)(TSKTask *task))block
+- (instancetype)initWithName:(NSString *)name
+    requiredPrerequisiteKeys:(NSSet<id<NSCopying>> *)requiredPrerequisiteKeys
+                       block:(void (^)(TSKTask *task))block
 {
     NSParameterAssert(block);
 
     self = [super initWithName:name];
     if (self) {
         _block = [block copy];
-        _requiredPrerequisiteKeys = [requiredPrerequisiteKeys copy];
+        _requiredPrerequisiteKeys = requiredPrerequisiteKeys ? [requiredPrerequisiteKeys copy] : [NSSet set];
     }
 
     return self;

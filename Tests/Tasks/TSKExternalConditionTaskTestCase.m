@@ -27,8 +27,6 @@
 #import "TSKRandomizedTestCase.h"
 
 
-
-
 @interface TSKExternalConditionTaskTestCase : TSKRandomizedTestCase
 
 - (void)testInit;

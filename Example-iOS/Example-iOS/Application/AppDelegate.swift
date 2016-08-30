@@ -1,9 +1,9 @@
 //
-//  main.m
+//  AppDelegate.swift
 //  Example-iOS
 //
-//  Created by Prachi Gauriar on 10/19/2014.
-//  Copyright (c) 2015 Ticketmaster Entertainment, Inc. All rights reserved.
+//  Created by Prachi Gauriar on 8/28/2016.
+//  Copyright © 2016 Ticketmaster Entertainment, Inc. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,11 @@
 //  THE SOFTWARE.
 //
 
-@import UIKit;
 
-#import "AppDelegate.h"
+import UIKit
 
 
-int main(int argc, char * argv[])
-{
-    @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
+@UIApplicationMain
+class AppDelegate : NSObject, UIApplicationDelegate {
+    var window: UIWindow?
 }

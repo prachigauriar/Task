@@ -51,10 +51,10 @@
 
 - (void)testInit
 {
-    XCTAssertThrows(([[TSKSubworkflowTask alloc] init]), @"nil subworkflow does not throw exception");
-    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithName:UMKRandomAlphanumericString()]), @"nil subworkflow does not throw exception");
-    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithSubworkflow:nil]), @"nil subworkflow does not throw exception");
-    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithName:UMKRandomAlphanumericString() subworkflow:nil]), @"nil subworkflow does not throw exception");
+    id nilObject = nil;
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithSubworkflow:nilObject]), @"nil subworkflow does not throw exception");
+    XCTAssertThrows(([[TSKSubworkflowTask alloc] initWithName:UMKRandomAlphanumericString() subworkflow:nilObject]),
+                    @"nil subworkflow does not throw exception");
 
     TSKWorkflow *subworkflow = [[TSKWorkflow alloc] init];
 

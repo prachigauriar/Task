@@ -66,7 +66,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 @interface TSKTask ()
 
-@property (nonatomic, weak, readwrite) TSKWorkflow *workflow;
+@property (nonatomic, weak, readwrite, nullable) TSKWorkflow *workflow;
 
 @property (nonatomic, strong, readwrite) NSDate *finishDate;
 @property (nonatomic, strong, readwrite) NSError *error;

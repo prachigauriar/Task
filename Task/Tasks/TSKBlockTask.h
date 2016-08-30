@@ -27,6 +27,8 @@
 #import <Task/TSKTask.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  TSKBlockTasks perform a task’s work by executing a block. Together with TSKSelectorTask and 
  TSKExternalConditionTask, this obviates the need to subclass TSKTask in most circumstances.
@@ -45,6 +47,19 @@
 @property (nonatomic, copy, readonly) void (^block)(TSKTask *task);
 
 /*!
+ @abstract -init is unavailable, as there is no reasonable default value for the instance’s block.
+ @discussion Use -initWithBlock: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/*!
+ @abstract -initWithName: is unavailable, as there is no reasonable default value for the instance’s 
+     block.
+ @discussion Use -initWithName:block: instead.
+ */
+- (instancetype)initWithName:(nullable NSString *)name NS_UNAVAILABLE;
+
+/*!
  @abstract Initializes a newly created TSKBlockTask instance with the specified block.
  @discussion A default name will be given to the task as specified by TSKTask’s ‑initWithName:.
      Furthermore, The task’s set of required prerequisite keys is the empty set.
@@ -61,7 +76,7 @@
  @param block The block that performs the task’s work. May not be nil.
  @result A newly initialized TSKBlockTask instance with the specified name and block.
  */
-- (instancetype)initWithName:(NSString *)name block:(void (^)(TSKTask *task))block;
+- (instancetype)initWithName:(nullable NSString *)name block:(void (^)(TSKTask *task))block;
 
 /*!
  @abstract Initializes a newly created TSKBlockTask instance with the specified name, required 
@@ -74,8 +89,10 @@
  @param block The block that performs the task’s work. May not be nil.
  @result A newly initialized TSKBlockTask instance with the specified name and block.
  */
-- (instancetype)initWithName:(NSString *)name
-    requiredPrerequisiteKeys:(NSSet *)requiredPrerequisiteKeys
+- (instancetype)initWithName:(nullable NSString *)name
+    requiredPrerequisiteKeys:(nullable NSSet<id<NSCopying>> *)requiredPrerequisiteKeys
                        block:(void (^)(TSKTask *task))block NS_DESIGNATED_INITIALIZER;
 
 @end
+
+NS_ASSUME_NONNULL_END

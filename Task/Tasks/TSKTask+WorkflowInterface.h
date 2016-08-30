@@ -27,13 +27,15 @@
 #import <Task/TSKTask.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  The WorkflowInterface category of TSKTask declares a messages that must be exposed so that
  TSKWorkflows can modify the internal state of their TSKTasks.
  */
 @interface TSKTask (WorkflowInterface)
 
-@property (nonatomic, weak, readwrite) TSKWorkflow *workflow;
+@property (nonatomic, weak, readwrite, nullable) TSKWorkflow *workflow;
 
 /*!
  @abstract Returns a recursive description of the task and its dependent tasks starting at the
@@ -51,3 +53,5 @@
 - (void)didAddPrerequisiteTask;
 
 @end
+
+NS_ASSUME_NONNULL_END

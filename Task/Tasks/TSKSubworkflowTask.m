@@ -31,12 +31,6 @@
 
 @implementation TSKSubworkflowTask
 
-- (instancetype)initWithName:(NSString *)name
-{
-    return [self initWithName:name subworkflow:nil];
-}
-
-
 - (instancetype)initWithSubworkflow:(TSKWorkflow *)subworkflow
 {
     return [self initWithName:nil subworkflow:subworkflow];
