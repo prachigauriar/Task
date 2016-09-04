@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion If the task is in the cancelled or failed state, it will automatically retry itself.
      Otherwise it will start itself if ready.
  */
-- (void)fulfillWithResult:(nullable id)result NS_SWIFT_NAME(fulfill(with:));
+- (void)fulfillWithResult:(nullable id)result;
 
 @end
 

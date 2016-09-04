@@ -78,16 +78,11 @@ class TimeSlicedTask : TSKTask {
         super.init(name: name)
     }
 
-    override func requiredPrerequisiteKeys() -> Set<AnyHashable> {
-        return ["userTask", "addressTask"]
-    }
-
 
     override func main() {
         // Run in 1/8s time slices
         let kTimeSliceInterval: TimeInterval = 0.0625;
 
-        // 
         let shouldFail = randomDouble() < probabilityOfFailure
         let failureTime: TimeInterval = randomDouble() * timeRequired
 
@@ -98,7 +93,7 @@ class TimeSlicedTask : TSKTask {
             }
 
             if shouldFail && timeTaken > failureTime {
-                fail(with: TimeSlicedTaskError.randomError)
+                fail(withError: TimeSlicedTaskError.randomError)
                 return
             }
 
@@ -110,6 +105,6 @@ class TimeSlicedTask : TSKTask {
             }
         }
 
-        finish(with: nil)
+        finish(withResult: nil)
     }
 }

@@ -157,6 +157,16 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 }
 
 
+- (void)setName:(NSString *)name
+{
+    if (!name) {
+        name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
+    }
+
+    _name = [name copy];
+}
+
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p name = %@>", self.class, self, self.name];
@@ -183,16 +193,6 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 - (NSSet *)allTasks
 {
     return [self.tasks copy];
-}
-
-
-- (void)setName:(NSString *)name
-{
-    if (!name) {
-        name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
-    }
-
-    _name = [name copy];
 }
 
 

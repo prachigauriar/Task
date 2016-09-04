@@ -36,6 +36,8 @@
 
 @implementation TSKBlockTask
 
+@synthesize requiredPrerequisiteKeys = _requiredPrerequisiteKeys;
+
 - (instancetype)initWithBlock:(void (^)(TSKTask *task))block
 {
     return [self initWithName:nil requiredPrerequisiteKeys:[NSSet set] block:block];

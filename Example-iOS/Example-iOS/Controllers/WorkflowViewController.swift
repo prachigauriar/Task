@@ -64,7 +64,15 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
         // Create the task state observers after the cell controllers, since the task state observer
         // will update the cell
         taskStateObservers = tasks.map { (task: TSKTask) -> KeyValueObserver<TSKTask> in
-            KeyValueObserver(object: task, keyPath: "state") { [unowned self] in self.updateCell(for: $0) }
+            KeyValueObserver(object: task, keyPath: "state") { [unowned self] (task) in
+                DispatchQueue.main.async {
+                    self.updateCell(for: task)
+
+                    for dependentTask in task.dependentTasks {
+                        self.updateCell(for: dependentTask)
+                    }
+                }
+            }
         }
 
         // Register our table view cell nib and create a prototype cell that we can use for cell height calculations
@@ -127,9 +135,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
             return
         }
 
-        DispatchQueue.main.async {
-            cellController.configure(cell)
-        }
+        cellController.configure(cell)
     }
 
 
@@ -173,7 +179,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
     }
 
 
-    func workflow(_ workflow: TSKWorkflow, task: TSKTask, didFailWith error: Error?) {
+    func workflow(_ workflow: TSKWorkflow, task: TSKTask, didFailWithError error: Error?) {
         guard task as? TSKExternalConditionTask == nil else {
             return
         }

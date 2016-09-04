@@ -29,8 +29,30 @@ import UIKit
 
 
 fileprivate extension UIColor {
+    static let finishedTaskText = UIColor(red: 0.37, green: 0.72, blue: 0.45, alpha: 1.0)
+    static let failedTaskText = UIColor(red: 0.82, green: 0.01, blue: 0.11, alpha: 1.0)
     static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
     static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
+
+    static func cellBackgroundColor(forTask task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return UIColor.finishedTaskCellBackground
+        } else if task.isFailed {
+            return UIColor.failedTaskCellBackground
+        }
+
+        return UIColor.white
+    }
+
+    static func textColor(forTask task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return UIColor.finishedTaskText
+        } else if task.isFailed {
+            return UIColor.failedTaskText
+        }
+
+        return UIColor.black
+    }
 }
 
 
@@ -44,33 +66,45 @@ class TaskCellController {
 
 
     func configure(_ cell: TaskTableViewCell) {
-        if task.isFinished {
-            cell.backgroundColor = UIColor.finishedTaskCellBackground
-        } else if task.isFailed {
-            cell.backgroundColor = UIColor.failedTaskCellBackground
-        } else {
-            cell.backgroundColor = UIColor.white
-        }
-
-        // Set the cell’s name, state, prerequisite labels, and progress
+        cell.backgroundColor = UIColor.cellBackgroundColor(forTask: task)
         cell.nameLabel.text = task.name;
         cell.stateLabel.text = TSKTaskStateDescription(task.state);
 
-        let prerequisiteNames = task.prerequisiteTasks.map { $0.name }.sorted()
-        cell.prerequisitesLabel.text = prerequisiteNames.isEmpty ? "None" : prerequisiteNames.joined(separator: "\n")
-
         cell.progressView.progress = task.isFinished ? 1.0 : 0.0
 
-        // Button configuration is complicated…
+        configurePrerequisiteLabel(cell.prerequisitesLabel)
         configureAction(for: cell.actionButton)
     }
 
 
+    func configurePrerequisiteLabel(_ label: UILabel) {
+        let sortedPrerequisites = task.prerequisiteTasks.sorted(by: { (task1, task2) -> Bool in
+            return task1.name.localizedStandardCompare(task2.name).rawValue <= ComparisonResult.orderedSame.rawValue
+        })
+
+        guard !sortedPrerequisites.isEmpty else {
+            label.text = "None"
+            return
+        }
+
+        let newlineAttributedString = NSAttributedString(string: "\n")
+        let attributedNames = NSMutableAttributedString()
+        for (index, task) in sortedPrerequisites.enumerated() {
+            let name = NSAttributedString(string: task.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(forTask: task)])
+
+            attributedNames.append(name)
+            if index != sortedPrerequisites.endIndex - 1 {
+                attributedNames.append(newlineAttributedString)
+            }
+        }
+
+        label.attributedText = attributedNames
+    }
+
+
     fileprivate func configureAction(for button: UIButton) {
-        // Get rid of any existing targets
         button.removeTarget(nil, action: nil, for: .allTouchEvents)
 
-        // Otherwise, we can start, cancel, retry, or reset the tasks
         switch task.state {
         case .pending:
             button.setTitle("N/A", for: .normal)
@@ -175,6 +209,6 @@ class ExternalConditionTaskCellController: TaskCellController {
 
 
     @objc func fulfillConditionTask() {
-        externalConditionTask.fulfill(with: nil)
+        externalConditionTask.fulfill(withResult: nil)
     }
 }

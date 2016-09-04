@@ -133,17 +133,23 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 {
     self = [super init];
     if (self) {
-        if (!name) {
-            name = [[NSString alloc] initWithFormat:@"TSKTask %p", self];
-        }
-
-        _name = [name copy];
+        self.name = name;
         _state = TSKTaskStateReady;
         NSString *stateQueueName = [NSString stringWithFormat:@"com.ticketmaster.TSKTask.%@.state", name];
         _stateQueue = dispatch_queue_create([stateQueueName UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
     return self;
+}
+
+
+- (void)setName:(NSString *)name
+{
+    if (!name) {
+        name = [[NSString alloc] initWithFormat:@"TSKTask %p", self];
+    }
+
+    _name = [name copy];
 }
 
 
@@ -192,25 +198,25 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (NSSet *)prerequisiteTasks
 {
-    return [self.workflow prerequisiteTasksForTask:self];
+    return self.workflow ? [self.workflow prerequisiteTasksForTask:self] : [NSSet set];
 }
 
 
 - (NSSet *)unkeyedPrerequisiteTasks
 {
-    return [self.workflow unkeyedPrerequisiteTasksForTask:self];
+    return self.workflow ? [self.workflow unkeyedPrerequisiteTasksForTask:self] : [NSSet set];
 }
 
 
 - (NSDictionary *)keyedPrerequisiteTasks
 {
-    return [self.workflow keyedPrerequisiteTasksForTask:self];
+    return self.workflow ? [self.workflow keyedPrerequisiteTasksForTask:self] : [NSSet set];
 }
 
 
 - (NSSet *)dependentTasks
 {
-    return [self.workflow dependentTasksForTask:self];
+    return self.workflow ? [self.workflow dependentTasksForTask:self] : [NSSet set];
 }
 
 

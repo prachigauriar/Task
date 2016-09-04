@@ -153,7 +153,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @discussion The default value of this property is “TSKTask «id»”, where «id» is the memory address
      of the task. 
  */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy, null_resettable) NSString *name;
 
 /*! The task’s delegate. */
 @property (nonatomic, weak, nullable) id<TSKTaskDelegate> delegate;
@@ -175,8 +175,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @abstract The task’s prerequisite tasks.
  @discussion This method returns a task’s keyed and unkeyed prerequisite tasks. A task’s prerequisite
      tasks can only be set when the task is added to a workflow via -[TSKWorkflow 
-     addTask:prerequisiteTasks:keyedPrerequisites:] or a related method. Until then, this property is
-     nil.
+     addTask:prerequisiteTasks:keyedPrerequisites:] or a related method.
 
      This property is not key-value observable.
  */
@@ -185,8 +184,7 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract The task’s keyed prerequisite tasks.
  @discussion A task’s keyed prerequisite tasks can only be set when the task is added to a workflow
-     via -[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisites:] or a related method. Until then,
-     this property is nil.
+     via -[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisites:] or a related method.
 
      This property is not key-value observable.
  */
@@ -195,8 +193,7 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract The task’s unkeyed prerequisite tasks.
  @discussion A task’s prerequisite tasks can only be set when the task is added to a workflow
-     via -[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisites:] or a related method. Until then,
-     this property is nil.
+     via -[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisites:] or a related method.
 
      This property is not key-value observable.
  */
@@ -206,7 +203,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @abstract The task’s dependent tasks.
  @discussion A task’s dependent tasks can only be affected when a dependent task is added to a
      workflow via -[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisites:] or a related 
-     method. If the task is not in a task workflow, this property is nil.
+     method.
 
      This property is not key-value observable.
  */
@@ -261,6 +258,27 @@ extern NSString *const TSKTaskDidStartNotification;
  */
 @property (nonatomic, strong, readonly, nullable) NSError *error;
 
+/*!
+ @abstract Returns the prerequisite keys that the receiver requires to run.
+ @discussion Returns an empty set by default. Subclasses can override this method to return a set of
+     keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
+     workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
+     is nil, no prerequisite keys are required.
+
+     Subclasses that override this method should take care to include their superclass’s required keys
+     in the set they return. For example, an appropriate Objective-C implementation may look like:
+
+     - (NSSet *)requiredPrerequisiteKeys
+     {
+         return [[super requiredPrerequisiteKeys] setByAddingObjectsFromArray:@[ @"a", @"b" ]];
+     }
+
+     Since the base implementation of this class returns the empty set, direct subclasses of TSKTask
+     need not do this.
+ @result The set of prerequisite keys that the receiver requires to run.
+ */
+@property (nonatomic, copy, readonly, nullable) NSSet<id<NSCopying>> *requiredPrerequisiteKeys;
+
 
 #pragma mark -
 
@@ -275,27 +293,6 @@ extern NSString *const TSKTaskDidStartNotification;
  @result A newly initialized TSKTask instance with the specified name.
  */
 - (instancetype)initWithName:(nullable NSString *)name NS_DESIGNATED_INITIALIZER;
-
-/*!
- @abstract Returns the prerequisite keys that the receiver requires to run.
- @discussion Returns an empty set by default. Subclasses can override this method to return a set of
-     keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
-     workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
-     is nil, no prerequisite keys are required.
- 
-     Subclasses that override this method should take care to include their superclass’s required keys
-     in the set they return. For example, an appropriate implementation may look like:
- 
-         - (NSSet *)requiredPrerequisiteKeys
-         {
-             return [[super requiredPrerequisiteKeys] setByAddingObjectsFromArray:@[ @"a", @"b" ]];
-         }
-
-     Since the base implementation of this class returns the empty set, direct subclasses of TSKTask
-     need not do this.
- @result The set of prerequisite keys that the receiver requires to run.
- */
-- (NSSet<id<NSCopying>> *)requiredPrerequisiteKeys;
 
 /*!
  @abstract Performs the task’s work.
@@ -364,7 +361,7 @@ extern NSString *const TSKTaskDidStartNotification;
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)finishWithResult:(nullable id)result NS_REQUIRES_SUPER NS_SWIFT_NAME(finish(with:));
+- (void)finishWithResult:(nullable id)result NS_REQUIRES_SUPER;
 
 /*!
  @abstract Sets the task’s state to failed and updates its error and finishDate properties.
@@ -376,7 +373,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
  */
-- (void)failWithError:(nullable NSError *)error NS_REQUIRES_SUPER NS_SWIFT_NAME(fail(with:));
+- (void)failWithError:(nullable NSError *)error NS_REQUIRES_SUPER NS_SWIFT_NAME(fail(withError:));
 
 
 #pragma mark - Prerequisite Results
@@ -477,7 +474,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon finishing.
      This method should not be invoked directly.
  */
-- (void)didFinishWithResult:(nullable id)result NS_SWIFT_NAME(didFinish(with:));
+- (void)didFinishWithResult:(nullable id)result;
 
 /*!
  @abstract Performs actions once the receiver has failed.
@@ -486,7 +483,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon failing.
      This method should not be invoked directly.
  */
-- (void)didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(didFail(with:));
+- (void)didFailWithError:(nullable NSError *)error;
 
 @end
 
@@ -506,14 +503,14 @@ extern NSString *const TSKTaskDidStartNotification;
  @param task The task that finished.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)task:(TSKTask *)task didFinishWithResult:(nullable id)result NS_SWIFT_NAME(task(_:didFinishWith:));
+- (void)task:(TSKTask *)task didFinishWithResult:(nullable id)result;
 
 /*!
  @abstract Sent to the delegate when the specified task fails.
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil. 
  */
-- (void)task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(task(_:didFailWith:));
+- (void)task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
 
 /*!
  @abstract Sent to the delegate when the specified task is cancelled.
