@@ -364,7 +364,7 @@ extern NSString *const TSKTaskDidStartNotification;
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)finishWithResult:(nullable id)result NS_REQUIRES_SUPER;
+- (void)finishWithResult:(nullable id)result NS_REQUIRES_SUPER NS_SWIFT_NAME(finish(with:));
 
 /*!
  @abstract Sets the task’s state to failed and updates its error and finishDate properties.
@@ -376,7 +376,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
  */
-- (void)failWithError:(nullable NSError *)error NS_REQUIRES_SUPER;
+- (void)failWithError:(nullable NSError *)error NS_REQUIRES_SUPER NS_SWIFT_NAME(fail(with:));
 
 
 #pragma mark - Prerequisite Results
@@ -477,7 +477,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon finishing.
      This method should not be invoked directly.
  */
-- (void)didFinishWithResult:(nullable id)result;
+- (void)didFinishWithResult:(nullable id)result NS_SWIFT_NAME(didFinish(with:));
 
 /*!
  @abstract Performs actions once the receiver has failed.
@@ -486,7 +486,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon failing.
      This method should not be invoked directly.
  */
-- (void)didFailWithError:(nullable NSError *)error;
+- (void)didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(didFail(with:));
 
 @end
 
@@ -506,14 +506,14 @@ extern NSString *const TSKTaskDidStartNotification;
  @param task The task that finished.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
-- (void)task:(TSKTask *)task didFinishWithResult:(nullable id)result;
+- (void)task:(TSKTask *)task didFinishWithResult:(nullable id)result NS_SWIFT_NAME(task(_:didFinishWith:));
 
 /*!
  @abstract Sent to the delegate when the specified task fails.
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil. 
  */
-- (void)task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
+- (void)task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(task(_:didFailWith:));
 
 /*!
  @abstract Sent to the delegate when the specified task is cancelled.

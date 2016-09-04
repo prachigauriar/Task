@@ -277,7 +277,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @result The set of prerequisite tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
-- (nullable NSSet<TSKTask *> *)prerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)prerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(prerequisites(for:));
 
 /*! 
  @abstract Returns the set of unkeyed prerequisite tasks for the specified task.
@@ -285,7 +285,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @result The set of unkeyed prerequisite tasks for the specified task. Returns nil if the task is not
      in the receiver.
  */
-- (nullable NSSet<TSKTask *> *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(unkeyedPrerequisites(for:));
 
 /*!
  @abstract Returns the keyed prerequisite tasks for the specified task.
@@ -293,7 +293,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @result A dictionary that maps the keys of the specified task’s keyed prerequisites to their 
      corresponding tasks. Returns nil if the task is not in the receiver.
  */
-- (nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(keyedPrerequisites(for:));
 
 /*!
  @abstract Returns the set of dependent tasks for the specified task.
@@ -301,7 +301,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @result The set of dependent tasks for the specified task. Returns nil if the task is not in the
      receiver.
  */
-- (nullable NSSet<TSKTask *> *)dependentTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)dependentTasksForTask:(TSKTask *)task NS_SWIFT_NAME(dependents(for:));
 
 
 #pragma mark - Workflow State
@@ -380,7 +380,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.
  */
-- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(workflow(_:task:didFailWith:));
 
 /*!
  @abstract Sent to the delegate when one of a workflow’s tasks is cancelled.
@@ -388,7 +388,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @param workflow The workflow that contains the task.
  @param task The task that was cancelled.
  */
-- (void)workflow:(TSKWorkflow *)workflow taskDidCancel:(TSKTask *)task;
+- (void)workflow:(TSKWorkflow *)workflow taskDidCancel:(TSKTask *)task NS_SWIFT_NAME(workflow(_:taskDidCancel:));
 
 @end
 

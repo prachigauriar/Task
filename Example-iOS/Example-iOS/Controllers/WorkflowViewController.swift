@@ -173,7 +173,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
     }
 
 
-    func workflow(_ workflow: TSKWorkflow, task: TSKTask, didFailWithError error: Error?) {
+    func workflow(_ workflow: TSKWorkflow, task: TSKTask, didFailWith error: Error?) {
         guard task as? TSKExternalConditionTask == nil else {
             return
         }
