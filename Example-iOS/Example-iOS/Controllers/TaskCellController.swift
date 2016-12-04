@@ -28,34 +28,6 @@ import Task
 import UIKit
 
 
-fileprivate extension UIColor {
-    static let finishedTaskText = UIColor(red: 0.37, green: 0.72, blue: 0.45, alpha: 1.0)
-    static let failedTaskText = UIColor(red: 0.82, green: 0.01, blue: 0.11, alpha: 1.0)
-    static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
-    static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
-
-    static func cellBackgroundColor(for task: TSKTask) -> UIColor {
-        if task.isFinished {
-            return finishedTaskCellBackground
-        } else if task.isFailed {
-            return failedTaskCellBackground
-        }
-
-        return white
-    }
-
-    static func textColor(for task: TSKTask) -> UIColor {
-        if task.isFinished {
-            return finishedTaskText
-        } else if task.isFailed {
-            return failedTaskText
-        }
-
-        return black
-    }
-}
-
-
 class TaskCellController {
     fileprivate(set) var task: TSKTask
     var cell: TaskTableViewCell?
@@ -78,27 +50,18 @@ class TaskCellController {
 
 
     func configurePrerequisiteLabel(_ label: UILabel) {
-        let sortedPrerequisites = task.prerequisiteTasks.sorted(by: { (task1, task2) -> Bool in
-            return task1.name.localizedStandardCompare(task2.name).rawValue <= ComparisonResult.orderedSame.rawValue
-        })
-
-        guard !sortedPrerequisites.isEmpty else {
+        guard !task.prerequisiteTasks.isEmpty else {
             label.text = "None"
             return
         }
 
-        let newlineAttributedString = NSAttributedString(string: "\n")
-        let attributedNames = NSMutableAttributedString()
-        for (index, task) in sortedPrerequisites.enumerated() {
-            let name = NSAttributedString(string: task.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: task)])
+        let sortedPrerequisites = task.prerequisiteTasks.sorted(by: { (task1, task2) -> Bool in
+            return task1.name.localizedStandardCompare(task2.name).rawValue <= ComparisonResult.orderedSame.rawValue
+        })
 
-            attributedNames.append(name)
-            if index != sortedPrerequisites.endIndex - 1 {
-                attributedNames.append(newlineAttributedString)
-            }
-        }
-
-        label.attributedText = attributedNames
+        label.attributedText = sortedPrerequisites
+            .map { NSAttributedString(string: $0.name ?? "", attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: $0)]) }
+            .joined(separator: NSAttributedString(string: "\n"))
     }
 
 
@@ -210,5 +173,56 @@ class ExternalConditionTaskCellController: TaskCellController {
 
     @objc func fulfillCondition() {
         externalConditionTask.fulfill(withResult: nil)
+    }
+}
+
+
+// MARK: - Cell background and text colors
+
+fileprivate extension UIColor {
+    static let finishedTaskText = UIColor(red: 0.37, green: 0.72, blue: 0.45, alpha: 1.0)
+    static let failedTaskText = UIColor(red: 0.82, green: 0.01, blue: 0.11, alpha: 1.0)
+    static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
+    static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
+
+    static func cellBackgroundColor(for task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return finishedTaskCellBackground
+        } else if task.isFailed {
+            return failedTaskCellBackground
+        }
+
+        return white
+    }
+
+    static func textColor(for task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return finishedTaskText
+        } else if task.isFailed {
+            return failedTaskText
+        }
+
+        return black
+    }
+}
+
+
+// MARK: - Joining collections of NSAttributedString
+
+fileprivate extension RandomAccessCollection where Iterator.Element == NSAttributedString, SubSequence.Iterator.Element == Iterator.Element {
+    func joined(separator: NSAttributedString) -> NSAttributedString {
+        guard let last = last else {
+            return NSAttributedString(string: "")
+        }
+
+        let joinedAttributedString = NSMutableAttributedString()
+        for element in dropLast() {
+            joinedAttributedString.append(element)
+            joinedAttributedString.append(separator)
+        }
+
+        joinedAttributedString.append(last)
+
+        return joinedAttributedString.copy() as! NSAttributedString
     }
 }

@@ -32,18 +32,17 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
     private static let kTaskCellReuseIdentifier = "TSKTaskViewController.TaskCell"
 
     private let workflow: TSKWorkflow = TSKWorkflow(name: "Order Product Workflow")
-    private var tasks: [TSKTask]!
-    private var taskStateObservers: [KeyValueObserver<TSKTask>]!
-    private var cellControllers: [TaskCellController]!
+    private var tasks: [TSKTask] = []
+    private var taskStateObservers: [KeyValueObserver<TSKTask>] = []
+    private var cellControllers: [TaskCellController] = []
 
     @IBOutlet weak var tableView: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        initializeWorkflow()
-
         title = workflow.name
+        initializeWorkflow()
 
         // Create a cell controller for each task
         cellControllers = tasks.map { (task: TSKTask) -> TaskCellController in

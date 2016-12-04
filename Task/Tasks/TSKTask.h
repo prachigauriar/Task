@@ -483,7 +483,7 @@ extern NSString *const TSKTaskDidStartNotification;
      does nothing. Subclasses can override this method to perform any special actions upon failing.
      This method should not be invoked directly.
  */
-- (void)didFailWithError:(nullable NSError *)error;
+- (void)didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(didFail(withError:));
 
 @end
 
