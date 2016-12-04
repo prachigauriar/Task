@@ -221,7 +221,7 @@ extern NSString *const TSKWorkflowTaskKey;
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no prerequisite
      tasks. Otherwise, each task in the set must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks;
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks NS_SWIFT_NAME(add(_:prerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified dictionary of keyed 
@@ -233,7 +233,8 @@ extern NSString *const TSKWorkflowTaskKey;
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
      in the dictionary must have already been added to the receiver.
  */
-- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
+-        (void)addTask:(TSKTask *)task
+keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks NS_SWIFT_NAME(add(_:keyedPrerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified prerequisite and keyed
@@ -253,7 +254,7 @@ extern NSString *const TSKWorkflowTaskKey;
  */
 -        (void)addTask:(TSKTask *)task
      prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks
-keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
+keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks NS_SWIFT_NAME(add(_:prerequisites:keyedPrerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.

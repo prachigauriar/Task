@@ -38,7 +38,6 @@
 
 @synthesize requiredPrerequisiteKeys = _requiredPrerequisiteKeys;
 
-
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector
 {
     return [self initWithName:nil target:target selector:selector requiredPrerequisiteKeys:[NSSet set]];

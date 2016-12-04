@@ -34,24 +34,24 @@ fileprivate extension UIColor {
     static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
     static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
 
-    static func cellBackgroundColor(forTask task: TSKTask) -> UIColor {
+    static func cellBackgroundColor(for task: TSKTask) -> UIColor {
         if task.isFinished {
-            return UIColor.finishedTaskCellBackground
+            return finishedTaskCellBackground
         } else if task.isFailed {
-            return UIColor.failedTaskCellBackground
+            return failedTaskCellBackground
         }
 
-        return UIColor.white
+        return white
     }
 
-    static func textColor(forTask task: TSKTask) -> UIColor {
+    static func textColor(for task: TSKTask) -> UIColor {
         if task.isFinished {
-            return UIColor.finishedTaskText
+            return finishedTaskText
         } else if task.isFailed {
-            return UIColor.failedTaskText
+            return failedTaskText
         }
 
-        return UIColor.black
+        return black
     }
 }
 
@@ -66,7 +66,7 @@ class TaskCellController {
 
 
     func configure(_ cell: TaskTableViewCell) {
-        cell.backgroundColor = UIColor.cellBackgroundColor(forTask: task)
+        cell.backgroundColor = UIColor.cellBackgroundColor(for: task)
         cell.nameLabel.text = task.name;
         cell.stateLabel.text = TSKTaskStateDescription(task.state);
 
@@ -90,7 +90,7 @@ class TaskCellController {
         let newlineAttributedString = NSAttributedString(string: "\n")
         let attributedNames = NSMutableAttributedString()
         for (index, task) in sortedPrerequisites.enumerated() {
-            let name = NSAttributedString(string: task.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(forTask: task)])
+            let name = NSAttributedString(string: task.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: task)])
 
             attributedNames.append(name)
             if index != sortedPrerequisites.endIndex - 1 {
@@ -175,7 +175,7 @@ class TimeSlicedTaskCellController: TaskCellController {
             }
 
             timeSlicedTask.progressBlock = { (task: TimeSlicedTask) in
-                DispatchQueue.main.async {
+                OperationQueue.main.addOperation {
                     cell.progressView.setProgress(Float(task.progress), animated: true)
                 }
             }
@@ -200,7 +200,7 @@ class ExternalConditionTaskCellController: TaskCellController {
 
         if !externalConditionTask.isFulfilled {
             button.setTitle("Fulfill", for: .normal)
-            button.addTarget(self, action: #selector(fulfillConditionTask), for: .touchUpInside)
+            button.addTarget(self, action: #selector(fulfillCondition), for: .touchUpInside)
         } else {
             button.setTitle("Reset", for: .normal)
             button.addTarget(self, action: #selector(resetTask), for: .touchUpInside)
@@ -208,7 +208,7 @@ class ExternalConditionTaskCellController: TaskCellController {
     }
 
 
-    @objc func fulfillConditionTask() {
+    @objc func fulfillCondition() {
         externalConditionTask.fulfill(withResult: nil)
     }
 }
