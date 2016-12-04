@@ -161,9 +161,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
 
     func workflowDidFinish(_ workflow: TSKWorkflow) {
         DispatchQueue.main.async {
-            let alertController = UIAlertController.init(title: "Tasks Finished",
-                                                         message: "All tasks finished successfully",
-                                                         preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Tasks Finished", message: "All tasks finished successfully.", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alertController, animated: true, completion: nil)
         }
@@ -176,9 +174,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
         }
 
         OperationQueue.main.addOperation {
-            let alertController = UIAlertController.init(title: "Task Failed",
-                                                         message: "\(task.name ?? "Unknown task") failed.",
-                                                         preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Task Failed", message: "\(task.name ?? "Unknown task") failed.", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             alertController.addAction(UIAlertAction(title: "Retry", style: .default) { [task] (_) in
                 task.retry()

@@ -55,12 +55,9 @@ class TaskCellController {
             return
         }
 
-        let sortedPrerequisites = task.prerequisiteTasks.sorted(by: { (task1, task2) -> Bool in
-            return task1.name.localizedStandardCompare(task2.name).rawValue <= ComparisonResult.orderedSame.rawValue
-        })
-
-        label.attributedText = sortedPrerequisites
-            .map { NSAttributedString(string: $0.name ?? "", attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: $0)]) }
+        label.attributedText = task.prerequisiteTasks
+            .sorted { $0.name.localizedStandardCompare($1.name).rawValue <= ComparisonResult.orderedSame.rawValue }
+            .map { NSAttributedString(string: $0.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: $0)]) }
             .joined(separator: NSAttributedString(string: "\n"))
     }
 
