@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Task"
-  s.version      = "1.1"
+  s.version      = "1.2"
 
   s.summary      = <<-SUMMARY
                    A simple framework for expressing and executing your app’s workflows.

@@ -26,75 +26,11 @@ workflows.
 * Works with all of Apple’s platforms
 
 
-## What’s New in 1.1
+## What’s New in 1.2
 
-Task 1.1 is a significant update that makes it easier for Task subclasses to get prerequisite
-results and respond to state changes. It also contains a very important fix related to task
-resetting. Users are strongly encouraged to upgrade to Task 1.1.
-
-
-### Keyed Prerequisites
-
-When adding a task to a workflow, prerequisites can be given unique keys that can be used to
-retrieve their results. For example,
-
-```swift
-let workflow: TSKWorkflow = …
-let taskA: TSKTask = …
-let taskB: TSKTask = …
-let taskC: TSKTask = …
-
-…
-
-workflow.add(taskC, keyedPrerequisiteTasks: ["userTask": taskA, "projectTask": taskB])
-```
-
-Later, `taskC` can access the results of `taskA` and `taskB`, e.g., in its `main()` method, using
-`TSKTask.prerequisiteResult(forKey:)`:
-
-```swift
-override func main() { 
-{
-    guard let user = prerequisiteResult(forKey: userTask) as? User,
-        let project = prerequisiteResult(forKey: projectTask) as? Project else {
-        …
-    }
-
-    …
-}
-```
-
-Tasks can even specify which keys they require to run by overriding `requiredPrerequisiteKeys()`. If
-this requirement is not fulfilled when a task is added to a workflow, an assertion is raised.
-
-
-### Task Subclass Interface
-
-We’ve also added numerous methods to `TSKTask` so that subclasses can respond to changes in task 
-state:
- 
-* `didCancel()`
-* `didReset()`
-* `didRetry()`
-* `didFinish(with:)` (`didFinishWithResult:` in Objective-C)
-* `didFail(with:)` (`didFailWithError:` in Objective-C)
-
-While the default implementations of these methods do nothing, subclasses can override them to
-perform necessary actions upon state changes. This should obviate the need for `TSKTask` subclasses
-to observe notifications posted by their superclass.
-
-
-### Reset Bug Fix
-
-Task 1.0 contains a serious bug in which a reset task may be able to run even if its prerequisites
-have not all completed. This bug can be reproduced as follows:
-
-1. Set up a workflow with two tasks, A and B, with A listed as a prerequisite of B.
-2. Run the workflow to completion.
-3. Reset B. A is now in the Finished state. B should be Ready.
-4. Reset A. A is now in the Ready state. As such, B should be in the Pending state.
-
-In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
+Task 1.2 updates Task to work better with Swift 3. Objective-C APIs have been annotated with
+nullability specifiers and generics, and the sample project and README have been updated to 
+use Swift instead of Objective-C.
 
 
 ## Installation
@@ -102,7 +38,7 @@ In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
 The easiest way to start using Task is to install it with CocoaPods.
 
 ```ruby
-pod 'Task', '~> 1.1'
+pod 'Task', '~> 1.2'
 ```
 
 You can also build it and include the built products in your project. For OS X and iOS 8, just add
@@ -160,7 +96,7 @@ In this workflow, task *A* is the lone task, with no prerequisites. Creating it 
 ```swift
 let workflow = TSKWorkflow("Workflow A")
 let taskA: TSKTask = …
-workflow.add(taskA, prerequisiteTasks: nil)
+workflow.add(taskA, prerequisites: nil)
 ```
 
 When we’re ready to run the workflow, we can send it the `‑start` message. This will in turn start
@@ -180,8 +116,8 @@ the result or some side-effect of running *A*. Modeling this workflow in code is
 let workflow = TSKWorkflow("Workflow A+B")
 let taskA: TSKTask = …
 let taskB: TSKTask = …
-workflow.add(taskA, prerequisiteTasks: nil)
-workflow.add(taskB, prerequisiteTasks: [taskA])
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: [taskA])
 ```
 
 When executing this workflow, Task.framework will automatically run `taskA` first and start `taskB`
@@ -205,8 +141,8 @@ We need only change our code above so that *B* doesn’t list *A* as a prerequis
 let workflow = TSKWorkflow("Workflow AB")
 let taskA: TSKTask = …
 let taskB: TSKTask = …
-workflow.add(taskA, prerequisiteTasks: nil)
-workflow.add(taskB, prerequisiteTasks: nil)
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
 ```
 
 With this simple change, Task.framework will run `taskA` and `taskB` concurrently. Easy enough. Now,
@@ -231,9 +167,9 @@ let workflow = TSKWorkflow("Workflow AB+C")
 let taskA: TSKTask = …
 let taskB: TSKTask = …
 let taskC: TSKTask = …
-workflow.add(taskA, prerequisiteTasks: nil)
-workflow.add(taskB, prerequisiteTasks: nil)
-workflow.add(taskC, prerequisiteTasks: [taskA, taskB])
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
+workflow.add(taskC, prerequisites: [taskA, taskB])
 ```
 
 When run, the workflow will automatically run tasks *A* and *B* concurrently, but only start *C*
@@ -260,9 +196,9 @@ let workflow = TSKWorkflow("Workflow A(B+C)")
 let taskA: TSKTask = …
 let taskB: TSKTask = …
 let taskC: TSKTask = …
-workflow.add(taskA, prerequisiteTasks: nil)
-workflow.add(taskB, prerequisiteTasks: nil)
-workflow.add(taskC, prerequisiteTasks: [taskB])
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
+workflow.add(taskC, prerequisites: [taskB])
 ```
 
 Again, Task.framework manages the mechanics of executing tasks so that tasks are run with maximal
@@ -321,7 +257,7 @@ func setUpWorkflow() {
         })
     }
 
-    workflow.add(blockTask, prerequisiteTasks: [requestTask])
+    workflow.add(blockTask, prerequisites: [requestTask])
     
     …
 }
@@ -341,7 +277,7 @@ func setUpWorkflow() {
                                     target: self, 
                                     selector: #selector(mapRequestResult(with:)))
                                                     
-    workflow.add(mappingTask, prerequisiteTasks: [requestTask])
+    workflow.add(mappingTask, prerequisites: [requestTask])
 
     …
 }
@@ -375,10 +311,10 @@ a prerequisite:
 
 ```swift
 let inputTask = TSKExternalConditionTask(name: "Get input")
-workflow.add(inputTask, prerequisiteTasks: nil)
+workflow.add(inputTask, prerequisites: nil)
 
 let requestTask: TSKTask = … 
-workflow.add(requestTask, prerequisiteTasks: [inputTask])
+workflow.add(requestTask, prerequisites: [inputTask])
 
 …
 
@@ -399,9 +335,9 @@ let filterWorkflow = workflow(for: imagefilter)
 let filterTask = TSKSubworkflowTask(subworkflow: filterWorkflow)
 let uploadImageTask = UploadDataTask()
 
-imageWorkflow.add(imageAvailableTask, prerequisiteTasks: nil)
+imageWorkflow.add(imageAvailableTask, prerequisites: nil)
 imageWorkflow.add(filterTask, prerequisitesTasks: [imageAvailableTask])
-imageWorkflow.add(uploadImageTask, prerequisiteTasks: [filterTask])
+imageWorkflow.add(uploadImageTask, prerequisites: [filterTask])
 ```
 
 
@@ -430,16 +366,16 @@ them uniformly.
 Sometimes, tasks need to use the results of multiple prerequisite in varied ways. For this purpose,
 Task.framework has the concept of *keyed* prerequisites. Keyed prerequisites allow a task to assign
 unique keys to its prerequisites with which they can be referred later. Tasks can define their keyed
-prerequisites using `TSKWorkflow.add(_:keyedPrerequisiteTasks:)` or 
-`TSKWorkflow.add(_:prerequisiteTasks:keyedPrerequisiteTasks:)`. In both cases, the
-`keyedPrerequisiteTasks` parameter is a dictionary that maps a key to its associated task. The
+prerequisites using `TSKWorkflow.add(_:keyedPrerequisites:)` or 
+`TSKWorkflow.add(_:prerequisites:keyedPrerequisites:)`. In both cases, the
+`keyedPrerequisites` parameter is a dictionary that maps a key to its associated task. The
 result of a given keyed prerequisite can be retrieved by sending a task
 `prerequisiteResult(forKey:)`. 
 
 For example, suppose a task were added to a workflow as follows:
 
 ```swift
-workflow.add(task, keyedPrerequisiteTasks: ["userTask": task1, "addressTask": task2])
+workflow.add(task, keyedPrerequisites: ["userTask": task1, "addressTask": task2])
 ```
 
 The task can easily refer to the results of `task1` and `task2`, e.g., in its `main()` method like so:
@@ -458,11 +394,11 @@ override func main() {
 ```
 
 Furthermore, if a task cannot function without certain keyed prerequisites, it can specify that to
-Task.framework by overriding `requiredPrerequisiteKeys()`. The `TSKTask` subclass in our example
+Task.framework by overriding `requiredPrerequisiteKeys`. The `TSKTask` subclass in our example
 above might override that method as follows:
 
 ```swift
-override func requiredPrerequisiteKeys() -> Set<AnyHashable> {
+var requiredPrerequisiteKeys: Set<AnyHashable> {
     return ["userTask", "addressTask"]
 }
 ```
