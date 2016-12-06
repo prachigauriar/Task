@@ -259,7 +259,7 @@ extern NSString *const TSKTaskDidStartNotification;
 @property (nonatomic, strong, readonly, nullable) NSError *error;
 
 /*!
- @abstract Returns the prerequisite keys that the receiver requires to run.
+ @abstract Returns the prerequisite keys that the task requires to run.
  @discussion Returns an empty set by default. Subclasses can override this method to return a set of
      keys for keyed prerequisites that the task requires. When the task is added to a workflow, the
      workflow will ensure that the task’s required keyed prerequisites are fulfilled. If this property
@@ -275,7 +275,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
      Since the base implementation of this class returns the empty set, direct subclasses of TSKTask
      need not do this.
- @result The set of prerequisite keys that the receiver requires to run.
+ @result The set of prerequisite keys that the task requires to run.
  */
 @property (nonatomic, copy, readonly, nullable) NSSet<id<NSCopying>> *requiredPrerequisiteKeys;
 
@@ -299,9 +299,9 @@ extern NSString *const TSKTaskDidStartNotification;
  @discussion The default implementation of this method simply invokes ‑finishWithResult: with a nil
      parameter. You should override this method to perform any work necessary to complete your task.
      In your implementation, do not invoke super. When your work is complete, it is imperative that
-     the receiver be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will
-     prevent dependent tasks from executing. When appropriate, you can send the receiver the ‑cancel
-     message to abort execution without completion.
+     the task be sent either ‑finishWithResult: or ‑failWithError:. Failing to do so will prevent 
+     dependent tasks from executing. When appropriate, you can send the task the ‑cancel message 
+     to abort execution without completion.
 
      Subclass implementations of this method should periodically check whether the task is in the
      executing state (-isExecuting) and, if not, stop executing at the earliest possible moment.
@@ -310,7 +310,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*!
  @abstract Executes the task’s ‑main method if the task is in the ready state.
- @discussion More accurately, if the receiver is in the ready state, it will enqueue an operation on
+ @discussion More accurately, if the task is in the ready state, it will enqueue an operation on
      its workflow’s operation queue that executes the task’s ‑main method if and only if the task is
      ready when the operation begins executing.
 
@@ -321,7 +321,7 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*!
  @abstract Sets the task’s state to cancelled if it is pending, ready, or executing. 
- @discussion Regardless of the receiver’s state, sends the ‑cancel message to all of the receiver’s
+ @discussion Regardless of the task’s state, sends the ‑cancel message to all of the task’s
      dependent tasks.
  
      Note that this only marks the task as cancelled. It is up individual subclasses of TSKTask to
@@ -334,9 +334,9 @@ extern NSString *const TSKTaskDidStartNotification;
 
 /*!
  @abstract Sets the task’s state to pending if it is ready, executing, finished, failed, or cancelled.
- @discussion If, after being reset, the receiver’s prerequisite tasks have all finished successfully,
-     the receiver is automatically put into the ready state. Regardless of the receiver’s state,
-     sends the ‑reset message to all of the receiver’s dependent tasks.
+ @discussion If, after being reset, the task’s prerequisite tasks have all finished successfully, the 
+     task is automatically put into the ready state. Regardless of the task’s state, sends the ‑reset 
+     message to all of the task’s dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
  */
@@ -345,7 +345,7 @@ extern NSString *const TSKTaskDidStartNotification;
 /*!
  @abstract Sets the task’s state to pending if it is cancelled or failed, and starts the task if its
      prerequisite tasks have all finished successfully.
- @discussion Regardless of the receiver’s state, sends the ‑retry message to all of the receiver’s
+ @discussion Regardless of the task’s state, sends the ‑retry message to all of the task’s
      dependent tasks.
 
      Subclasses should invoke the superclass implementation of this method.
@@ -357,7 +357,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @discussion Subclasses should ensure that this message is sent to the task when the task’s work
      finishes successfully.
  
-     If the receiver’s delegate implements ‑task:didFinishWithResult:, it is sent that message
+     If the task’s delegate implements ‑task:didFinishWithResult:, it is sent that message
      after the task’s state is updated.
  @param result An object that represents the result of performing the task’s work. May be nil.
  */
@@ -368,7 +368,7 @@ extern NSString *const TSKTaskDidStartNotification;
  @discussion Subclasses should ensure that this message is sent to the task when the task’s work
      fails. 
 
-     If the receiver’s delegate implements ‑task:didFailWithError:, it is sent that message
+     If the task’s delegate implements ‑task:didFailWithError:, it is sent that message
      after the task’s state is updated.
  @param error An error containing the reason for why the task failed. May be nil, though this is
      discouraged.
@@ -379,53 +379,53 @@ extern NSString *const TSKTaskDidStartNotification;
 #pragma mark - Prerequisite Results
 
 /*!
- @abstract Returns the result of one of the receiver’s prerequisite tasks.
- @discussion This is primarily useful if the receiver only has or expects one prerequisite. It
+ @abstract Returns the result of one of the task’s prerequisite tasks.
+ @discussion This is primarily useful if the task only has or expects one prerequisite. It
      returns the equivalent of [[self.prerequisiteTasks anyObject] result]. No guarantee is made
      that this method will return the same task’s result on repeated invocations.
- @result The result of one of the receiver’s prerequisite tasks.
+ @result The result of one of the task’s prerequisite tasks.
  */
 - (nullable id)anyPrerequisiteResult;
 
 /*!
- @abstract Returns the results of all the receiver’s prerequisite tasks in an array.
- @discussion This is primarily useful if the receiver has many prerequisites that all produce the
+ @abstract Returns the results of all the task’s prerequisite tasks in an array.
+ @discussion This is primarily useful if the task has many prerequisites that all produce the
      same type of result and processes them uniformly. The returned array will contain NSNull 
      elements for each task that returns nil. The order of the array is arbitrary.
- @result An array containing the results of all the receiver’s prerequisite tasks.
+ @result An array containing the results of all the task’s prerequisite tasks.
  */
 - (NSArray *)allPrerequisiteResults;
 
 /*!
- @abstract Returns the results of all the receiver’s unkeyed prerequisite tasks in an array.
+ @abstract Returns the results of all the task’s unkeyed prerequisite tasks in an array.
  @discussion The returned array will contain NSNull elements for each task that returns nil. 
      The order of the array is arbitrary.
- @result An array containing the results of all the receiver’s unkeyed prerequisite tasks.
+ @result An array containing the results of all the task’s unkeyed prerequisite tasks.
  */
 - (NSArray *)allUnkeyedPrerequisiteResults;
 
 /*!
- @abstract Returns the results of all the receiver’s keyed prerequisite tasks in a dictionary.
+ @abstract Returns the results of all the task’s keyed prerequisite tasks in a dictionary.
  @discussion The returned dictionary maps the prerequisite’s key to its result and will contain
      NSNull elements for each task that returns nil.
- @result A dictionary containing the results of all the receiver’s keyed prerequisite tasks.
+ @result A dictionary containing the results of all the task’s keyed prerequisite tasks.
  */
 - (NSDictionary *)keyedPrerequisiteResults;
 
 /*!
- @abstract Returns the result of the prerequisite in the receiver’s keyed prerequisites that has
+ @abstract Returns the result of the prerequisite in the task’s keyed prerequisites that has
      the specified key.
  @param prerequisiteKey The key of the prerequisite task whose result is being retrieved.
- @result The result for the receiver’s prerequisite task with the specified key. Returns nil if
-     the receiver has no such prerequisite task or the task has a nil result.
+ @result The result for the task’s prerequisite task with the specified key. Returns nil if
+     the task has no such prerequisite task or the task has a nil result.
  */
 - (nullable id)prerequisiteResultForKey:(id<NSCopying>)prerequisiteKey;
 
 /*!
- @abstract Returns the results of all the receiver’s prerequisite tasks in a map table.
+ @abstract Returns the results of all the task’s prerequisite tasks in a map table.
  @discussion The keys in the map table are the prerequisite tasks; the values are their
      corresponding results. The map table will contain NSNull values for each nil result.
- @result A map table containing the results of all the receiver’s prerequisite tasks.
+ @result A map table containing the results of all the task’s prerequisite tasks.
  */
 - (NSMapTable<TSKTask *, id> *)prerequisiteResultsByTask;
 
@@ -441,8 +441,8 @@ extern NSString *const TSKTaskDidStartNotification;
 @interface TSKTask (SubclassInterface)
 
 /*!
- @abstract Performs actions once the receiver has been cancelled.
- @discussion This method is invoked after the receiver has been put in the cancelled state but
+ @abstract Performs actions once the task has been cancelled.
+ @discussion This method is invoked after the task has been put in the cancelled state but
      before it has informed its delegate or posted any relevant notifications. The default
      implementation does nothing. Subclasses can override this method to perform any special actions
      upon cancellation. This method should not be invoked directly.
@@ -450,8 +450,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)didCancel;
 
 /*!
- @abstract Performs actions once the receiver has been reset.
- @discussion This method is invoked after the receiver has been put in the pending state but before
+ @abstract Performs actions once the task has been reset.
+ @discussion This method is invoked after the task has been put in the pending state but before
      it has informed its delegate or posted any relevant notifications. The default implementation
      does nothing. Subclasses can override this method to perform any special actions upon being
      reset. This method should not be invoked directly.
@@ -459,8 +459,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)didReset;
 
 /*!
- @abstract Performs actions once the receiver has been retried.
- @discussion This method is invoked after the receiver has been put in the pending state but before
+ @abstract Performs actions once the task has been retried.
+ @discussion This method is invoked after the task has been put in the pending state but before
      it has informed its delegate or posted any relevant notifications. The default implementation
      does nothing. Subclasses can override this method to perform any special actions upon being
      retried. This method should not be invoked directly.
@@ -468,8 +468,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)didRetry;
 
 /*!
- @abstract Performs actions once the receiver finishes.
- @discussion This method is invoked after the receiver has been put in the finished state but before
+ @abstract Performs actions once the task finishes.
+ @discussion This method is invoked after the task has been put in the finished state but before
      it has informed its delegate or posted any relevant notifications. The default implementation
      does nothing. Subclasses can override this method to perform any special actions upon finishing.
      This method should not be invoked directly.
@@ -477,8 +477,8 @@ extern NSString *const TSKTaskDidStartNotification;
 - (void)didFinishWithResult:(nullable id)result;
 
 /*!
- @abstract Performs actions once the receiver has failed.
- @discussion This method is invoked after the receiver has been put in the failed state but before
+ @abstract Performs actions once the task has failed.
+ @discussion This method is invoked after the task has been put in the failed state but before
      it has informed its delegate or posted any relevant notifications. The default implementation
      does nothing. Subclasses can override this method to perform any special actions upon failing.
      This method should not be invoked directly.

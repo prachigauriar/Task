@@ -80,38 +80,38 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 @property (nonatomic, strong, readonly) dispatch_queue_t stateQueue;
 
 /*!
- @abstract If the receiver’s state is in the specified set of from-states, transitions to the specified
+ @abstract If the task’s state is in the specified set of from-states, transitions to the specified
      to-state and executes the block.
- @param validFromStates The set of states from which the receiver can transition.
- @param toState The state to which the receiver will transition.
+ @param validFromStates The set of states from which the task can transition.
+ @param toState The state to which the task will transition.
  @param block A block of code to execute after the state transition is completed successfully.
  */
 - (void)transitionFromStateInSet:(NSSet *)validFromStates toState:(TSKTaskState)toState andExecuteBlock:(void (^)(void))block;
 
 /*!
- @abstract If the receiver’s state is the specified from-state, transitions to the specified to-state 
+ @abstract If the task’s state is the specified from-state, transitions to the specified to-state
      and executes the block.
- @param fromState The state from which the receiver can transition.
- @param toState The state to which the receiver will transition.
+ @param fromState The state from which the task can transition.
+ @param toState The state to which the task will transition.
  @param block A block of code to execute after the state transition is completed successfully.
  */
 - (void)transitionFromState:(TSKTaskState)fromState toState:(TSKTaskState)toState andExecuteBlock:(void (^)(void))block;
 
 /*!
- @abstract Returns whether all the receiver’s prerequisite tasks have finished successfully.
- @result Whether all the receiver’s prerequisite tasks have finished successfully.
+ @abstract Returns whether all the task’s prerequisite tasks have finished successfully.
+ @result Whether all the task’s prerequisite tasks have finished successfully.
  */
 - (BOOL)allPrerequisiteTasksFinished;
 
 /*!
- @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from
+ @abstract If all the task’s prerequisite tasks have finished successfully, transitions from
      pending to ready and executes the specified block.
  @param block The block to execute after successfully transitioning to the ready state.
  */
 - (void)transitionToReadyStateAndExecuteBlock:(void (^)(void))block;
 
 /*!
- @abstract If all the receiver’s prerequisite tasks have finished successfully, transitions from 
+ @abstract If all the task’s prerequisite tasks have finished successfully, transitions from 
      pending to ready and starts the task.
  */
 - (void)startIfReady;

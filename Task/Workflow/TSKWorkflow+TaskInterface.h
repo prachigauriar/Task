@@ -34,27 +34,27 @@
 @interface TSKWorkflow (TaskInterface)
 
 /*!
- @abstract Indicates to the receiver that the specified task finished successfully.
+ @abstract Indicates to the workflow that the specified task finished successfully.
  @param task The task that finished. May not be nil.
  @param result The result that the task finished with.
  */
 - (void)subtask:(TSKTask *)task didFinishWithResult:(id)result;
 
 /*!
- @abstract Indicates to the receiver that the specified task failed.
+ @abstract Indicates to the workflow that the specified task failed.
  @param task The task that failed. May not be nil.
  @param error The error that caused the task to fail.
  */
 - (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
 
 /*!
- @abstract Indicates to the receiver that the specified task was cancelled.
+ @abstract Indicates to the workflow that the specified task was cancelled.
  @param task The task that was cancelled. May not be nil.
  */
 - (void)subtaskDidCancel:(TSKTask *)task;
 
 /*!
- @abstract Indicates to the receiver that the specified task was reset.
+ @abstract Indicates to the workflow that the specified task was reset.
  @param task The task that was reset. May not be nil.
  */
 - (void)subtaskDidReset:(TSKTask *)task;

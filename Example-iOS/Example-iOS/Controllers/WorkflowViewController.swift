@@ -160,7 +160,7 @@ class WorkflowViewController : UIViewController, TSKWorkflowDelegate, UITableVie
     // MARK: - Workflow delegate
 
     func workflowDidFinish(_ workflow: TSKWorkflow) {
-        DispatchQueue.main.async {
+        OperationQueue.main.addOperation {
             let alertController = UIAlertController(title: "Tasks Finished", message: "All tasks finished successfully.", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alertController, animated: true, completion: nil)
