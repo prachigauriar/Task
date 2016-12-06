@@ -102,10 +102,10 @@
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
-    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
-    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+    XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.keyedPrerequisiteTasks, [NSDictionary dictionary], @"keyedPrerequisiteTasks is not an empty dictionary");
+    XCTAssertEqualObjects(task.unkeyedPrerequisiteTasks, [NSSet set], @"unkeyedPrerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependentTasks is not the empty set");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
     NSString *name = UMKRandomUnicodeString();
@@ -114,20 +114,21 @@
     XCTAssertEqualObjects(task.name, name, @"name not set to default");
     XCTAssertNotEqualObjects(task.name, notName, @"name not set correctly");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
-    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
-    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+    XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.keyedPrerequisiteTasks, [NSDictionary dictionary], @"keyedPrerequisiteTasks is not an empty dictionary");
+    XCTAssertEqualObjects(task.unkeyedPrerequisiteTasks, [NSSet set], @"unkeyedPrerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependentTasks is not the empty set");
     XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 
     task = [[TSKTask alloc] initWithName:nil];
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
     XCTAssertNil(task.workflow, @"workflow is non-nil");
-    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
-    XCTAssertNil(task.keyedPrerequisiteTasks, @"keyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.unkeyedPrerequisiteTasks, @"unkeyedPrerequisiteTasks is non-nil");
-    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
+    XCTAssertEqualObjects(task.prerequisiteTasks, [NSSet set], @"prerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.keyedPrerequisiteTasks, [NSDictionary dictionary], @"keyedPrerequisiteTasks is not an empty dictionary");
+    XCTAssertEqualObjects(task.unkeyedPrerequisiteTasks, [NSSet set], @"unkeyedPrerequisiteTasks is not the empty set");
+    XCTAssertEqualObjects(task.dependentTasks, [NSSet set], @"dependentTasks is not the empty set");
+    XCTAssertEqual(task.state, TSKTaskStateReady, @"state not set to default");
 }
 
 
@@ -201,6 +202,20 @@
     [workflow addTask:task prerequisites:nil];
     [workflow start];
     [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+
+- (void)testName
+{
+    TSKTask *task = [[TSKTask alloc] init];
+    XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
+
+    NSString *name = UMKRandomUnicodeString();
+    task.name = name;
+    XCTAssertEqualObjects(task.name, name, @"name is not set correctly");
+
+    task.name = nil;
+    XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
 }
 
 

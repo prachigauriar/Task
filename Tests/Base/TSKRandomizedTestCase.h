@@ -55,6 +55,13 @@ extern const NSTimeInterval kTSKRandomizedTestCaseDateTolerance;
 - (NSString *)defaultNameForTask:(TSKTask *)task;
 
 /*!
+ @abstract Returns the default name for the specified workflow.
+ @param workflow The workflow whose default name will be returned.
+ @result The default name for the specified workflow.
+ */
+- (NSString *)defaultNameForWorkflow:(TSKWorkflow *)workflow;
+
+/*!
  @abstract Returns a new workflow whose notification center is the same as the receiver’s.
  @result A new workflow whose notification center is the same as the receiver’s.
  */

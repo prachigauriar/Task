@@ -210,7 +210,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (NSDictionary *)keyedPrerequisiteTasks
 {
-    return self.workflow ? [self.workflow keyedPrerequisiteTasksForTask:self] : [NSSet set];
+    return self.workflow ? [self.workflow keyedPrerequisiteTasksForTask:self] : [NSDictionary dictionary];
 }
 
 

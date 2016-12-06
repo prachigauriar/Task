@@ -45,9 +45,6 @@
     TSKExternalConditionTask *task = [[TSKExternalConditionTask alloc] init];
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.name, [self defaultNameForTask:task], @"name not set to default");
-    XCTAssertNil(task.workflow, @"workflow is non-nil");
-    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
-    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertFalse(task.isFulfilled, @"task is initially fulfilled");
     XCTAssertNil(task.result, @"result is non-nil");
 
@@ -55,9 +52,6 @@
     task = [[TSKExternalConditionTask alloc] initWithName:name];
     XCTAssertNotNil(task, @"returns nil");
     XCTAssertEqualObjects(task.name, name, @"name is set incorrectly");
-    XCTAssertNil(task.workflow, @"workflow is non-nil");
-    XCTAssertNil(task.prerequisiteTasks, @"prerequisiteTasks is non-nil");
-    XCTAssertNil(task.dependentTasks, @"dependentTasks is non-nil");
     XCTAssertFalse(task.isFulfilled, @"task is initially fulfilled");
     XCTAssertNil(task.result, @"result is non-nil");
 }
