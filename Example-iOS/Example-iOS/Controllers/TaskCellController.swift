@@ -28,12 +28,6 @@ import Task
 import UIKit
 
 
-fileprivate extension UIColor {
-    static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
-    static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
-}
-
-
 class TaskCellController {
     fileprivate(set) var task: TSKTask
     var cell: TaskTableViewCell?
@@ -44,33 +38,33 @@ class TaskCellController {
 
 
     func configure(_ cell: TaskTableViewCell) {
-        if task.isFinished {
-            cell.backgroundColor = UIColor.finishedTaskCellBackground
-        } else if task.isFailed {
-            cell.backgroundColor = UIColor.failedTaskCellBackground
-        } else {
-            cell.backgroundColor = UIColor.white
-        }
-
-        // Set the cell’s name, state, prerequisite labels, and progress
+        cell.backgroundColor = UIColor.cellBackgroundColor(for: task)
         cell.nameLabel.text = task.name;
         cell.stateLabel.text = TSKTaskStateDescription(task.state);
 
-        let prerequisiteNames = task.prerequisiteTasks.map { $0.name }.sorted()
-        cell.prerequisitesLabel.text = prerequisiteNames.isEmpty ? "None" : prerequisiteNames.joined(separator: "\n")
-
         cell.progressView.progress = task.isFinished ? 1.0 : 0.0
 
-        // Button configuration is complicated…
+        configurePrerequisiteLabel(cell.prerequisitesLabel)
         configureAction(for: cell.actionButton)
     }
 
 
+    func configurePrerequisiteLabel(_ label: UILabel) {
+        guard !task.prerequisiteTasks.isEmpty else {
+            label.text = "None"
+            return
+        }
+
+        label.attributedText = task.prerequisiteTasks
+            .sorted { $0.name.localizedStandardCompare($1.name).rawValue <= ComparisonResult.orderedSame.rawValue }
+            .map { NSAttributedString(string: $0.name, attributes: [NSForegroundColorAttributeName: UIColor.textColor(for: $0)]) }
+            .joined(separator: NSAttributedString(string: "\n"))
+    }
+
+
     fileprivate func configureAction(for button: UIButton) {
-        // Get rid of any existing targets
         button.removeTarget(nil, action: nil, for: .allTouchEvents)
 
-        // Otherwise, we can start, cancel, retry, or reset the tasks
         switch task.state {
         case .pending:
             button.setTitle("N/A", for: .normal)
@@ -141,7 +135,7 @@ class TimeSlicedTaskCellController: TaskCellController {
             }
 
             timeSlicedTask.progressBlock = { (task: TimeSlicedTask) in
-                DispatchQueue.main.async {
+                OperationQueue.main.addOperation {
                     cell.progressView.setProgress(Float(task.progress), animated: true)
                 }
             }
@@ -166,7 +160,7 @@ class ExternalConditionTaskCellController: TaskCellController {
 
         if !externalConditionTask.isFulfilled {
             button.setTitle("Fulfill", for: .normal)
-            button.addTarget(self, action: #selector(fulfillConditionTask), for: .touchUpInside)
+            button.addTarget(self, action: #selector(fulfillCondition), for: .touchUpInside)
         } else {
             button.setTitle("Reset", for: .normal)
             button.addTarget(self, action: #selector(resetTask), for: .touchUpInside)
@@ -174,7 +168,58 @@ class ExternalConditionTaskCellController: TaskCellController {
     }
 
 
-    @objc func fulfillConditionTask() {
+    @objc func fulfillCondition() {
         externalConditionTask.fulfill(withResult: nil)
+    }
+}
+
+
+// MARK: - Cell background and text colors
+
+fileprivate extension UIColor {
+    static let finishedTaskText = UIColor(red: 0.37, green: 0.72, blue: 0.45, alpha: 1.0)
+    static let failedTaskText = UIColor(red: 0.82, green: 0.01, blue: 0.11, alpha: 1.0)
+    static let finishedTaskCellBackground = UIColor(red: 0.96, green: 1.0, blue: 0.95, alpha: 1.0)
+    static let failedTaskCellBackground = UIColor(red: 1.0, green: 0.89, blue: 0.90, alpha: 1.0)
+
+    static func cellBackgroundColor(for task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return finishedTaskCellBackground
+        } else if task.isFailed {
+            return failedTaskCellBackground
+        }
+
+        return white
+    }
+
+    static func textColor(for task: TSKTask) -> UIColor {
+        if task.isFinished {
+            return finishedTaskText
+        } else if task.isFailed {
+            return failedTaskText
+        }
+
+        return black
+    }
+}
+
+
+// MARK: - Joining collections of NSAttributedString
+
+fileprivate extension RandomAccessCollection where Iterator.Element == NSAttributedString, SubSequence.Iterator.Element == Iterator.Element {
+    func joined(separator: NSAttributedString) -> NSAttributedString {
+        guard let last = last else {
+            return NSAttributedString(string: "")
+        }
+
+        let joinedAttributedString = NSMutableAttributedString()
+        for element in dropLast() {
+            joinedAttributedString.append(element)
+            joinedAttributedString.append(separator)
+        }
+
+        joinedAttributedString.append(last)
+
+        return joinedAttributedString.copy() as! NSAttributedString
     }
 }

@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TSKSubworkflowTask : TSKTask
 
-/*! The receiver’s subworkflow. May not be nil. */
+/*! The instance’s subworkflow. May not be nil. */
 @property (nonatomic, strong, readonly) TSKWorkflow *subworkflow;
 
 

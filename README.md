@@ -10,7 +10,7 @@ workflows.
 
 ## Features
 
-* Simple, well-documented Objective-C API
+* Simple, well-documented API that is at home in both Swift and Objective-C
 * Flexible system for expressing your app’s workflows in a clear, concise manner
 * Powerful execution system that allows you to easily manage your workflow’s execution
     * Tasks are started as soon as all their prerequisites have finished successfully
@@ -23,75 +23,14 @@ workflows.
   conditions that must be fulfilled before work can continue
 * Subworkflow tasks for executing whole workflows as a single step in a workflow
 * Easy-to-extend API for creating your own reusable tasks
-* Works with both iOS and OS X
+* Works with all of Apple’s platforms
 
 
-## What’s New in 1.1
+## What’s New in 1.2
 
-Task 1.1 is a significant update that makes it easier for Task subclasses to get prerequisite
-results and respond to state changes. It also contains a very important fix related to task
-resetting. Users are strongly encouraged to upgrade to Task 1.1.
-
-
-### Keyed Prerequisites
-
-When adding a task to a workflow, prerequisites can be given unique keys that can be used to
-retrieve their results. For example,
-
-```objc
-TSKWorkflow *workflow = …;
-TSKTask *taskA = …;
-TSKTask *taskB = …;
-TSKTask *taskC = …;
-
-…
-
-[workflow addTask:taskC keyedPrerequisiteTasks:@{ @"userTask" : taskA, @"projectTask" : taskB }];
-```
-
-Later, `taskC` can access the results of `taskA` and `taskB`, e.g., in its `‑main` method, using
-`‑[TSKTask prerequisiteResultForKey:]`:
-
-```objc
-- (void)main
-{
-    User *user = [self prerequisiteResultForKey:@"userTask"];
-    Project *project = [self prerequisiteResultForKey:@"projectTask"];
-    …
-}
-```
-
-Tasks can even specify which keys they require to run by overriding `‑requiredPrerequisiteKeys`. If
-this requirement is not fulfilled when a task is added to a workflow, an assertion is raised.
-
-
-### Task Subclass Interface
-
-We’ve also added numerous methods to `TSKTask` so that subclasses can respond to changes in task 
-state:
- 
-* `didCancel`
-* `didReset`
-* `didRetry`
-* `didFinishWithResult:`
-* `didFailWithError:`
-
-While the default implementations of these methods do nothing, subclasses can override them to
-perform necessary actions upon state changes. This should obviate the need for `TSKTask` subclasses
-to observe notifications posted by their superclass.
-
-
-### Reset Bug Fix
-
-Task 1.0 contains a serious bug in which a reset task may be able to run even if its prerequisites
-have not all completed. This bug can be reproduced as follows:
-
-1. Set up a workflow with two tasks, A and B, with A listed as a prerequisite of B.
-2. Run the workflow to completion.
-3. Reset B. A is now in the Finished state. B should be Ready.
-4. Reset A. A is now in the Ready state. As such, B should be in the Pending state.
-
-In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
+Task 1.2 updates Task to work better with Swift 3. Objective-C APIs have been annotated with
+nullability specifiers and generics, and the sample project and README have been updated to 
+use Swift instead of Objective-C.
 
 
 ## Installation
@@ -99,7 +38,7 @@ In Task 1.0, B will be in the Ready state. Task 1.1 fixes this.
 The easiest way to start using Task is to install it with CocoaPods.
 
 ```ruby
-pod 'Task', '~> 1.1'
+pod 'Task', '~> 1.2'
 ```
 
 You can also build it and include the built products in your project. For OS X and iOS 8, just add
@@ -135,8 +74,8 @@ To model a workflow with Task, you first need to create a workflow object. Each 
 initialized with a name — useful when debugging — and an operation queue on which the workflow’s
 tasks run. If you don’t provide a queue, one will be created for you, which is what we do below: 
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow"];
+```swift
+let workflow = TSKWorkflow(name:"Workflow")
 ```
 
 Once you’ve created a workflow, you need to create tasks that represent your work and add them to
@@ -146,63 +85,91 @@ configurations.
 
 The simplest non-empty workflow contains a single task:
 
-![Workflow with a single task](Resources/Example-A.png)
+```
+┌───────────┐        ╔═══════════╗        ┌──────────┐
+│   Start   │───────>║     A     ║───────>│  Finish  │
+└───────────┘        ╚═══════════╝        └──────────┘
+```
 
 In this workflow, task *A* is the lone task, with no prerequisites. Creating it is trivial:
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow A"];
-TSKTask *taskA = …;
-[workflow addTask:taskA prerequisites:nil];
+```swift
+let workflow = TSKWorkflow("Workflow A")
+let taskA: TSKTask = …
+workflow.add(taskA, prerequisites: nil)
 ```
 
 When we’re ready to run the workflow, we can send it the `‑start` message. This will in turn start
 `taskA`, and once it finishes successfully, the workflow will finish. We can make this workflow
 slightly more complex by adding a second task *B*, which only runs if *A* finishes successfully.
 
-![Workflow with two tasks in serial](Resources/Example-A%2BB.png)
+```
+┌───────────┐        ╔═══════════╗        ╔═══════════╗        ┌──────────┐
+│   Start   │───────>║     A     ║───────>║     B     ║───────>│  Finish  │
+└───────────┘        ╚═══════════╝        ╚═══════════╝        └──────────┘
+```
 
 Here, successful completion of *A* is a prerequisite to run *B*, presumably because *B* depends on
 the result or some side-effect of running *A*. Modeling this workflow in code is straightforward:
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow A+B"];
-TSKTask *taskA = …;
-TSKTask *taskB = …;
-[workflow addTask:taskA prerequisites:nil];
-[workflow addTask:taskB prerequisites:taskA, nil];
+```swift
+let workflow = TSKWorkflow("Workflow A+B")
+let taskA: TSKTask = …
+let taskB: TSKTask = …
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: [taskA])
 ```
 
 When executing this workflow, Task.framework will automatically run `taskA` first and start `taskB`
 when `taskA` finishes successfully. But what if *B* didn’t depend on *A*? 
 
-![Workflow with two tasks in parallel](Resources/Example-AB.png)
+```
+                     ╔═══════════╗                   
+                ┌───>║     A     ║───┐               
+                │    ╚═══════════╝   │               
+┌───────────┐   │                    │    ┌──────────┐
+│   Start   │───┤                    ├───>│  Finish  │
+└───────────┘   │                    │    └──────────┘
+                │    ╔═══════════╗   │               
+                └───>║     B     ║───┘               
+                     ╚═══════════╝                   
+```
 
 We need only change our code above so that *B* doesn’t list *A* as a prerequisite.
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow AB"];
-TSKTask *taskA = …;
-TSKTask *taskB = …;
-[workflow addTask:taskA prerequisites:nil];
-[workflow addTask:taskB prerequisites:nil];
+```swift
+let workflow = TSKWorkflow("Workflow AB")
+let taskA: TSKTask = …
+let taskB: TSKTask = …
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
 ```
 
 With this simple change, Task.framework will run `taskA` and `taskB` concurrently. Easy enough. Now,
 suppose there’s some third task *C* that can only run when *A* and *B* are both done executing.
 
-![Workflow with two tasks in parallel and a third that depends on both](Resources/Example-AB%2BC.png)
+```
+                    ╔═══════════╗                                       
+                ┌──>║     A     ║───┐                                   
+                │   ╚═══════════╝   │                                   
+┌───────────┐   │                   │   ╔═══════════╗       ┌──────────┐
+│   Start   │───┤                   ├──>║     C     ║──────>│  Finish  │
+└───────────┘   │                   │   ╚═══════════╝       └──────────┘
+                │   ╔═══════════╗   │                                   
+                └──>║     B     ║───┘                                   
+                    ╚═══════════╝                                       
+```
 
 Again, this is simple to express:
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow AB+C"];
-TSKTask *taskA = …;
-TSKTask *taskB = …;
-TSKTask *taskC = …;
-[workflow addTask:taskA prerequisites:nil];
-[workflow addTask:taskB prerequisites:nil];
-[workflow addTask:taskC prerequisites:taskA, taskB, nil];
+```swift
+let workflow = TSKWorkflow("Workflow AB+C")
+let taskA: TSKTask = …
+let taskB: TSKTask = …
+let taskC: TSKTask = …
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
+workflow.add(taskC, prerequisites: [taskA, taskB])
 ```
 
 When run, the workflow will automatically run tasks *A* and *B* concurrently, but only start *C*
@@ -210,18 +177,28 @@ after both *A* and *B* finish successfully. If either *A* or *B* fails, *C* won�
 changed our workflow so that *C* depended on *B*, but not *A*, we’d get a workflow that looks like
 this:
 
-![Workflow with two tasks in parallel and a third that depends on one](Resources/Example-A%28B%2BC%29.png)
+```
+                              ╔═══════════╗                             
+                ┌────────────>║     A     ║─────────────┐               
+                │             ╚═══════════╝             │               
+┌───────────┐   │                                       │   ┌──────────┐
+│   Start   │───┤                                       ├──>│  Finish  │
+└───────────┘   │                                       │   └──────────┘
+                │   ╔═══════════╗       ╔═══════════╗   │               
+                └──>║     B     ║──────>║     C     ║───┘               
+                    ╚═══════════╝       ╚═══════════╝                   
+```
 
 By now, you can probably guess what our code would look like:
 
-```objc
-TSKWorkflow *workflow = [[TSKWorkflow alloc] initWithName:@"Workflow A(B+C)"];
-TSKTask *taskA = …;
-TSKTask *taskB = …;
-TSKTask *taskC = …;
-[workflow addTask:taskA prerequisites:nil];
-[workflow addTask:taskB prerequisites:nil];
-[workflow addTask:taskC prerequisites:taskB, nil];
+```swift
+let workflow = TSKWorkflow("Workflow A(B+C)")
+let taskA: TSKTask = …
+let taskB: TSKTask = …
+let taskC: TSKTask = …
+workflow.add(taskA, prerequisites: nil)
+workflow.add(taskB, prerequisites: nil)
+workflow.add(taskC, prerequisites: [taskB])
 ```
 
 Again, Task.framework manages the mechanics of executing tasks so that tasks are run with maximal
@@ -233,89 +210,94 @@ take a look at that next.
 
 ### Creating Tasks
 
-Every task is an instance of `TSKTask`, with its work being executed by the instance’s `‑main`
-method. Unfortunately, `TSKTask` is an abstract class, so its `‑main` method doesn’t actually do
+Every task is an instance of `TSKTask`, with its work being executed by the instance’s `main()`
+method. Unfortunately, `TSKTask` is an abstract class, so its `main()` method doesn’t actually do
 anything. To make a task that does real work, you either need to subclass `TSKTask` and override its
-`‑main` method, or use `TSKBlockTask` and `TSKSelectorTask`, which allow you to wrap a block or method
-invocation in a task, respectively.
+`main()` method, or use `TSKBlockTask` and `TSKSelectorTask`, which allow you to wrap a block or
+method invocation in a task, respectively.
 
 Subclassing makes sense if you need to repeatedly run tasks that perform the same type of work. For
 example, if your app repeatedly breaks an image into multiple tiles and then processes those tiles
 in the same way, you might create a `TSKTask` subclass called `ProcessImageTileTask` that can be
-executed on each tile concurrently. Your subclass would override `‑main` to perform your work and,
-if successful, invoke `‑finishWithResult:` on itself to indicate that the work was successful.
-If you couldn’t complete the processing work due to some error, you would instead invoke
-`‑failWithError:`.
+executed on each tile concurrently. Your subclass would override `main()` to perform your work and,
+if successful, invoke `finish(with:)` on itself to indicate that the work was successful. If you
+couldn’t complete the processing work due to some error, you would instead invoke `fail(with:)`.
 
-```objc
-@implementation ProcessImageTileTask
-
-- (void)main
-{
-    // Process image data 
-    NSError *error = nil;
-    UIImage *result = [self processImageData:self.data rect:self.tileRect error:&error];
-
-    // If the result is non-nil, finish successfully. Otherwise fail.
-    if (result) {
-        [self finishWithResult:result];
-    } else {
-        [self failWithError:error];
+```swift
+class ProcessImageTileTask : TSKTask {
+    override func main() {
+        do {
+            // Process image data 
+            let result = try process(imageData, rect: tileRect)
+            finish(with: result)
+        } catch {
+            fail(with: error)
+        }
     }
+
+    …
 }
-
-…
-
-@end
 ```
 
 For smaller one-off tasks, you can use `TSKBlockTask`. `TSKBlockTask` instances execute a block to
 perform their work. The block takes a single `TSKTask` parameter, to which you should send
-`‑finishWithResult:` on success and `‑failWithError:` on failure. The block task below runs an
-imaginary API request and invokes `‑finishWithResult:` and `‑failWithError:` in the API request’s
-success and failure blocks, respectively.
+`finish(with:)` on success and `fail(with:)` on failure. The block task below runs an imaginary API
+request and invokes `finish(with:)` and `fail(with:)` in the API request’s success and failure
+blocks, respectively.
 
-```objc
-TSKTask *requestTask = [[TSKBlockTask alloc] initWithName:@"API Request" block:^(TSKTask *task) { 
-    [self executeAPIRequestWithSuccess:^(id response) {
-        [task finishWithResult:response];
-    } failure:^(NSError *error) {
-        [task failWithError:error];
-    }];
-}];
+```swift
+func setUpWorkflow() {
+    …
 
-[workflow addTask:Task prerequisites:requestTask, nil];
+    let blockTask = TSKBlockTask(name: "API Request") { [weak self] task in 
+        weak?.execute(request, success: { response in 
+            task.finish(with: response)
+        }, failure: { error in
+            task.fail(with: error)
+        })
+    }
 
+    workflow.add(blockTask, prerequisites: [requestTask])
+    
+    …
+}
 ```
 
 We can similarly create a task that performs a selector using `TSKSelectorTask`. The selector takes
-a single `TSKTask` parameter. As you could probably guess, the method must invoke
-`‑finishWithResult:` on success and `‑failWithError:` on failure. In the example below, we create
-the selector task and set its prerequisite to `blockTask` from above. In our task method, we read
-the prerequisite task’s result and use that as input for our work.
+a single `TSKTask` parameter. As you could probably guess, the method must invoke `finish(with:)` on
+success and `fail(with:)` on failure. In the example below, we create the selector task and set its
+prerequisite to `blockTask` from above. In our task method, we read the prerequisite task’s result
+and use that as input for our work.
 
-```objc
-TSKTask *mappingTask = [[TSKSelectorTask alloc] initWithName:@"Map API Result"
-                                                      target:self
-                                                    selector:@selector(mapRequestResultWithTask:)];
+```swift
+func setUpWorkflow() {
+    …
+    
+    let mappingTask TSKSelectorTask(name: "Map API Result", 
+                                    target: self, 
+                                    selector: #selector(mapRequestResult(with:)))
                                                     
-[workflow addTask:mappingTask prerequisites:requestTask, nil];
+    workflow.add(mappingTask, prerequisites: [requestTask])
+
+    …
+}
 
 …
 
-- (void)mapRequestResultWithTask:(TSKTask *)task
-{
-    NSDictionary *JSONResponse = [task anyPrerequisiteResult];
-    NSManagedObject *mappedObject = [self mapJSONResponse:JSONResponse
-                                              intoContext:self.managedObjectContext];
-
-    NSError *error = nil;
-    if ([self.managedObjectContext save:&error]) {
-        [self finishWithResult:mappedObject.objectID];
-    } else {
-        [self failWithError:error];
+@objc func mapRequestResult(with task: TSKTask) {
+    guard let jsonResponse = task.anyPrerequisiteResult as? [String:Any] else {
+        fail(with: …)
+        return
     }
+    
+    do {
+        let mappedObjectID = try map(jsonResponse, into: managedObjectContext)
+        finish(with: mappedObjectID)
+    } catch {
+        fail(with: error)
+    }    
 }
+
 ```
     
 Again, the work that the task is actually doing is imaginary, but you get the idea.
@@ -327,17 +309,17 @@ input before being able to run. For example, suppose a REST API call requires us
 parameter. You could represent the API call as a `TSKTask`, and create an external condition task as
 a prerequisite:
 
-```objc
-TSKExternalConditionTask *inputTask = [[TSKExternalConditionTask alloc] initWithName:@"Get input"];
-[workflow addTask:inputTask prerequisites:nil];
+```swift
+let inputTask = TSKExternalConditionTask(name: "Get input")
+workflow.add(inputTask, prerequisites: nil)
 
-TSKTask *requestTask = … ;
-[workflow addTask:requestTask prerequisites:inputTask, nil];
+let requestTask: TSKTask = … 
+workflow.add(requestTask, prerequisites: [inputTask])
 
 …
 
-// When the user has entered in their data
-[dataTask fulfillWithResult:userSuppliedData];    
+// When the user has entered in their input
+inputTask.fulfill(with: userSuppliedData)
 ```
 
 In this example, when the external condition task is fulfilled, the API request task automatically
@@ -346,16 +328,16 @@ starts.
 `TSKSubworkflowTask` is a task that executes an entire workflow as its unit of work. This can be 
 useful when composing complex workflows of several simpler ones:
 
-```objc
-TSKWorkflow *imageWorkflow = [[TSKWorkflow alloc] initWithName:@"Upload Image"];
-TSKExternalConditionTask *imageAvailableTask = [[TSKExternalConditionTask alloc] init];
-TSKWorkflow *filterWorkflow = [self workflowForImageFilter:filter];
-TSKSubworkflowTask *filterTask = [[TSKSubworkflowTask alloc] initWithSubworkflow:filterWorkflow];
-TSKTask *uploadImageTask = [[UploadDataTask alloc] init];
+```swift
+let imageWorkflow = TSKWorkflow(name: "Upload Image")
+let imageAvailableTask = TSKExternalConditionTask()
+let filterWorkflow = workflow(for: imagefilter)
+let filterTask = TSKSubworkflowTask(subworkflow: filterWorkflow)
+let uploadImageTask = UploadDataTask()
 
-[imageWorkflow addTask:imageAvailableTask prerequisites:nil];
-[imageWorkflow addTask:filterTask prerequisites:imageAvailableTask, nil];
-[imageWorkflow addTask:uploadImageTask prerequisites:filterTask, nil];
+imageWorkflow.add(imageAvailableTask, prerequisites: nil)
+imageWorkflow.add(filterTask, prerequisitesTasks: [imageAvailableTask])
+imageWorkflow.add(uploadImageTask, prerequisites: [filterTask])
 ```
 
 
@@ -369,55 +351,55 @@ first task’s resulting JSON object into a model object. Task.framework provide
 accessing a task’s prerequisite results.
 
 In the simplest case, a task doesn’t use its prerequisites’ results at all; the task simply runs its
-`‑main` method with no dependency on its prerequisites’ output. A very slightly more complex case
+`main()` method with no dependency on its prerequisites’ output. A very slightly more complex case
 occurs when a task has only one prerequisite and depends on its result. In this case, the task can
-simply invoke `‑anyPrerequisiteResult` on itself to get the result of one of its prerequisites.
+simply invoke `anyPrerequisiteResult()` on itself to get the result of one of its prerequisites.
 Since the task has only one prerequisite, this is equivalent to getting the result of that single
 prerequisite.
 
 A task may also aggregate the results of its prerequisites uniformly. For example, a workflow might
 break some data set into chunks, process each of those chunks in separate tasks, and then combine
 the results of those tasks in a final task. In cases like these, a task can invoke
-`‑allPrerequisiteResults` on itself to get an array of all its prerequisite results and process them
-uniformly.
+`allPrerequisiteResults()` on itself to get an array of all its prerequisite results and process
+them uniformly.
 
 Sometimes, tasks need to use the results of multiple prerequisite in varied ways. For this purpose,
 Task.framework has the concept of *keyed* prerequisites. Keyed prerequisites allow a task to assign
 unique keys to its prerequisites with which they can be referred later. Tasks can define their keyed
-prerequisites using `‑[TSKWorkflow addTask:keyedPrerequisiteTasks:]` or 
-`‑[TSKWorkflow addTask:prerequisiteTasks:keyedPrerequisiteTasks:]`. In both cases, the
-`keyedPrerequisiteTasks` parameter is a dictionary that maps a key to its associated task. The
+prerequisites using `TSKWorkflow.add(_:keyedPrerequisites:)` or 
+`TSKWorkflow.add(_:prerequisites:keyedPrerequisites:)`. In both cases, the
+`keyedPrerequisites` parameter is a dictionary that maps a key to its associated task. The
 result of a given keyed prerequisite can be retrieved by sending a task
-`‑prerequisiteResultForKey:`. 
+`prerequisiteResult(forKey:)`. 
 
 For example, suppose a task were added to a workflow as follows:
 
-```objc
-[workflow addTask:task keyedPrerequisiteTasks:@{ @"userTask" : task1, @"addressTask" : task2 }];
+```swift
+workflow.add(task, keyedPrerequisites: ["userTask": task1, "addressTask": task2])
 ```
 
-The task can easily refer to the results of `task1` and `task2`, e.g., in its `‑main` method like so:
+The task can easily refer to the results of `task1` and `task2`, e.g., in its `main()` method like so:
 
-```objc
-- (void)main
-{
-    User *user = [self prerequisiteResultForKey:@"userTask"];
-    Address *address = [self prerequisiteResultForKey:@"addressTask"];
+```swift
+override func main() {
+    guard let user = prerequisiteResult(forKey: "userTask") as? User, 
+        let address = prerequisiteResult(forKey: "addressTask") as? Address else {
+        …        
+    }
 
-    user.address = address;
+    user.address = address
     
     …
 }
 ```
 
 Furthermore, if a task cannot function without certain keyed prerequisites, it can specify that to
-Task.framework by overriding `‑requiredPrerequisiteKeys`. The `TSKTask` subclass in our example
+Task.framework by overriding `requiredPrerequisiteKeys`. The `TSKTask` subclass in our example
 above might override that method as follows:
 
-```objc
-- (NSSet *)requiredPrerequisiteKeys
-{
-    return [NSSet setWithObjects:@"userTask", @"addressTask", nil];
+```swift
+var requiredPrerequisiteKeys: Set<AnyHashable> {
+    return ["userTask", "addressTask"]
 }
 ```
 
@@ -430,10 +412,10 @@ during initialization.
 ### Changing the Execution State of Tasks
 
 Once you have a task workflow set up, you can start executing it by sending the workflow the
-`‑start` message. This will find all tasks in the workflow that have no prerequisite tasks and start
-them. If you subsequently wish to cancel a task (or a whole workflow), you can send it the `‑cancel`
-message. Retrying failed tasks is as simple as sending them the `‑retry` message, and if you wish to
-reset a successfully finished task so that you can re-run it, send it the `‑reset` message. As
+`start()` message. This will find all tasks in the workflow that have no prerequisite tasks and start
+them. If you subsequently wish to cancel a task (or a whole workflow), you can send it the `cancel()`
+message. Retrying failed tasks is as simple as sending them the `retry()` message, and if you wish to
+reset a successfully finished task so that you can re-run it, send it the `reset()` message. As
 alluded to earlier, tasks propagate these messages down to their dependents, which propagate them to
 their dependents, and so on, so that, e.g., cancelling a task also cancels all of its dependent
 tasks.
@@ -452,7 +434,7 @@ workflow fails or is cancelled.
 Task.framework is fully documented, so if you’d like more information about how a class works, take
 a look at the class header. Also, the `Example-iOS` subdirectory contains a fairly involved example
 that includes a custom `TSKTask` subclass, external conditions, and task workflow delegate methods.
-In particular, `‑[TaskViewController initializeWorkflow]` is a great place to experiment with your
+In particular, `WorkflowViewController.initializeWorkflow()` is a great place to experiment with your
 own task workflow configurations, whose progress can be visualized by running the example app.
 
 

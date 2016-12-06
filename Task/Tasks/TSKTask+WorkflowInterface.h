@@ -30,7 +30,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- The WorkflowInterface category of TSKTask declares a messages that must be exposed so that
+ The WorkflowInterface category of TSKTask declares messages that must be exposed so that
  TSKWorkflows can modify the internal state of their TSKTasks.
  */
 @interface TSKTask (WorkflowInterface)
@@ -46,8 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)recursiveDescriptionWithDepth:(NSUInteger)depth;
 
 /*!
- @abstract Indicates to the receiver that it has a prerequisite.
- @discussion This has the effect of transitioning the receiver from the ready state to the pending
+ @abstract Indicates to the task that it has a prerequisite.
+ @discussion This has the effect of transitioning the task from the ready state to the pending
      state.
  */
 - (void)didAddPrerequisiteTask;

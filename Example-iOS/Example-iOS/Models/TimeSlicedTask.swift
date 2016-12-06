@@ -81,9 +81,8 @@ class TimeSlicedTask : TSKTask {
 
     override func main() {
         // Run in 1/8s time slices
-        let kTimeSliceInterval: TimeInterval = 0.0625;
+        let kTimeSliceInterval: TimeInterval = 1 / 8;
 
-        // 
         let shouldFail = randomDouble() < probabilityOfFailure
         let failureTime: TimeInterval = randomDouble() * timeRequired
 
@@ -94,18 +93,24 @@ class TimeSlicedTask : TSKTask {
             }
 
             if shouldFail && timeTaken > failureTime {
-                failWithError(TimeSlicedTaskError.randomError)
+                fail(withError: TimeSlicedTaskError.randomError)
                 return
             }
 
+            let start = Date()
             Thread.sleep(forTimeInterval: kTimeSliceInterval)
-            timeTaken += kTimeSliceInterval
+            timeTaken += Date().timeIntervalSince(start)
 
             if let progressBlock = progressBlock {
                 progressBlock(self)
             }
         }
 
-        finish(withResult: nil)
+        if shouldFail {
+            // If the failure was supposed to occur during the last time slice, fail here
+            fail(withError: TimeSlicedTaskError.randomError)
+        } else {
+            finish(withResult: nil)
+        }
     }
 }

@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
      ‑workflowDidFinish: message. The object of the notification is the workflow. It has no userInfo
      dictionary.
  */
-extern NSString *const TSKWorkflowDidFinishNotification;
+extern NSNotificationName const TSKWorkflowDidFinishNotification;
 
 /*!
  @abstract Notification posted when a workflow’s task is cancelled.
@@ -46,7 +46,7 @@ extern NSString *const TSKWorkflowDidFinishNotification;
      userInfo dictionary contains a single key, TSKWorkflowTaskKey, whose value is the task that
      was cancelled.
  */
-extern NSString *const TSKWorkflowTaskDidCancelNotification;
+extern NSNotificationName const TSKWorkflowTaskDidCancelNotification;
 
 /*!
  @abstract Notification posted when a workflow’s task fails.
@@ -55,35 +55,35 @@ extern NSString *const TSKWorkflowTaskDidCancelNotification;
      userInfo dictionary contains a single key, TSKWorkflowTaskKey, whose value is the task that
      failed.
  */
-extern NSString *const TSKWorkflowTaskDidFailNotification;
+extern NSNotificationName const TSKWorkflowTaskDidFailNotification;
 
 /*!
  @abstract Notification posted when a workflow is about to cancel its tasks.
  @discussion This notification is posted immediately before the workflow’s tasks are sent the
      ‑cancel message. The object of the notification is the workflow. It has no userInfo dictionary.
  */
-extern NSString *const TSKWorkflowWillCancelNotification;
+extern NSNotificationName const TSKWorkflowWillCancelNotification;
 
 /*!
  @abstract Notification posted when a workflow about to reset its tasks.
  @discussion This notification is posted immediately before the workflow’s tasks are sent the ‑reset
      message. The object of the notification is the workflow. It has no userInfo dictionary.
  */
-extern NSString *const TSKWorkflowWillResetNotification;
+extern NSNotificationName const TSKWorkflowWillResetNotification;
 
 /*!
  @abstract Notification posted when a workflow about to retry its tasks.
  @discussion This notification is posted immediately before the workflow’s tasks are sent the ‑retry
      message. The object of the notification is the workflow. It has no userInfo dictionary.
  */
-extern NSString *const TSKWorkflowWillRetryNotification;
+extern NSNotificationName const TSKWorkflowWillRetryNotification;
 
 /*!
  @abstract Notification posted when a workflow is about to start its tasks.
  @discussion This notification is posted immediately before the workflow’s tasks are sent the ‑start
      message. The object of the notification is the workflow. It has no userInfo dictionary.
  */
-extern NSString *const TSKWorkflowWillStartNotification;
+extern NSNotificationName const TSKWorkflowWillStartNotification;
 
 /*!
  @abstract Notification userInfo key whose value is a TSKTask object pertaining to the workflow 
@@ -146,10 +146,10 @@ extern NSString *const TSKWorkflowTaskKey;
 /*! The task workflow’s current set of tasks. */
 @property (nonatomic, copy, readonly) NSSet<TSKTask *> *allTasks;
 
-/*! The set of tasks currently in the receiver that have no prerequisite tasks. */
+/*! The set of tasks currently in the workflow that have no prerequisite tasks. */
 @property (nonatomic, copy, readonly) NSSet<TSKTask *> *tasksWithNoPrerequisiteTasks;
 
-/*! The set of tasks currently in the receiver that have no dependent tasks. */
+/*! The set of tasks currently in the workflow that have no dependent tasks. */
 @property (nonatomic, copy, readonly) NSSet<TSKTask *> *tasksWithNoDependentTasks;
 
 
@@ -219,9 +219,9 @@ extern NSString *const TSKWorkflowTaskKey;
      a nil keyedPrerequisiteTasks parameter.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no prerequisite
-     tasks. Otherwise, each task in the set must have already been added to the receiver.
+     tasks. Otherwise, each task in the set must have already been added to the workflow.
  */
-- (void)addTask:(TSKTask *)task prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks;
+- (void)addTask:(TSKTask *)task prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks NS_SWIFT_NAME(add(_:prerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified dictionary of keyed 
@@ -231,14 +231,15 @@ extern NSString *const TSKWorkflowTaskKey;
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite keys to their 
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
-     in the dictionary must have already been added to the receiver.
+     in the dictionary must have already been added to the workflow.
  */
-- (void)addTask:(TSKTask *)task keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
+-        (void)addTask:(TSKTask *)task
+keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks NS_SWIFT_NAME(add(_:keyedPrerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified prerequisite and keyed
      prerequisite tasks.
- @discussion The task’s workflow property is set to the receiver, and its prerequisite and keyed 
+ @discussion The task’s workflow property is set to the task, and its prerequisite and keyed
      prerequisite tasks are set to the ones specified. Furthermore, for each prerequisite task —
      keyed or otherwise — the task is added to the prerequisite’s set of dependent tasks. If the 
      task has any prerequisites, its state is set to pending.
@@ -246,14 +247,14 @@ extern NSString *const TSKWorkflowTaskKey;
      This is not a thread-safe operation. This method should only execute on one thread at a time.
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTasks The task’s prerequisite tasks. If nil, the task will have no unkeyed
-     prerequisite tasks. Otherwise, each task in the set must have already been added to the receiver.
+     prerequisite tasks. Otherwise, each task in the set must have already been added to the workflow.
  @param keyedPrerequisiteTasks A dictionary that maps the task’s prerequisite keys to their
      corresponding task. If nil, the task will have no keyed prerequisite tasks. Otherwise, each task
-     in the dictionary must have already been added to the receiver.
+     in the dictionary must have already been added to the workflow.
  */
 -        (void)addTask:(TSKTask *)task
      prerequisiteTasks:(nullable NSSet<TSKTask *> *)prerequisiteTasks
-keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks;
+keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasks NS_SWIFT_NAME(add(_:prerequisites:keyedPrerequisites:));
 
 /*!
  @abstract Adds the specified task to the task workflow with the specified list of prerequisite tasks.
@@ -263,7 +264,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
          [workflow addTask:task prerequisiteTasks:[NSSet setWithObjects:prerequisiteTask1, ...]];
  @param task The task to add. May not be nil. May not be a member of any other task workflow.
  @param prerequisiteTask1 ... The task’s prerequisite tasks as a nil-terminated list. Each task in
-     the set must have already been added to the receiver.
+     the set must have already been added to the workflow.
  */
 - (void)addTask:(TSKTask *)task prerequisites:(nullable TSKTask *)prerequisiteTask1, ... NS_REQUIRES_NIL_TERMINATION;
 
@@ -275,40 +276,40 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @discussion This is the union of the task’s keyed and unkeyed prerequisite tasks.
  @param task The task.
  @result The set of prerequisite tasks for the specified task. Returns nil if the task is not in the
-     receiver.
+     workflow.
  */
-- (nullable NSSet<TSKTask *> *)prerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)prerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(prerequisites(for:));
 
 /*! 
  @abstract Returns the set of unkeyed prerequisite tasks for the specified task.
  @param task The task.
  @result The set of unkeyed prerequisite tasks for the specified task. Returns nil if the task is not
-     in the receiver.
+     in the workflow.
  */
-- (nullable NSSet<TSKTask *> *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)unkeyedPrerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(unkeyedPrerequisites(for:));
 
 /*!
  @abstract Returns the keyed prerequisite tasks for the specified task.
  @param task The task.
  @result A dictionary that maps the keys of the specified task’s keyed prerequisites to their 
-     corresponding tasks. Returns nil if the task is not in the receiver.
+     corresponding tasks. Returns nil if the task is not in the workflow.
  */
-- (nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasksForTask:(TSKTask *)task;
+- (nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedPrerequisiteTasksForTask:(TSKTask *)task NS_SWIFT_NAME(keyedPrerequisites(for:));
 
 /*!
  @abstract Returns the set of dependent tasks for the specified task.
  @param task The task.
  @result The set of dependent tasks for the specified task. Returns nil if the task is not in the
-     receiver.
+     workflow.
  */
-- (nullable NSSet<TSKTask *> *)dependentTasksForTask:(TSKTask *)task;
+- (nullable NSSet<TSKTask *> *)dependentTasksForTask:(TSKTask *)task NS_SWIFT_NAME(dependents(for:));
 
 
 #pragma mark - Workflow State
 
 /*!
- @abstract Sends ‑start to every prerequisite-less task in the receiver.
- @discussion This serves to begin execution of the tasks in the receiver. After the initial set of 
+ @abstract Sends ‑start to every prerequisite-less task in the workflow.
+ @discussion This serves to begin execution of the tasks in the workflow. After the initial set of
      tasks finish successfully, they will automatically invoke ‑start on their dependent tasks and
      so on until all tasks have finished successfully. If no tasks have been added to the workflow, 
      this will immediately send ‑workflowDidFinish: to the delegate.
@@ -316,40 +317,40 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
 - (void)start;
 
 /*!
- @abstract Sends ‑cancel to every prerequisite-less task in the receiver. 
- @discussion This serves to mark all the tasks in the receiver as cancelled. The initial set of 
+ @abstract Sends ‑cancel to every prerequisite-less task in the workflow.
+ @discussion This serves to mark all the tasks in the workflow as cancelled. The initial set of
      tasks will propagate the cancellation to their dependent tasks and so on until all tasks that
      can be cancelled will be.
  */
 - (void)cancel;
 
 /*!
- @abstract Sends ‑reset to every prerequisite-less task in the receiver.
- @discussion This serves to reset all the tasks in the receiver. The initial set of tasks will
+ @abstract Sends ‑reset to every prerequisite-less task in the workflow.
+ @discussion This serves to reset all the tasks in the workflow. The initial set of tasks will
      propagate the reset to their dependent tasks and so on until all tasks that can be reset will
      be.
  */
 - (void)reset;
 
 /*!
- @abstract Sends ‑retry to every prerequisite-less task in the receiver. 
- @discussion This serves to retry all the tasks in the receiver that have failed. The initial set of 
+ @abstract Sends ‑retry to every prerequisite-less task in the workflow.
+ @discussion This serves to retry all the tasks in the workflow that have failed. The initial set of
      tasks will propagate the retry to their dependent tasks and so on until all tasks that
      can be retried will be.
  */
 - (void)retry;
 
 /*!
- @abstract Returns whether the receiver has any unfinished tasks.
+ @abstract Returns whether the workflow has any unfinished tasks.
  @discussion This is not key-value observable.
- @result Whether the receiver has any unfinished tasks.
+ @result Whether the workflow has any unfinished tasks.
  */
 - (BOOL)hasUnfinishedTasks;
 
 /*!
- @abstract Returns whether the receiver has any failed tasks.
+ @abstract Returns whether the workflow has any failed tasks.
  @discussion This is not key-value observable.
- @result Whether the receiver has any failed tasks.
+ @result Whether the workflow has any failed tasks.
  */
 - (BOOL)hasFailedTasks;
 
@@ -380,7 +381,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.
  */
-- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error;
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(workflow(_:task:didFailWithError:));
 
 /*!
  @abstract Sent to the delegate when one of a workflow’s tasks is cancelled.

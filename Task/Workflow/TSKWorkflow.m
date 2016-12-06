@@ -85,10 +85,10 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
  */
 @property (nonatomic, strong, readonly, nonnull) NSMapTable<TSKTask *, NSSet<TSKTask *> *> *dependentTasks;
 
-/*! The set of tasks currently in the receiver that have no prerequisite tasks. */
+/*! The set of tasks currently in the workflow that have no prerequisite tasks. */
 @property (nonatomic, copy, readwrite) NSSet<TSKTask *> *tasksWithNoPrerequisiteTasks;
 
-/*! The set of tasks currently in the receiver that have no dependent tasks. */
+/*! The set of tasks currently in the workflow that have no dependent tasks. */
 @property (nonatomic, copy, readwrite) NSSet<TSKTask *> *tasksWithNoDependentTasks;
 
 @end
@@ -157,6 +157,16 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 }
 
 
+- (void)setName:(NSString *)name
+{
+    if (!name) {
+        name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
+    }
+
+    _name = [name copy];
+}
+
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p name = %@>", self.class, self, self.name];
@@ -183,16 +193,6 @@ NSString *const TSKWorkflowTaskKey = @"TSKWorkflowTaskKey";
 - (NSSet *)allTasks
 {
     return [self.tasks copy];
-}
-
-
-- (void)setName:(NSString *)name
-{
-    if (!name) {
-        name = [[NSString alloc] initWithFormat:@"TSKWorkflow %p", self];
-    }
-
-    _name = [name copy];
 }
 
 
