@@ -27,6 +27,8 @@
 #import <Task/TSKWorkflow.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*!
  The TaskInterface category of TSKWorkflow declares messages that must be exposed so that TSKTasks
  can notify their workflows of state changes.
@@ -38,14 +40,14 @@
  @param task The task that finished. May not be nil.
  @param result The result that the task finished with.
  */
-- (void)subtask:(TSKTask *)task didFinishWithResult:(id)result;
+- (void)subtask:(TSKTask *)task didFinishWithResult:(nullable id)result;
 
 /*!
  @abstract Indicates to the workflow that the specified task failed.
  @param task The task that failed. May not be nil.
  @param error The error that caused the task to fail.
  */
-- (void)subtask:(TSKTask *)task didFailWithError:(NSError *)error;
+- (void)subtask:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(subtask(_:didFailwithError:));
 
 /*!
  @abstract Indicates to the workflow that the specified task was cancelled.
@@ -60,3 +62,5 @@
 - (void)subtaskDidReset:(TSKTask *)task;
 
 @end
+
+NS_ASSUME_NONNULL_END

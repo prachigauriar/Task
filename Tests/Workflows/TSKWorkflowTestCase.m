@@ -96,7 +96,7 @@
     TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
     XCTAssertNotNil(workflow, @"returns nil");
     XCTAssertEqualObjects(workflow.allTasks, [NSSet set]);
-    XCTAssertEqualObjects(workflow.name, ([NSString stringWithFormat:@"TSKWorkflow %p", workflow]), @"name not set to default");
+    XCTAssertEqualObjects(workflow.name, [self defaultNameForWorkflow:workflow], @"name not set to default");
     XCTAssertNotNil(workflow.operationQueue, @"operation queue not set to default");
     XCTAssertEqualObjects(workflow.operationQueue.name, ([NSString stringWithFormat:@"com.ticketmaster.TSKWorkflow.TSKWorkflow %p", workflow]),
                           @"name not set to default");
@@ -120,6 +120,20 @@
     XCTAssertEqualObjects(workflow.operationQueue, queue, @"operation queue is set incorrectly");
     XCTAssertEqualObjects(workflow.operationQueue.name, queueName, @"operation queue name changed");
     XCTAssertEqualObjects(workflow.notificationCenter, self.notificationCenter, @"notificationCenter not set to default");
+}
+
+
+- (void)testName
+{
+    TSKWorkflow *workflow = [[TSKWorkflow alloc] init];
+    XCTAssertEqualObjects(workflow.name, [self defaultNameForWorkflow:workflow], @"name not set to default");
+
+    NSString *name = UMKRandomUnicodeString();
+    workflow.name = name;
+    XCTAssertEqualObjects(workflow.name, name, @"name is not set correctly");
+
+    workflow.name = nil;
+    XCTAssertEqualObjects(workflow.name, [self defaultNameForWorkflow:workflow], @"name not set to default");
 }
 
 

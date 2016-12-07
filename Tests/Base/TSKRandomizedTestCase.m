@@ -59,6 +59,12 @@ const NSTimeInterval kTSKRandomizedTestCaseDateTolerance = 0.1;
 }
 
 
+- (NSString *)defaultNameForWorkflow:(TSKWorkflow *)workflow
+{
+    return [NSString stringWithFormat:@"TSKWorkflow %p", workflow];
+}
+
+
 #pragma mark -
 
 - (TSKWorkflow *)workflowForNotificationTesting

@@ -210,7 +210,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
 
 - (NSDictionary *)keyedPrerequisiteTasks
 {
-    return self.workflow ? [self.workflow keyedPrerequisiteTasksForTask:self] : [NSSet set];
+    return self.workflow ? [self.workflow keyedPrerequisiteTasksForTask:self] : [NSDictionary dictionary];
 }
 
 
@@ -456,7 +456,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
         [self.workflow subtaskDidReset:self];
         [self transitionToReadyStateAndExecuteBlock:nil];
-}];
+    }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
 }
