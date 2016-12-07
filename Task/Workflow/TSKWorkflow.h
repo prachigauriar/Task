@@ -381,7 +381,7 @@ keyedPrerequisiteTasks:(nullable NSDictionary<id<NSCopying>, TSKTask *> *)keyedP
  @param task The task that failed.
  @param error An error containing the reason the task failed. May be nil.
  */
-- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(workflow(_:task:didFailWithError:));
+- (void)workflow:(TSKWorkflow *)workflow task:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(workflow(_:task:didFailWith:));
 
 /*!
  @abstract Sent to the delegate when one of a workflow’s tasks is cancelled.

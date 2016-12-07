@@ -93,7 +93,7 @@ class TimeSlicedTask : TSKTask {
             }
 
             if shouldFail && timeTaken > failureTime {
-                fail(withError: TimeSlicedTaskError.randomError)
+                fail(with: TimeSlicedTaskError.randomError)
                 return
             }
 
@@ -108,9 +108,9 @@ class TimeSlicedTask : TSKTask {
 
         if shouldFail {
             // If the failure was supposed to occur during the last time slice, fail here
-            fail(withError: TimeSlicedTaskError.randomError)
+            fail(with: TimeSlicedTaskError.randomError)
         } else {
-            finish(withResult: nil)
+            finish(with: nil)
         }
     }
 }
