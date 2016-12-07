@@ -456,7 +456,7 @@ NSString *const TSKTaskStateDescription(TSKTaskState state)
         [self.workflow.notificationCenter postNotificationName:TSKTaskDidResetNotification object:self];
         [self.workflow subtaskDidReset:self];
         [self transitionToReadyStateAndExecuteBlock:nil];
-}];
+    }];
 
     [self.dependentTasks makeObjectsPerformSelector:@selector(reset)];
 }
