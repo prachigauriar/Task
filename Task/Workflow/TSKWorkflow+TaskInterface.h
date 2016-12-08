@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param task The task that failed. May not be nil.
  @param error The error that caused the task to fail.
  */
-- (void)subtask:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(subtask(_:didFailWith:));;
+- (void)subtask:(TSKTask *)task didFailWithError:(nullable NSError *)error NS_SWIFT_NAME(subtask(_:didFailWith:));
 
 /*!
  @abstract Indicates to the workflow that the specified task was cancelled.
