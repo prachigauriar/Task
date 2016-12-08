@@ -24,6 +24,11 @@
 //  THE SOFTWARE.
 //
 
+@import Foundation;
+
+FOUNDATION_EXPORT double TSKTaskVersionNumber;
+FOUNDATION_EXPORT const unsigned char TSKTaskVersionString[];
+
 #import <Task/TaskErrors.h>
 
 #import <Task/TSKTask.h>
