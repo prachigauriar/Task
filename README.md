@@ -275,7 +275,7 @@ func setUpWorkflow() {
     
     let mappingTask TSKSelectorTask(name: "Map API Result", 
                                     target: self, 
-                                    selector: #selector(mapRequestResult(with:)))
+                                    selector: #selector(mapRequestResult(from:)))
                                                     
     workflow.add(mappingTask, prerequisites: [requestTask])
 
@@ -284,17 +284,17 @@ func setUpWorkflow() {
 
 …
 
-@objc func mapRequestResult(with task: TSKTask) {
+@objc func mapRequestResult(from task: TSKTask) {
     guard let jsonResponse = task.anyPrerequisiteResult as? [String:Any] else {
-        fail(with: …)
+        task.fail(with: …)
         return
     }
     
     do {
         let mappedObjectID = try map(jsonResponse, into: managedObjectContext)
-        finish(with: mappedObjectID)
+        task.finish(with: mappedObjectID)
     } catch {
-        fail(with: error)
+        task.fail(with: error)
     }    
 }
 

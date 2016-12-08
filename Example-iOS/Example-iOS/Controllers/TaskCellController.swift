@@ -169,7 +169,7 @@ class ExternalConditionTaskCellController: TaskCellController {
 
 
     @objc func fulfillCondition() {
-        externalConditionTask.fulfill(withResult: nil)
+        externalConditionTask.fulfill(with: nil)
     }
 }
 
