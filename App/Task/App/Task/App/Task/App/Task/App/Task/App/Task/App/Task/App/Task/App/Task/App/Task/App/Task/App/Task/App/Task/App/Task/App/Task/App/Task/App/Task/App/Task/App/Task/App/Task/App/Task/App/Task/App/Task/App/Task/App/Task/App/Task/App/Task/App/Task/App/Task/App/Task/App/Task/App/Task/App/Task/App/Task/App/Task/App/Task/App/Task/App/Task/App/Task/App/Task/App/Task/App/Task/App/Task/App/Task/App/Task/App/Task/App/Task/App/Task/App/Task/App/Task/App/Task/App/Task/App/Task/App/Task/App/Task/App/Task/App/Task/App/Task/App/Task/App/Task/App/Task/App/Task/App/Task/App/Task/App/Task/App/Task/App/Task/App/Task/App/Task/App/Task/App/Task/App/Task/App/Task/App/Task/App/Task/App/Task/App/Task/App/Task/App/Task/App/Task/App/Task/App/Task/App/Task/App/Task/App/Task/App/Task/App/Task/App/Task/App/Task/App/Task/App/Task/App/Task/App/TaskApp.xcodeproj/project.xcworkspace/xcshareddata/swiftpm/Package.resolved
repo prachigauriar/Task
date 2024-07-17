@@ -1,0 +1,15 @@
+{
+  "originHash" : "4f7ce387429ed0e5f01f412ed9f7e66c54852a977727740ccf680afe3a89d5d0",
+  "pins" : [
+    {
+      "identity" : "urlmock",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/prachigauriar/URLMock.git",
+      "state" : {
+        "revision" : "6d52a5e64c9f5e3a1248de6269d100fe39c5bdc8",
+        "version" : "1.3.6"
+      }
+    }
+  ],
+  "version" : 3
+}

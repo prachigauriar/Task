@@ -10,20 +10,20 @@ workflows.
 
 ## Features
 
-* Simple, well-documented API that is at home in both Swift and Objective-C
-* Flexible system for expressing your app’s workflows in a clear, concise manner
-* Powerful execution system that allows you to easily manage your workflow’s execution
-    * Tasks are started as soon as all their prerequisites have finished successfully
-    * Tasks that have no cross-dependencies are executed concurrently
-    * Tasks and their dependents can be easily cancelled or retried
-    * Tasks that previously finished successfully can be reset and re-run
-* Strong task state reporting so that you know when a task succeeds, fails, or is cancelled
-* Block and selector tasks for creating tasks that execute a block or method
-* External condition tasks for representing prerequisite user interaction or other external
-  conditions that must be fulfilled before work can continue
-* Subworkflow tasks for executing whole workflows as a single step in a workflow
-* Easy-to-extend API for creating your own reusable tasks
-* Works with all of Apple’s platforms
+  - Simple, well-documented API that is at home in both Swift and Objective-C
+  - Flexible system for expressing your app’s workflows in a clear, concise manner
+  - Powerful execution system that allows you to easily manage your workflow’s execution
+      - Tasks are started as soon as all their prerequisites have finished successfully
+      - Tasks that have no cross-dependencies are executed concurrently
+      - Tasks and their dependents can be easily cancelled or retried
+      - Tasks that previously finished successfully can be reset and re-run
+  - Strong task state reporting so that you know when a task succeeds, fails, or is cancelled
+  - Block and selector tasks for creating tasks that execute a block or method
+  - External condition tasks for representing prerequisite user interaction or other external
+    conditions that must be fulfilled before work can continue
+  - Subworkflow tasks for executing whole workflows as a single step in a workflow
+  - Easy-to-extend API for creating your own reusable tasks
+  - Works with all of Apple’s platforms
 
 
 ## What’s New in 1.2
@@ -31,20 +31,6 @@ workflows.
 Task 1.2 updates Task to work better with Swift 3. Objective-C APIs have been annotated with
 nullability specifiers and generics, and the sample project and README have been updated to 
 use Swift instead of Objective-C.
-
-
-## Installation
-
-The easiest way to start using Task is to install it with CocoaPods.
-
-```ruby
-pod 'Task', '~> 1.2'
-```
-
-You can also build it and include the built products in your project. For OS X and iOS 8, just add
-`Task.framework` to your project. For older versions of iOS, add Task’s public headers to your
-header search path and link in `libTask.a`, all of which can be found in the project’s build output
-directory.
 
 
 ## Using Task
